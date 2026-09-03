@@ -24,32 +24,46 @@ Status as of this session: the repo is live, installable, and CI is green.
 - [x] `render.yaml` added so `server/validate.js` deploys as a Render Blueprint
       with all five Lemon Squeezy env vars pre-declared
 
+## Done, this session (in addition to the "Done" list above)
+
+- [x] Community catalog submission completed via platform.claude.com/plugins/submit
+      (your Console session was already authenticated) — status: submitted for
+      review, no ETA given
+- [x] `awesome-claude-skills` PR opened and live:
+      https://github.com/travisvn/awesome-claude-skills/pull/1211
+- [x] `awesome-claude-code` **deliberately skipped** — their own
+      CONTRIBUTING.md forbids PRs entirely ("Do not open a PR... not possible
+      to submit via the gh CLI"), requires 14+ days of history or 100+ stars
+      (this repo has neither yet), and states a paid/signup product is a
+      review blocker. Submit later via their issue form once those clear:
+      https://github.com/hesreallyhim/awesome-claude-code/issues/new?template=recommend-resource.yml
+- [x] Demo GIF recorded (`docs/demo/shipcheck-scan.gif`, via `vhs` against the
+      synthetic `examples/bad-expo-app` fixture — not a real customer's app)
+      and wired into both the README and the landing page's CLI section
+- [x] Render blueprint (`render.yaml`) added for one-click `validate.js` deploy
+
 ## Still needs you — this is the actual blocker on taking money
 
-1. **Lemon Squeezy.** No existing account on this machine, and creating one
-   needs your identity/banking, so this has to be you. Per
+Everything below needs your identity or banking. I did not attempt any of it —
+account creation and entering financial/tax info are hard lines I don't cross
+even on request.
+
+1. **Lemon Squeezy.** No existing account on this machine. Per
    `lemon-squeezy-setup.md`: create the store, the three products (one-time
    $29 / yearly $49 / yearly $149), and license keys.
 2. **Paste the three checkout URLs** into `docs/index.html`
    (`REPLACE_CHECKOUT_SINGLE/YEARLY/AGENCY`) — the only placeholders left in
-   the file.
+   the file (confirmed live on the deployed page).
 3. **Deploy `server/validate.js`.** Render Dashboard → New → Blueprint →
    connect this repo → Apply. It'll prompt for `LEMONSQUEEZY_API_KEY` first;
    the three `VARIANT_*` ids come after you create the products in step 1.
    **Until `VARIANT_SINGLE/UNLIMITED/AGENCY` are set, every valid key resolves
-   to `unlimited` — the $29 single-app tier restricts nothing.** That's
-   deliberate fail-safe behavior, not a bug, but it means step 1 has to
-   actually finish before you charge $29 and expect it to mean one app.
+   to `unlimited` — the $29 single-app tier restricts nothing.** Deliberate
+   fail-safe, not a bug — but step 1 has to finish before $29 means one app.
 4. Point the plugin at your deployed endpoint: change `DEFAULT_ENDPOINT` in
-   `scripts/license.py` to your Render URL and commit it (so users don't need
-   an env var), or tell early users to `export SHIPCHECK_VALIDATE_URL=...`.
-5. Submit to the Anthropic community catalog: **clau.de/plugin-directory-submission**
-   (confirmed URL). Run `claude plugin validate .` first — already passes.
-6. Open the awesome-list PRs per `directory-submissions.md`.
-7. Set F5Bot keywords per `reddit-playbook.md`.
-8. **Record one GIF of `/shipcheck:scan`.** Run it against `examples/bad-expo-app`
-   — 34 findings, 100/100 risk score, demos well. `examples/bare-rn-app` is a
-   second good demo if you want to show RN (not just Expo) support explicitly.
+   `scripts/license.py` to your Render URL and commit it, or tell early users
+   to `export SHIPCHECK_VALIDATE_URL=...`.
+5. Set F5Bot keywords per `reddit-playbook.md`.
 
 ## Launch order
 
