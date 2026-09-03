@@ -25,6 +25,66 @@ import xml.etree.ElementTree as ET
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
 
+
+CORPUS_DIR = os.path.abspath(os.path.join(HERE, "..", "corpus"))
+
+
+def corpus_text(rel):
+    try:
+        with open(os.path.join(CORPUS_DIR, rel), encoding="utf-8") as f:
+            return f.read()
+    except OSError:
+        return ""
+
+
+def target_api_floors():
+    """Read Play's current target-API floors out of the cached policy page.
+
+    Hardcoding "API 35" would be stale the moment Google moves the deadline,
+    which is the whole reason the corpus exists. Returns
+    (new_app_floor, existing_app_floor, deadline) with None for anything the
+    page no longer states in a recognisable form.
+    """
+    txt = corpus_text("google/target-api-level.md")
+    if not txt:
+        return None, None, None
+    new = existing = deadline = None
+    m = re.search(r"New apps and app updates must target Android\s+\d+\s*"
+                  r"\(API level (\d+)\)", txt)
+    if m:
+        new = int(m.group(1))
+    m = re.search(r"Existing apps must target Android\s+\d+\s*\(API level (\d+)\)", txt)
+    if m:
+        existing = int(m.group(1))
+    m = re.search(r"Starting\s+([A-Z][a-z]+ \d{1,2},\s*\d{4})", txt)
+    if m:
+        deadline = m.group(1)
+    return new, existing, deadline
+
+
+PERMISSION_REMEDY = {
+    "android.permission.QUERY_ALL_PACKAGES":
+        "replace with a <queries> element naming the packages or intents you "
+        "actually need. Keep the permission only with an approved declaration — "
+        "broad package visibility is reserved for launchers, antivirus and "
+        "accessibility tools.",
+    "android.permission.ACCESS_BACKGROUND_LOCATION":
+        "reviewed individually, and it needs a demo video of the in-app flow plus "
+        "user-facing consent. Confirm foreground location genuinely is not enough; "
+        "if it is, remove this. Budget several review rounds if you keep it.",
+    "android.permission.MANAGE_EXTERNAL_STORAGE":
+        "use the Storage Access Framework or scoped storage instead unless you are "
+        "a file manager or backup app.",
+    "android.permission.SCHEDULE_EXACT_ALARM":
+        "use setInexactRepeating or WorkManager unless the app is an alarm clock or "
+        "calendar; otherwise you must justify it.",
+    "android.permission.USE_FULL_SCREEN_INTENT":
+        "restricted to calling and alarm apps; anything else should use a normal "
+        "high-priority notification.",
+    "android.permission.REQUEST_INSTALL_PACKAGES":
+        "only for app stores and file managers; remove it if a library pulled it in.",
+}
+
 SEV = {"critical": 4, "high": 3, "medium": 2, "low": 1, "info": 0}
 
 
@@ -724,7 +784,11 @@ class Scan:
                      fix="For each one, either remove the permission or complete the "
                          "matching declaration form in Play Console > App content. "
                          "A release with an undeclared sensitive permission is "
-                         "rejected. Most affected here: %s." % needs_form[0],
+                         "rejected.\n\n%s"
+                         % "\n".join("- **%s** — %s" % (p.split(".")[-1],
+                                      PERMISSION_REMEDY.get(p, "declare the use case "
+                                      "in Play Console > App content, or remove it."))
+                                      for p in needs_form),
                      platform="android",
                      corpus="google/permissions-policy.md")
         if needs_disc:
@@ -748,17 +812,40 @@ class Scan:
         if m:
             tgt = int(m.group(1))
         self.facts["target_sdk"] = tgt
-        if tgt is not None and tgt < 35:
-            self.add("TARGET-SDK", "high",
-                     "targetSdkVersion is %d" % tgt,
+
+        new_floor, existing_floor, deadline = target_api_floors()
+        self.facts["play_target_api"] = dict(new_apps=new_floor,
+                                             existing_apps=existing_floor,
+                                             deadline=deadline)
+        floor = new_floor or existing_floor
+        if tgt is not None and floor and tgt < floor:
+            below_existing = existing_floor and tgt < existing_floor
+            self.add("TARGET-SDK",
+                     "critical" if below_existing else "high",
+                     "targetSdkVersion is %d, below Play's floor of API %d"
+                     % (tgt, floor),
                      clause="play:target-api-level",
-                     evidence="android/build.gradle targetSdkVersion = %d" % tgt,
-                     fix="Raise targetSdkVersion. Play blocks new apps and updates "
-                         "below its rolling target-API requirement; check "
-                         "corpus/google/target-api-level.md for the current floor "
-                         "and deadline.",
+                     evidence="android/build.gradle sets targetSdkVersion = %d. "
+                              "Play requires API %s for new apps and updates%s, and "
+                              "API %s for an existing app to stay available to users "
+                              "on newer Android versions."
+                              % (tgt, new_floor,
+                                 " (from %s)" % deadline if deadline else "",
+                                 existing_floor),
+                     fix="Set `targetSdkVersion = %d` in android/build.gradle (or "
+                         "`expo.android.targetSdkVersion` / the expo-build-properties "
+                         "plugin) and re-test. %s"
+                         % (new_floor or floor,
+                            "Below API %d the Play Console rejects the upload "
+                            "outright." % existing_floor if below_existing else
+                            "Updates are blocked until you raise it."),
                      platform="android",
                      corpus="google/target-api-level.md")
+        elif tgt is not None and not floor:
+            self.gap("Play target API floor",
+                     "Could not parse the current target-API requirement out of "
+                     "corpus/google/target-api-level.md — Google may have reworded "
+                     "the page. Run /shipcheck:refresh and check that section.")
 
     # ------------------------------------------------------------- shared
     def grep_source(self, pattern, exts=(".ts", ".tsx", ".js", ".jsx")):
