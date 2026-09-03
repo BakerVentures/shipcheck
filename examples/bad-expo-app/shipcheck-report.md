@@ -1,6 +1,6 @@
 # ShipCheck report
 
-**Bad App** · v1.0.0 · generated 2026-09-03 14:13
+**Bad App** · v1.0.0 · generated 2026-09-03 14:17
 
 ## Rejection risk: 100 / 100
 

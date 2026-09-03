@@ -1,11 +1,9 @@
 ---
-name: license
-description: Check ShipCheck license status (alias of /shipcheck:unlock).
+name: unlock
+description: Add your ShipCheck license key to unlock the full report.
 ---
 
-Manage the ShipCheck license. Identical to `/shipcheck:unlock` — both names
-exist because purchase receipts tell buyers to run `unlock`, while `license`
-is the name people reach for when checking status.
+Manage the ShipCheck license.
 
 If `$ARGUMENTS` contains a key, write it to `~/.shipcheck/license` (create the
 directory, `chmod 600` the file), clear any cached validation in

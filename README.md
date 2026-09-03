@@ -7,16 +7,39 @@ your store-listing metadata and produces a ranked rejection-risk report — each
 finding carrying the exact guideline clause, the text of that clause, what the
 reviewer will likely say, and the specific fix.
 
+```
+$ /shipcheck:scan
+
+shipcheck · guidelines fetched 2026-09-03 · risk 71/100
+
+HIGH  5.1.1(v)    Account deletion not found
+      Reviewer will say: "Your app supports account creation but does not
+      include an option to initiate account deletion."
+      Fix: add a Delete account action under Settings → Account.
+
+HIGH  ITMS-91053  Privacy manifest does not declare FileTimestamp
+      Used by expo-file-system. Upload is rejected before review.
+      Fix: add an NSPrivacyAccessedAPITypes entry with reason C617.1.
+
+MED   3.1.2       Paywall shows price but not renewal period
+      Fix: "$39.99 / year, renews automatically. Cancel anytime in Settings."
+
+PASS  4.8 Sign in with Apple present · 2.1 no placeholder text ·
+      1024px icon has no alpha · export compliance key set
+```
+
 Apple rejects a large share of submissions, and each rejection costs a review
-cycle. Most of those rejections are things a script and a current copy of the
-rules can see from the outside.
+cycle. Most rejections of React Native and Expo apps are configuration problems
+you cannot see from JavaScript: a permission string pulled in by a transitive
+Expo module, an SDK without a privacy manifest, a paywall that shows the price
+but not the renewal period.
 
 ---
 
 ## Install
 
 ```
-/plugin marketplace add rbaker/shipcheck
+/plugin marketplace add BakerVentures/shipcheck
 /plugin install shipcheck@shipcheck
 ```
 
@@ -42,7 +65,7 @@ dependencies, no build step.
 | `/shipcheck:android` | Google Play only: Data safety, permissions, target API, testing gate |
 | `/shipcheck:refresh` | Re-fetch Apple/Google policy and print a changelog of what changed |
 | `/shipcheck:reply` | Draft a Resolution Center reply to a rejection you received |
-| `/shipcheck:license` | Store or check your license key |
+| `/shipcheck:unlock` | Add your license key (`/shipcheck:license` is the same command) |
 
 ## What it checks
 
@@ -124,7 +147,7 @@ runs forever on that app. Ship more than one app and the yearly plan is cheaper
 by the second app.
 
 ```
-/shipcheck:license YOUR-KEY-HERE
+/shipcheck:unlock YOUR-KEY-HERE
 ```
 
 Stored at `~/.shipcheck/license`, cached for 7 days.
@@ -141,6 +164,8 @@ scripts/            fetch_corpus.py, scan.py, report.py, license.py
 corpus/             cached policy, chunked, + manifest.json
 corpus/patterns/    hand-curated RN/Expo rejection patterns
 server/validate.js  license endpoint (deploy yourself)
+docs/               landing page, served by GitHub Pages from /docs
+marketing/          launch playbooks: Show HN, Reddit, PH, directories, LS setup
 examples/           a deliberately non-compliant Expo app, for testing
 ```
 

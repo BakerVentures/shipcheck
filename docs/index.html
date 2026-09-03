@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shipcheck — catch App Store rejections before you submit</title>
+<meta name="description" content="A Claude Code plugin that scans your React Native / Expo project and store listing against the live App Store Review Guidelines and Google Play policies, then tells you exactly what Apple will reject and how to fix it.">
+<meta property="og:title" content="shipcheck — catch App Store rejections before you submit">
+<meta property="og:description" content="Scan your Expo/React Native app against the live App Store guidelines. Free scan on every app.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none}
+header nav a:hover{color:var(--ink)}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.1;letter-spacing:-.02em;font-weight:600;margin:44px 0 16px;max-width:640px}
+.lede{font-size:19px;color:var(--muted);max-width:600px;margin:0 0 28px}
+.term{background:var(--code);color:var(--codeink);border-radius:8px;padding:20px 22px;font:14px/1.6 "IBM Plex Mono",ui-monospace,monospace;overflow:auto;margin:0 0 20px;box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.term .p{color:#8FA3B5}
+.term .r{color:#FF6B7A}.term .a{color:#F2C14E}.term .g{color:#6FCF97}.term .d{color:#8FA3B5}
+.term b{font-weight:500;color:#fff}
+.install{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 56px}
+.install code{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font:14px "IBM Plex Mono",monospace}
+.install button{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:11px 16px;font:500 14px "IBM Plex Sans",sans-serif;cursor:pointer}
+.install button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.install small{color:var(--muted);width:100%}
+h2{font-size:22px;letter-spacing:-.01em;font-weight:600;margin:0 0 12px}
+section{margin:0 0 52px}
+section p{max-width:620px;margin:0 0 12px}
+.checks{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.checks li{display:grid;grid-template-columns:78px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.checks .c{font:500 13px "IBM Plex Mono",monospace;color:var(--muted);padding-top:2px}
+.pricing{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.plan{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px}
+.plan .price{font-size:30px;font-weight:600;letter-spacing:-.02em;margin:4px 0}
+.plan .per{color:var(--muted);font-size:14px}
+.plan p{margin:10px 0 16px;color:var(--muted);font-size:15px}
+.plan a{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;border-radius:6px;padding:10px 14px;font-weight:500;font-size:14px}
+.plan.free{border-style:dashed;background:transparent}
+.plan.free a{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.faq dt{font-weight:600;margin-top:16px}
+.faq dd{margin:4px 0 0;color:var(--muted);max-width:620px}
+footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px solid var(--line)}
+@media (max-width:560px){.pricing{grid-template-columns:1fr}.checks li{grid-template-columns:1fr;gap:2px}}
+@media (prefers-reduced-motion:no-preference){.term{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="brand">shipcheck</span>
+  <nav><a href="#checks">What it checks</a><a href="#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<h1>Find out what Apple will reject before Apple does.</h1>
+<p class="lede">shipcheck is a Claude Code plugin for React Native and Expo apps. It reads your project and store listing, checks them against the live App Store Review Guidelines and Google Play policies, and tells you the clause, the reviewer's likely wording, and the fix.</p>
+
+<pre class="term" aria-label="Example scan output"><span class="p">$</span> /shipcheck:scan
+
+<b>shipcheck</b> · guidelines fetched 2026-09-03 · risk <b>71/100</b>
+
+<span class="r">HIGH</span>  5.1.1(v)  Account deletion not found
+       Reviewer will say: "Your app supports account creation but does not
+       include an option to initiate account deletion."
+       Fix: add a Delete account action under Settings → Account that calls
+       DELETE /v1/users/me, then confirm in review notes.
+
+<span class="r">HIGH</span>  ITMS-91053  Privacy manifest does not declare FileTimestamp
+       Used by expo-file-system. Upload is rejected before review.
+       Fix: add an NSPrivacyAccessedAPITypes entry with reason C617.1.
+
+<span class="a">MED </span>  3.1.2  Paywall shows price but not renewal period
+       Fix: "$39.99 / year, renews automatically. Cancel anytime in Settings."
+
+<span class="g">PASS</span>  4.8 Sign in with Apple present · 2.1 no placeholder text ·
+       1024px icon has no alpha · export compliance key set
+
+<span class="d">6 more findings in the full report. Run /shipcheck:unlock to add a license.</span></pre>
+
+<div class="install">
+  <code id="cmd">/plugin marketplace add BakerVentures/shipcheck</code>
+  <button onclick="navigator.clipboard.writeText(document.getElementById('cmd').textContent);this.textContent='Copied'">Copy install command</button>
+  <small>Runs inside your own Claude Code. Your code never leaves your machine.</small>
+</div>
+
+<section id="checks">
+<h2>What it checks</h2>
+<p>The guideline corpus is fetched live and cached with a date and hash, so you're never checking against last year's rules. <code>/shipcheck:refresh</code> shows you what Apple changed since your last scan.</p>
+<ul class="checks">
+  <li><span class="c">Privacy</span><span>Required-reason API declarations for your app and every SDK in node_modules, NSUsageDescription strings pulled in by Expo modules, ATT prompt timing, App Privacy label consistency.</span></li>
+  <li><span class="c">Subscriptions</span><span>Price, period, and renewal disclosure on the paywall, restore purchases, intro-offer terms, and guideline 3.1.2 wording.</span></li>
+  <li><span class="c">Accounts</span><span>Sign in with Apple when third-party login exists, account deletion when accounts exist, demo credentials in review notes.</span></li>
+  <li><span class="c">Metadata</span><span>Placeholder text, dead URLs, screenshots that show features not in the build, references to other platforms or pricing, age rating mismatches.</span></li>
+  <li><span class="c">Build</span><span>Icon dimensions and alpha, export compliance flag, dev-menu and Expo Go artifacts in production, minimum-functionality signals for guideline 4.2.</span></li>
+  <li><span class="c">Android</span><span>Manifest permissions versus Data safety declarations, target API level, privacy policy link, closed-testing requirement, prominent-disclosure for runtime permissions.</span></li>
+</ul>
+</section>
+
+<section>
+<h2>Already rejected?</h2>
+<p>Paste the Resolution Center message into <code>/shipcheck:reply</code>. It reads the cited guideline, checks what you've changed, and drafts the reply in the register reviewers actually respond to.</p>
+</section>
+
+<section id="pricing">
+<h2>Pricing</h2>
+<div class="pricing">
+  <div class="plan free">
+    <div class="price">Free</div>
+    <div class="per">scan, every app</div>
+    <p>Risk score plus your top three findings with fixes.</p>
+    <a href="#cmd">Install</a>
+  </div>
+  <div class="plan">
+    <div class="price">$29</div>
+    <div class="per">one app, forever</div>
+    <p>Full report, unlimited rescans, Resolution Center reply drafts.</p>
+    <a href="REPLACE_CHECKOUT_SINGLE">Buy for one app</a>
+  </div>
+  <div class="plan">
+    <div class="price">$49</div>
+    <div class="per">per year, unlimited apps</div>
+    <p>Everything above across every project you ship.</p>
+    <a href="REPLACE_CHECKOUT_YEARLY">Buy unlimited</a>
+  </div>
+  <div class="plan">
+    <div class="price">$149</div>
+    <div class="per">per year, agencies</div>
+    <p>Unlimited apps, five team seats, priority guideline updates.</p>
+    <a href="REPLACE_CHECKOUT_AGENCY">Buy for a team</a>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Questions</h2>
+<dl class="faq">
+  <dt>Does my code get uploaded anywhere?</dt><dd>No. The scan runs in your own Claude Code session. The only network calls are fetching Apple and Google's public policy pages and, if you buy a license, a key check that sends the key and plugin version and nothing else.</dd>
+  <dt>Does it guarantee approval?</dt><dd>No. It catches the rejections that come from the guidelines and from common React Native and Expo configuration mistakes. It can't run your app or predict a reviewer's mood.</dd>
+  <dt>Why React Native and Expo specifically?</dt><dd>Because that's where the config-level rejections cluster: transitive permission strings, SDK privacy manifests, Expo Go leftovers. Native Swift projects work too, with less depth.</dd>
+  <dt>Refunds?</dt><dd>Fourteen days, no questions. Email the address on your receipt.</dd>
+</dl>
+</section>
+
+<footer>Built by an indie developer who got rejected enough times to automate it. <a href="https://github.com/BakerVentures/shipcheck">Source and issues on GitHub</a>.</footer>
+</div>
+</body>
+</html>

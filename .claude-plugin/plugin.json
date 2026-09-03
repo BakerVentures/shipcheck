@@ -4,10 +4,21 @@
   "displayName": "ShipCheck",
   "version": "0.1.0",
   "description": "App Store / Google Play rejection-risk checker for React Native and Expo apps. Scans your project and store metadata, cites the exact guideline clause, and gives you the fix.",
-  "author": { "name": "Ryan Baker" },
-  "homepage": "https://github.com/rbaker/shipcheck",
-  "repository": "https://github.com/rbaker/shipcheck",
+  "author": {
+    "name": "Ryan Baker"
+  },
+  "homepage": "https://bakerventures.github.io/shipcheck/",
+  "repository": "https://github.com/BakerVentures/shipcheck",
   "license": "LicenseRef-Proprietary",
-  "keywords": ["app-store", "google-play", "react-native", "expo", "app-review", "compliance", "ios", "android"],
+  "keywords": [
+    "app-store",
+    "google-play",
+    "react-native",
+    "expo",
+    "app-review",
+    "compliance",
+    "ios",
+    "android"
+  ],
   "defaultEnabled": true
 }
