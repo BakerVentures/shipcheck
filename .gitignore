@@ -6,3 +6,6 @@ node_modules/
 *.pyc
 __pycache__/
 server/node_modules/
+
+# but do ship the example report as sample output
+!examples/bad-expo-app/shipcheck-report.md
