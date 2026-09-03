@@ -1,12 +1,12 @@
 # ShipCheck report
 
-**Bad App** · v1.0.0 · generated 2026-09-03 14:08
+**Bad App** · v1.0.0 · generated 2026-09-03 14:13
 
 ## Rejection risk: 100 / 100
 
 **Very likely to be rejected**
 
-`[████████████████████]` 15 critical · 6 high · 6 medium · 1 low
+`[████████████████████]` 15 critical · 7 high · 6 medium · 1 low
 
 > Checked against policy text fetched 2026-09-03 from 37 official Apple and Google sources. Run `/shipcheck:refresh` to re-fetch and see what changed.
 
@@ -305,7 +305,7 @@ The build will be rejected at review, and on device the permission prompt crashe
 
 ### 11. 🔴 CRITICAL No PrivacyInfo.xcprivacy in the app target
 
-**Guideline apple:required-reason-api** · confidence: high · iOS · deterministic
+**Guideline apple:required-reason-api** · confidence: high · iOS · **ITMS-91053** · deterministic
 
 > # Describing use of required reason API
 > 
@@ -636,7 +636,30 @@ IAP via react-native-purchases but no restorePurchases/restoreTransactions/syncP
 Add a visible "Restore Purchases" control that calls `Purchases.restorePurchases()` (RevenueCat) or the equivalent. Apps selling non-consumables or subscriptions must let a returning user restore entitlements.
 
 
-### 22. 🟡 MEDIUM eas.json production profile uses internal distribution
+### 22. 🟠 HIGH 7 SDK(s) on Apple's list must ship a privacy manifest and signature
+
+**Guideline apple:third-party-sdk-requirements** · confidence: medium · iOS · **ITMS-91061** · deterministic
+
+> # Third-party SDK requirements
+> 
+> Third-party software development kits (SDKs) can provide great functionality for apps; they can also have the potential to impact user privacy in ways that aren’t obvious to developers and users. As a reminder, when you use a third-party SDK with your app, you are responsible for all the code the SDK includes in your app, and need to be aware of its data collection and use practices. At [WWDC23](/videos/play/wwdc2023/10060/), we introduced new privacy manifests and signatures for SDKs to help bring more awareness for how third-party SDKs use data. This functionality is a step forward for all apps, and we encourage all SDKs to adopt it to better support the apps that depend on them.
+> 
+> #### Privacy Manifests
+> 
+> [Privacy manifest files](/documentation/bundleresources/privacy_manifest_files/describing_data_use_in_privacy_manifests) outline the privacy practices […]
+> 
+> — [apple:third-party-sdk-requirements](https://developer.apple.com/support/third-party-SDK-requirements/)
+
+**What ShipCheck found**
+
+Pulled in by @react-native-google-signin/google-signin, react-native-fbsdk-next: AppAuth, FBAEMKit, FBSDKCoreKit, FBSDKLoginKit, FBSDKShareKit, GTMAppAuth, GoogleSignIn. 0 SDK-shipped manifests were found under node_modules.
+
+**Fix**
+
+Upgrade each to a version that ships its own PrivacyInfo.xcprivacy and signature. Patching the pod by hand does not satisfy the signature requirement. This is the most common cause of the ITMS-91061 upload rejection in Expo projects. Cross-check the current list in corpus/apple/third-party-sdk-requirements.md.
+
+
+### 23. 🟡 MEDIUM eas.json production profile uses internal distribution
 
 confidence: high · iOS · deterministic
 
@@ -649,7 +672,7 @@ build.production.distribution = internal
 Set `"distribution": "store"` for the profile you submit to the App Store.
 
 
-### 23. 🟡 MEDIUM ITSAppUsesNonExemptEncryption is not declared
+### 24. 🟡 MEDIUM ITSAppUsesNonExemptEncryption is not declared
 
 **Guideline ASC:export-compliance** · confidence: high · iOS · deterministic
 
@@ -680,7 +703,7 @@ Key absent from Info.plist / expo.ios.infoPlist
 Add "ITSAppUsesNonExemptEncryption": false to expo.ios.infoPlist if you only use standard HTTPS. Without it every single upload stops and asks you the export compliance question before it can be submitted.
 
 
-### 24. 🟡 MEDIUM 6 runtime permission(s) need prominent in-app disclosure
+### 25. 🟡 MEDIUM 6 runtime permission(s) need prominent in-app disclosure
 
 **Guideline play:user-data-policy** · confidence: medium · Android · deterministic
 
@@ -709,7 +732,7 @@ Requested via android/app/src/main/AndroidManifest.xml: android.permission.ACCES
 Before each runtime permission dialog, show an in-app screen that names the data, says what it is used for, and is not buried in a privacy policy or ToS. Then declare the same data in the Data safety form.
 
 
-### 25. 🟡 MEDIUM expo-dev-client is a production dependency
+### 26. 🟡 MEDIUM expo-dev-client is a production dependency
 
 **Guideline 2.2** · confidence: medium · iOS · deterministic
 
@@ -728,7 +751,7 @@ expo-dev-client present in package.json dependencies
 Move it to devDependencies. If it is bundled into the release binary the Expo dev menu can surface in the shipped app, which reads as a beta build to review.
 
 
-### 26. 🟡 MEDIUM NSLocationWhenInUseUsageDescription uses a generic purpose string
+### 27. 🟡 MEDIUM NSLocationWhenInUseUsageDescription uses a generic purpose string
 
 **Guideline 5.1.1** · confidence: medium · iOS · deterministic
 
@@ -753,7 +776,7 @@ NSLocationWhenInUseUsageDescription = "We need your location."
 Rewrite it to name the specific feature and benefit, e.g. "Used to attach a photo to your progress log." Reviewers reject boilerplate and Expo's plugin default strings.
 
 
-### 27. 🟡 MEDIUM NSPhotoLibraryUsageDescription uses a generic purpose string
+### 28. 🟡 MEDIUM NSPhotoLibraryUsageDescription uses a generic purpose string
 
 **Guideline 5.1.1** · confidence: medium · iOS · deterministic
 
@@ -778,7 +801,7 @@ NSPhotoLibraryUsageDescription = "Allow $(PRODUCT_NAME) to access your photos"
 Rewrite it to name the specific feature and benefit, e.g. "Used to attach a photo to your progress log." Reviewers reject boilerplate and Expo's plugin default strings.
 
 
-### 28. ⚪ LOW Keywords contain spaces after commas
+### 29. ⚪ LOW Keywords contain spaces after commas
 
 **Guideline 2.3.7** · confidence: high · iOS · deterministic
 
@@ -807,4 +830,4 @@ ShipCheck could not verify these. They are not passes:
 
 ---
 
-<sub>ShipCheck v0.1.0 · pro tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>
+<sub>ShipCheck v0.1.0 · unlimited tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>

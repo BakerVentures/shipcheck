@@ -3,6 +3,18 @@ name: reply
 description: Draft a Resolution Center reply to an App Store or Play rejection, addressing the cited guideline.
 ---
 
+**This command requires a paid licence.** Check first:
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/license.py" --require-pro \
+  --app-id "<bundle id from app.json, if you have it>"
+```
+
+If that exits non-zero, tell the user the reply drafter is a paid feature, show
+them the one-line unlock (`/shipcheck:license <key>`, $29 one-time for this app
+or $49/year for unlimited apps), and stop. Do not draft the reply anyway. Say it
+once, plainly, without a sales pitch.
+
 The user will paste the rejection message from App Store Connect Resolution
 Center (or the Play Console policy notice). It may be in `$ARGUMENTS`; if not,
 ask for it and wait.

@@ -58,11 +58,12 @@ class Scan:
             return None
 
     def add(self, fid, severity, title, clause=None, evidence=None, fix=None,
-            confidence="high", platform="ios", corpus=None):
+            confidence="high", platform="ios", corpus=None, itms=None):
         self.findings.append(dict(
             id=fid, severity=severity, title=title, clause=clause,
             evidence=evidence, fix=fix, confidence=confidence,
-            platform=platform, corpus=corpus, source="deterministic"))
+            platform=platform, corpus=corpus, itms=itms,
+            source="deterministic"))
 
     def gap(self, what, why):
         self.gaps.append(dict(what=what, why=why))
@@ -300,7 +301,8 @@ class Scan:
                          "NSPrivacyAccessedAPITypes for: %s. Since 1 May 2024 App Store "
                          "Connect rejects uploads that use these APIs without it."
                          % ", ".join(sorted(needed)),
-                     corpus="apple/required-reason-api.md")
+                     corpus="apple/required-reason-api.md",
+                     itms="ITMS-91053")
             return
         got = self.read_manifest_categories(app_manifest)
         if got is None:
@@ -321,15 +323,43 @@ class Scan:
                 fix="Add an NSPrivacyAccessedAPITypes entry with "
                     "NSPrivacyAccessedAPIType = %s and an approved reason code "
                     "from corpus/apple/required-reason-codes.md." % cat,
-                corpus="apple/required-reason-codes.md")
+                corpus="apple/required-reason-codes.md",
+                itms="ITMS-91053")
 
-        # SDKs on Apple's list that ship no manifest of their own
+
+    def check_listed_sdks(self, deps, sdk_manifests):
+        """SDKs on Apple's published list must ship a manifest and a signature.
+
+        Kept separate from check_required_reason because that one returns early
+        when the app has no manifest at all -- which is exactly the project most
+        likely to also have this problem.
+        """
         listed = set()
         for pkg in deps:
             entry = self.map["packages"].get(pkg) or {}
             for name in entry.get("apple_listed_sdk") or []:
                 listed.add((name, pkg))
         self.facts["apple_listed_sdks"] = sorted(n for n, _ in listed)
+        if not listed:
+            return
+        pkgs = sorted({p for _, p in listed})
+        names = sorted({n for n, _ in listed})
+        self.add("SDK-MANIFEST-REQUIRED", "high",
+                 "%d SDK(s) on Apple's list must ship a privacy manifest and "
+                 "signature" % len(names),
+                 clause="apple:third-party-sdk-requirements",
+                 evidence="Pulled in by %s: %s. %d SDK-shipped manifests were found "
+                          "under node_modules."
+                          % (", ".join(pkgs), ", ".join(names), len(sdk_manifests)),
+                 fix="Upgrade each to a version that ships its own "
+                     "PrivacyInfo.xcprivacy and signature. Patching the pod by hand "
+                     "does not satisfy the signature requirement. This is the most "
+                     "common cause of the ITMS-91061 upload rejection in Expo "
+                     "projects. Cross-check the current list in "
+                     "corpus/apple/third-party-sdk-requirements.md.",
+                 confidence="medium",
+                 corpus="apple/third-party-sdk-requirements.md",
+                 itms="ITMS-91061")
 
     def check_signin_with_apple(self, deps, cfg, plist):
         third_party, satisfied = [], []
@@ -716,6 +746,7 @@ class Scan:
             self.check_icon(cfg)
             self.check_usage_descriptions(deps, plist)
             self.check_required_reason(deps, app_manifest, sdk_manifests)
+            self.check_listed_sdks(deps, sdk_manifests)
             self.check_signin_with_apple(deps, cfg, plist)
             self.check_iap(deps, cfg)
             self.check_account_deletion(deps)

@@ -160,6 +160,8 @@ def render(data, tier_info, corpus_manifest=None, corpus_dir=None):
         meta.append("confidence: %s" % f.get("confidence", "high"))
         meta.append("%s" % ("iOS" if f.get("platform") == "ios" else
                             "Android" if f.get("platform") == "android" else "both"))
+        if f.get("itms"):
+            meta.append("**%s**" % f["itms"])
         if f.get("source"):
             meta.append(f["source"])
         L.append(" · ".join(meta))
@@ -204,6 +206,9 @@ def render(data, tier_info, corpus_manifest=None, corpus_dir=None):
                  "say, and the file-level fix for each — are in the full report."
                  % (hidden, "s" if hidden != 1 else "", summary))
         L.append("")
+        L.append("**$29 one-time for this app**, unlimited scans of it forever — or "
+                 "**$49/year for unlimited apps** if you ship more than one.")
+        L.append("")
         L.append("Unlock: <https://shipcheck.dev> — then run "
                  "`/shipcheck:license <your-key>` and re-scan.")
         L.append("")
@@ -236,11 +241,14 @@ def render(data, tier_info, corpus_manifest=None, corpus_dir=None):
     L.append("---")
     L.append("")
     tier = tier_info.get("tier", "free")
+    note = ""
+    if tier_info.get("degraded"):
+        note = " (licence server unreachable, treated as paid)"
+    elif tier == "single":
+        note = " (licensed to this app)"
     L.append("<sub>ShipCheck v%s · %s tier%s · findings are advisory: App Review "
              "outcomes are decided by Apple and Google, not by this tool.</sub>"
-             % (lic.VERSION, tier,
-                " (license check degraded, treated as paid)" if tier_info.get("degraded")
-                else ""))
+             % (lic.VERSION, tier, note))
     return "\n".join(L)
 
 
@@ -255,13 +263,17 @@ def main():
     with open(args.findings, encoding="utf-8") as f:
         data = json.load(f)
 
+    facts = data.get("facts") or {}
+    app_id = facts.get("bundle_id") or facts.get("android_package") or ""
+
     if args.force_tier == "free":
         tier = dict(tier="free", valid=False, limit=lic.FREE_FINDING_LIMIT,
                     reason="forced")
     elif args.force_tier == "pro":
-        tier = dict(tier="pro", valid=True, limit=None, reason="forced")
+        tier = dict(tier="unlimited", valid=True, limit=None, reason="forced")
     else:
-        tier = lic.check()
+        # per-app binding: a $29 single-app licence is pinned to this bundle id
+        tier = lic.check(app_id=app_id or None)
 
     cm = None
     mpath = os.path.join(args.corpus, "manifest.json")

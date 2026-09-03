@@ -49,6 +49,8 @@ dependencies, no build step.
 **iOS** — privacy manifest and required-reason API declarations (app and SDK);
 `NSUsageDescription` strings for permissions pulled in transitively by Expo
 modules, including Expo's generic default strings that reviewers reject;
+the Apple-listed SDKs that must ship their own manifest and signature
+(**ITMS-91061**) and undeclared required-reason APIs (**ITMS-91053**);
 Sign in with Apple when third-party login is present (4.8); subscription terms
 and paywall disclosure (3.1.2); restore purchases (3.1.1); in-app account
 deletion (5.1.1(v)); demo account behind a login wall (2.1); placeholder text
@@ -91,20 +93,35 @@ server that sees your project. The only outbound requests ShipCheck makes are:
 1. Fetching public Apple/Google policy pages (`/shipcheck:refresh`).
 2. Reachability checks on the URLs *you* put in `shipcheck.metadata.md`
    (skip with `--offline`).
-3. A license check containing **only your license key and the plugin version**.
+3. A license check containing **only your license key, the plugin version, and
+   an opaque per-app token**.
+
+That token is `sha256(license_key + ":" + bundle_id)`. It exists so a one-app
+licence can bind to one app — and because it is a hash, the server cannot work
+out which app it is without already knowing your bundle id.
 
 That third one is verifiable rather than promised: read `scripts/license.py`.
-The function `_payload()` is the entire request body — a key and a version
-string. No project path, no dependency list, no metadata, no findings.
+The function `_payload()` is the entire request body. No project path, no
+dependency list, no source, no metadata, no findings.
 
 If the license endpoint is unreachable, ShipCheck fails **open** and treats you
 as licensed. An outage on our side never blocks your release.
 
-## Free vs paid
+## Pricing
 
-The free scan gives you the risk score and the three findings most likely to get
-your build rejected. The full report — every finding, with clause text, reviewer
-language, and file-level fixes — and `/shipcheck:reply` need a license key.
+| | Free | $29 one-time | $49 / year | $149 / year |
+|---|---|---|---|---|
+| | | **one app** | **unlimited apps** | **agency** |
+| Risk score | ✅ | ✅ | ✅ | ✅ |
+| Top 3 findings | ✅ | ✅ | ✅ | ✅ |
+| Every finding, with clause text + fixes | | ✅ | ✅ | ✅ |
+| `/shipcheck:reply` rejection drafter | | ✅ | ✅ | ✅ |
+| Unlimited re-scans | | ✅ *(that app)* | ✅ | ✅ |
+| Team seats | | | | ✅ |
+
+The $29 tier binds to one bundle identifier the first time you scan, and then
+runs forever on that app. Ship more than one app and the yearly plan is cheaper
+by the second app.
 
 ```
 /shipcheck:license YOUR-KEY-HERE
