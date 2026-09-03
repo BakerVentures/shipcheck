@@ -316,20 +316,39 @@ class Scan:
         self.facts["required_usage_descriptions"] = {
             k: v for k, v in sorted(needed.items())}
 
+        call_sites = self.map.get("usage_description_call_sites", {})
         for key, pkgs in sorted(needed.items()):
             val = plist.get(key)
             if val in (None, ""):
-                self.add("PLIST-MISSING-%s" % key, "critical",
-                         "Missing %s" % key,
-                         clause="5.1.1",
-                         evidence="Required by: %s. Not present in %s"
-                                  % (", ".join(pkgs),
-                                     " / ".join(self.facts.get("info_plist_sources")
-                                                or ["app config"]) or "app config"),
-                         fix='Add to app.json under expo.ios.infoPlist:\n'
-                             '  "%s": "<specific reason this app needs it>"\n'
-                             "The build will be rejected at review, and on device the "
-                             "permission prompt crashes without this key." % key)
+                pattern = call_sites.get(key)
+                used_in = self.grep_source(pattern) if pattern else None
+                if used_in:
+                    self.add("PLIST-MISSING-%s" % key, "critical",
+                             "Missing %s" % key,
+                             clause="5.1.1",
+                             evidence="%s calls this API (%s) and %s is not set in %s"
+                                      % (used_in, ", ".join(pkgs), key,
+                                         " / ".join(self.facts.get("info_plist_sources")
+                                                    or ["app config"])),
+                             fix='Add to app.json under expo.ios.infoPlist:\n'
+                                 '  "%s": "<specific reason this app needs it>"\n'
+                                 "Without the key iOS terminates the app the moment the "
+                                 "permission is requested, which reviewers hit "
+                                 "immediately and reject under 2.1." % key)
+                else:
+                    self.add("PLIST-UNUSED-%s" % key, "low",
+                             "%s pulls in %s but nothing calls it"
+                             % (", ".join(pkgs), key.replace("UsageDescription", "")),
+                             clause="5.1.1",
+                             evidence="No call site found for %s, and %s is not set. "
+                                      "The dependency looks unused."
+                                      % (", ".join(pkgs), key),
+                             fix="Either remove the unused dependency, or add %s "
+                                 "before you ship the feature. Do not add the key "
+                                 "speculatively — shipping a permission you never use "
+                                 "widens your privacy surface and invites questions at "
+                                 "review." % key,
+                             confidence="medium")
                 continue
             if val in defaults or any(r.search(str(val)) for r in weak_res):
                 self.add("PLIST-WEAK-%s" % key, "medium",

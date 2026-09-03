@@ -498,5 +498,20 @@
       "android.permission.READ_MEDIA_IMAGES",
       "android.permission.READ_MEDIA_VIDEO"
     ]
+  },
+  "usage_description_call_sites": {
+    "_comment": "Regexes that show the app actually calls the API a usage-description key protects. A missing key with a call site is a runtime crash and a 2.1 rejection. A missing key with no call site is an unused dependency, which is a cleanup note, not a blocker. Severity is set from this.",
+    "NSCameraUsageDescription": "launchCameraAsync|requestCameraPermissions|useCameraPermissions|CameraView|<Camera\\b|getCameraPermissions",
+    "NSMicrophoneUsageDescription": "Audio\\.Recording|requestMicrophonePermissions|useMicrophonePermissions|startRecording|AudioModule|expo-audio",
+    "NSPhotoLibraryUsageDescription": "launchImageLibraryAsync|requestMediaLibraryPermissions|MediaLibrary\\.|getAssetsAsync",
+    "NSPhotoLibraryAddUsageDescription": "saveToLibraryAsync|createAssetAsync|MediaLibrary\\.save",
+    "NSLocationWhenInUseUsageDescription": "getCurrentPositionAsync|requestForegroundPermissionsAsync|watchPositionAsync|useForegroundPermissions",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "requestBackgroundPermissionsAsync|startLocationUpdatesAsync",
+    "NSContactsUsageDescription": "Contacts\\.|getContactsAsync|requestContactsPermission",
+    "NSCalendarsUsageDescription": "Calendar\\.|getCalendarsAsync|createEventAsync",
+    "NSRemindersUsageDescription": "getRemindersAsync|Reminder",
+    "NSFaceIDUsageDescription": "authenticateAsync|LocalAuthentication",
+    "NSUserTrackingUsageDescription": "requestTrackingPermissionsAsync|getTrackingPermissionsAsync|AppTrackingTransparency|setAdvertiserTrackingEnabled",
+    "NSSpeechRecognitionUsageDescription": "SpeechRecognition|startSpeechRecognition"
   }
 }
