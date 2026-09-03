@@ -2,6 +2,8 @@
 
 **Find out why Apple will reject your app before Apple tells you.**
 
+![ShipCheck scan demo](docs/demo/shipcheck-scan.gif)
+
 ShipCheck is a Claude Code plugin that scans a React Native or Expo project plus
 your store-listing metadata and produces a ranked rejection-risk report — each
 finding carrying the exact guideline clause, the text of that clause, what the
