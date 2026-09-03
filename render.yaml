@@ -1,0 +1,39 @@
+# Render Blueprint for the ShipCheck license validation endpoint.
+#
+# Deploy: Render Dashboard -> New -> Blueprint -> connect this repo -> Apply.
+# Render prompts for each sync:false var below. LEMONSQUEEZY_API_KEY is the
+# only one required to go live; the three VARIANT_* vars can be added after
+# you create the Lemon Squeezy products (Settings -> API on the LS dashboard
+# for the key, Products -> a product's Variants tab for each id).
+#
+# Until VARIANT_SINGLE/UNLIMITED/AGENCY are set, every valid key resolves to
+# "unlimited" -- see server/README.md. That is deliberate (an unmapped variant
+# should not lock out someone who paid), but it means the $29 single-app tier
+# does not restrict anything until those three are filled in.
+#
+# After deploy, point the plugin at this service:
+#   export SHIPCHECK_VALIDATE_URL=https://<your-service>.onrender.com/validate
+# or change DEFAULT_ENDPOINT in scripts/license.py to the same URL and commit
+# it, so users don't need the env var set themselves.
+services:
+  - type: web
+    name: shipcheck-validate
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: LEMONSQUEEZY_API_KEY
+        sync: false
+      - key: LEMONSQUEEZY_STORE_ID
+        sync: false
+      - key: VARIANT_SINGLE
+        sync: false
+      - key: VARIANT_UNLIMITED
+        sync: false
+      - key: VARIANT_AGENCY
+        sync: false
+      # PORT is provided by Render automatically; the server reads process.env.PORT.

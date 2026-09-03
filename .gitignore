@@ -7,6 +7,13 @@ node_modules/
 __pycache__/
 server/node_modules/
 
+# the fixture's node_modules is synthetic (stub packages for selftest.py, not
+# real installed dependencies) and must be tracked so CI has it on a clean
+# checkout -- without it the required-reason/SDK-manifest checks degrade to
+# gaps instead of findings and the self-test fails
+!examples/bad-expo-app/node_modules/
+!examples/bad-expo-app/node_modules/**
+
 # but do ship the example report as sample output
 !examples/bad-expo-app/shipcheck-report.md
 
