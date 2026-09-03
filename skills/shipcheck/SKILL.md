@@ -124,9 +124,22 @@ Each judgment finding:
   "evidence": "<what you saw, with file paths>",
   "reviewer_says": "<the sentence a reviewer would send>",
   "fix": "<exact change>",
+  "blocks": "upload|review|metadata",
   "source": "judgment"
 }
 ```
+
+`blocks` says which wall the developer hits first, and it drives ordering:
+
+- `upload` — App Store Connect refuses the build (icon alpha, privacy manifest,
+  export compliance). These come first because nothing else matters until the
+  binary is accepted.
+- `review` — the build uploads, a human rejects it (4.8, 5.1.1(v), 3.1.2).
+- `metadata` — fixable in App Store Connect with **no new build**. Call these out;
+  a developer who can fix six things without waiting on a build wants to know.
+
+Omit it and `report.py` infers it from the finding id, which is right often
+enough — set it explicitly when you know better.
 
 Omitting `clause_text` is usually better: `report.py` pulls the clause off disk
 verbatim, which is guaranteed accurate. Set `clause` to the ASRG number

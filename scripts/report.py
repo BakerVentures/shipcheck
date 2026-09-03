@@ -60,6 +60,12 @@ def load_clause(corpus_dir, clause):
             url = m.group(1)
         body = re.sub(r"<!--.*?-->", "", raw, flags=re.S)
         body = re.sub(r"(?s)^---\n.*?\n---\n", "", body).strip()
+        # Apple's help pages open with breadcrumb chrome ("App Store Connect
+        # Help", nav links, "Reference") before the real H1. Quoting that makes
+        # the citation look broken, so start at the title when there is one.
+        h1 = re.search(r"^# .+$", body, re.M)
+        if h1 and h1.start() < 600:
+            body = body[h1.start():]
         if not url:
             # prefer the canonical human URL; final_url can be the DocC JSON
             # endpoint for developer.apple.com/documentation pages
@@ -91,9 +97,36 @@ def band(s):
     return "Nothing blocking found"
 
 
+UPLOAD_IDS = ("ICON-", "EXPORT-COMPLIANCE", "BUNDLE-ID", "PRIVACY-MANIFEST",
+              "SDK-NO-MANIFEST", "SDK-MANIFEST-REQUIRED", "REASON-MISSING")
+METADATA_IDS = ("META-", "URL-DEAD", "DEMO-ACCOUNT", "JUDGE-OTHER-PLATFORM",
+                "JUDGE-PRICE-IN-METADATA", "JUDGE-SCREENSHOT", "JUDGE-AGE-RATING",
+                "JUDGE-REVIEW-NOTES", "META-KEYWORDS")
+BLOCK_RANK = {"upload": 0, "review": 1, "metadata": 2}
+BLOCK_LABEL = {
+    "upload": "blocks upload",
+    "review": "blocks review",
+    "metadata": "metadata only — no new build",
+}
+
+
+def blocks(f):
+    """What wall does this hit first? Drives ordering, and tells the developer
+    whether a fix costs them a new build or just an App Store Connect edit."""
+    if f.get("blocks"):
+        return f["blocks"]
+    fid = f.get("id", "")
+    if f.get("itms") or fid.startswith(UPLOAD_IDS):
+        return "upload"
+    if fid.startswith(METADATA_IDS):
+        return "metadata"
+    return "review"
+
+
 def rank(findings):
     return sorted(findings, key=lambda f: (
         -WEIGHT.get(f.get("severity"), 0) * CONF.get(f.get("confidence", "high"), 1.0),
+        BLOCK_RANK.get(blocks(f), 1),
         f.get("platform", "ios"), f.get("id", "")))
 
 
@@ -135,6 +168,18 @@ def render(data, tier_info, corpus_manifest=None, corpus_dir=None):
         sum(1 for f in findings if f["severity"] == "medium"),
         sum(1 for f in findings if f["severity"] == "low")))
     L.append("")
+    upload = [f for f in findings if blocks(f) == "upload"]
+    meta_only = [f for f in findings if blocks(f) == "metadata"]
+    bits = []
+    if upload:
+        bits.append("**%d block the upload** — App Store Connect will not accept a "
+                    "build until these are fixed" % len(upload))
+    if meta_only:
+        bits.append("**%d are metadata only** and need no new build — you can fix "
+                    "those in App Store Connect right now" % len(meta_only))
+    if bits:
+        L.append(" · ".join(bits) + ".")
+        L.append("")
 
     if corpus_manifest:
         L.append("> Checked against policy text fetched %s from %d official Apple and "
@@ -160,6 +205,7 @@ def render(data, tier_info, corpus_manifest=None, corpus_dir=None):
         meta.append("confidence: %s" % f.get("confidence", "high"))
         meta.append("%s" % ("iOS" if f.get("platform") == "ios" else
                             "Android" if f.get("platform") == "android" else "both"))
+        meta.append(BLOCK_LABEL[blocks(f)])
         if f.get("itms"):
             meta.append("**%s**" % f["itms"])
         if f.get("source"):
