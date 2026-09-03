@@ -1,205 +1,438 @@
 {
-  "_comment": "Maps npm packages found in package.json to the iOS/Android declarations they oblige. Structural rules only (plist keys, manifest keys, permission names) — never policy prose, which lives in corpus/. 'confidence' marks entries the skill should re-verify against the corpus before asserting.",
+  "_comment": "Maps npm packages to the iOS/Android declarations they oblige. Structural rules only (plist keys, manifest keys, permission names) -- never policy prose, which lives in corpus/. IMPORTANT: required_reason_api is a HINT that the package touches required-reason API. What a package actually declares is read from its shipped PrivacyInfo.xcprivacy in node_modules at scan time, which is authoritative; this list is only used to decide which packages are worth looking at, and as a low-confidence fallback when node_modules is absent. Entries carrying 'verified_against' were checked against a real installed tree.",
   "_schema": {
     "ios_usage_descriptions": "Info.plist keys that must exist and carry a specific purpose string",
     "required_reason_api": "NSPrivacyAccessedAPITypes categories the package's code touches",
     "android_permissions": "permissions the library merges into AndroidManifest",
-    "triggers": "named rejection patterns this package can trip"
+    "triggers": "named rejection patterns this package can trip",
+    "pods": "CocoaPods names this package delivers its native SDK through; checked in ios/Pods",
+    "js_only": "no native iOS code, so it cannot use required-reason API directly"
   },
-
   "packages": {
     "expo-camera": {
-      "ios_usage_descriptions": ["NSCameraUsageDescription", "NSMicrophoneUsageDescription"],
-      "android_permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
+      "ios_usage_descriptions": [
+        "NSCameraUsageDescription",
+        "NSMicrophoneUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
       "notes": "Config plugin injects a generic default purpose string; generic strings draw 5.1.1 rejections.",
       "confidence": "high"
     },
     "expo-image-picker": {
-      "ios_usage_descriptions": ["NSPhotoLibraryUsageDescription", "NSCameraUsageDescription"],
-      "android_permissions": ["android.permission.READ_MEDIA_IMAGES"],
+      "ios_usage_descriptions": [
+        "NSPhotoLibraryUsageDescription",
+        "NSCameraUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.READ_MEDIA_IMAGES"
+      ],
       "confidence": "high"
     },
     "expo-media-library": {
-      "ios_usage_descriptions": ["NSPhotoLibraryUsageDescription", "NSPhotoLibraryAddUsageDescription"],
-      "android_permissions": ["android.permission.READ_MEDIA_IMAGES", "android.permission.READ_MEDIA_VIDEO"],
+      "ios_usage_descriptions": [
+        "NSPhotoLibraryUsageDescription",
+        "NSPhotoLibraryAddUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
+      ],
       "confidence": "high"
     },
     "expo-location": {
-      "ios_usage_descriptions": ["NSLocationWhenInUseUsageDescription"],
+      "ios_usage_descriptions": [
+        "NSLocationWhenInUseUsageDescription"
+      ],
       "ios_conditional": {
         "NSLocationAlwaysAndWhenInUseUsageDescription": "only when background location is enabled"
       },
-      "android_permissions": ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"],
-      "triggers": ["background-location-justification"],
+      "android_permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "triggers": [
+        "background-location-justification"
+      ],
       "confidence": "high"
     },
     "expo-contacts": {
-      "ios_usage_descriptions": ["NSContactsUsageDescription"],
-      "android_permissions": ["android.permission.READ_CONTACTS"],
+      "ios_usage_descriptions": [
+        "NSContactsUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.READ_CONTACTS"
+      ],
       "confidence": "high"
     },
     "expo-calendar": {
-      "ios_usage_descriptions": ["NSCalendarsUsageDescription", "NSRemindersUsageDescription"],
-      "android_permissions": ["android.permission.READ_CALENDAR", "android.permission.WRITE_CALENDAR"],
+      "ios_usage_descriptions": [
+        "NSCalendarsUsageDescription",
+        "NSRemindersUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.READ_CALENDAR",
+        "android.permission.WRITE_CALENDAR"
+      ],
       "confidence": "high"
     },
     "expo-av": {
-      "ios_usage_descriptions": ["NSMicrophoneUsageDescription"],
-      "android_permissions": ["android.permission.RECORD_AUDIO"],
+      "ios_usage_descriptions": [
+        "NSMicrophoneUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "confidence": "high"
     },
     "expo-audio": {
-      "ios_usage_descriptions": ["NSMicrophoneUsageDescription"],
-      "android_permissions": ["android.permission.RECORD_AUDIO"],
+      "ios_usage_descriptions": [
+        "NSMicrophoneUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "confidence": "high"
     },
     "expo-speech-recognition": {
-      "ios_usage_descriptions": ["NSSpeechRecognitionUsageDescription", "NSMicrophoneUsageDescription"],
+      "ios_usage_descriptions": [
+        "NSSpeechRecognitionUsageDescription",
+        "NSMicrophoneUsageDescription"
+      ],
       "confidence": "medium"
     },
     "expo-tracking-transparency": {
-      "ios_usage_descriptions": ["NSUserTrackingUsageDescription"],
-      "triggers": ["att-prompt-timing", "att-string-wording"],
+      "ios_usage_descriptions": [
+        "NSUserTrackingUsageDescription"
+      ],
+      "triggers": [
+        "att-prompt-timing",
+        "att-string-wording"
+      ],
       "confidence": "high"
     },
     "expo-local-authentication": {
-      "ios_usage_descriptions": ["NSFaceIDUsageDescription"],
-      "android_permissions": ["android.permission.USE_BIOMETRIC"],
+      "ios_usage_descriptions": [
+        "NSFaceIDUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.USE_BIOMETRIC"
+      ],
       "confidence": "high"
     },
     "expo-notifications": {
-      "android_permissions": ["android.permission.POST_NOTIFICATIONS"],
+      "android_permissions": [
+        "android.permission.POST_NOTIFICATIONS"
+      ],
       "confidence": "high"
     },
     "expo-file-system": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategoryFileTimestamp", "NSPrivacyAccessedAPICategoryDiskSpace"],
-      "confidence": "high"
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryFileTimestamp",
+        "NSPrivacyAccessedAPICategoryDiskSpace"
+      ],
+      "confidence": "high",
+      "verified_against": "expo-file-system ios/PrivacyInfo.xcprivacy (SDK 56): FileTimestamp + DiskSpace"
     },
     "expo-device": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategorySystemBootTime", "NSPrivacyAccessedAPICategoryDiskSpace"],
-      "confidence": "high"
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategorySystemBootTime"
+      ],
+      "confidence": "high",
+      "verified_against": "expo-device ios/PrivacyInfo.xcprivacy (SDK 56)"
     },
     "expo-constants": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategorySystemBootTime"],
-      "confidence": "medium"
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryUserDefaults"
+      ],
+      "confidence": "high",
+      "verified_against": "expo-constants ios/PrivacyInfo.xcprivacy (SDK 56)"
     },
     "@react-native-async-storage/async-storage": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategoryUserDefaults"],
-      "confidence": "high"
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryFileTimestamp"
+      ],
+      "confidence": "high",
+      "notes": "RN AsyncStorage is file-backed on iOS, not NSUserDefaults; its shipped manifest declares FileTimestamp.",
+      "verified_against": "async-storage ios/PrivacyInfo.xcprivacy"
     },
     "react-native-mmkv": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategoryUserDefaults", "NSPrivacyAccessedAPICategoryFileTimestamp"],
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryUserDefaults",
+        "NSPrivacyAccessedAPICategoryFileTimestamp"
+      ],
       "notes": "Recent versions ship their own PrivacyInfo.xcprivacy; older ones do not.",
       "confidence": "medium"
     },
     "react-native-device-info": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategorySystemBootTime", "NSPrivacyAccessedAPICategoryDiskSpace", "NSPrivacyAccessedAPICategoryUserDefaults"],
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategorySystemBootTime",
+        "NSPrivacyAccessedAPICategoryDiskSpace",
+        "NSPrivacyAccessedAPICategoryUserDefaults"
+      ],
       "confidence": "high"
     },
     "react-native-purchases": {
       "vendor": "RevenueCat",
-      "required_reason_api": ["NSPrivacyAccessedAPICategoryUserDefaults"],
-      "triggers": ["subscription-terms", "restore-purchases", "paywall-disclosure"],
-      "confidence": "high"
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryUserDefaults"
+      ],
+      "triggers": [
+        "subscription-terms",
+        "restore-purchases",
+        "paywall-disclosure"
+      ],
+      "confidence": "high",
+      "pods": [
+        "RevenueCat",
+        "PurchasesHybridCommon"
+      ]
     },
     "react-native-iap": {
-      "triggers": ["subscription-terms", "restore-purchases", "paywall-disclosure"],
+      "triggers": [
+        "subscription-terms",
+        "restore-purchases",
+        "paywall-disclosure"
+      ],
       "confidence": "high"
     },
     "expo-in-app-purchases": {
-      "triggers": ["subscription-terms", "restore-purchases", "paywall-disclosure"],
+      "triggers": [
+        "subscription-terms",
+        "restore-purchases",
+        "paywall-disclosure"
+      ],
       "confidence": "high"
     },
     "posthog-react-native": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategoryUserDefaults", "NSPrivacyAccessedAPICategoryFileTimestamp"],
-      "triggers": ["privacy-label-analytics"],
-      "confidence": "medium"
+      "js_only": true,
+      "triggers": [
+        "privacy-label-analytics"
+      ],
+      "notes": "Pure JS/TS (dist only, no ios/ dir, no podspec). It cannot call a required-reason API itself; its storage goes through AsyncStorage or expo-file-system, which ship their own manifests. Verified against an installed tree.",
+      "verified_against": "posthog-react-native 4.x node_modules layout",
+      "confidence": "high"
     },
     "@sentry/react-native": {
-      "required_reason_api": ["NSPrivacyAccessedAPICategoryUserDefaults", "NSPrivacyAccessedAPICategoryFileTimestamp", "NSPrivacyAccessedAPICategorySystemBootTime"],
-      "triggers": ["privacy-label-diagnostics"],
-      "confidence": "medium"
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryUserDefaults",
+        "NSPrivacyAccessedAPICategoryFileTimestamp",
+        "NSPrivacyAccessedAPICategorySystemBootTime"
+      ],
+      "triggers": [
+        "privacy-label-diagnostics"
+      ],
+      "confidence": "medium",
+      "pods": [
+        "Sentry",
+        "SentryPrivate"
+      ]
     },
     "react-native-appsflyer": {
-      "ios_usage_descriptions": ["NSUserTrackingUsageDescription"],
-      "android_permissions": ["com.google.android.gms.permission.AD_ID"],
-      "triggers": ["att-prompt-timing", "privacy-label-tracking", "data-safety-tracking"],
-      "confidence": "high"
+      "ios_usage_descriptions": [
+        "NSUserTrackingUsageDescription"
+      ],
+      "android_permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ],
+      "triggers": [
+        "att-prompt-timing",
+        "privacy-label-tracking",
+        "data-safety-tracking"
+      ],
+      "confidence": "high",
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryUserDefaults",
+        "NSPrivacyAccessedAPICategoryFileTimestamp",
+        "NSPrivacyAccessedAPICategorySystemBootTime"
+      ],
+      "verified_against": "react-native-appsflyer ios/PrivacyInfo.xcprivacy",
+      "pods": [
+        "AppsFlyerFramework"
+      ]
     },
     "react-native-fbsdk-next": {
-      "ios_usage_descriptions": ["NSUserTrackingUsageDescription"],
-      "apple_listed_sdk": ["FBSDKCoreKit", "FBSDKLoginKit", "FBSDKShareKit", "FBAEMKit"],
-      "triggers": ["sign-in-with-apple", "att-prompt-timing", "privacy-label-tracking"],
-      "confidence": "high"
+      "ios_usage_descriptions": [
+        "NSUserTrackingUsageDescription"
+      ],
+      "apple_listed_sdk": [
+        "FBSDKCoreKit",
+        "FBSDKLoginKit",
+        "FBSDKShareKit",
+        "FBAEMKit"
+      ],
+      "triggers": [
+        "sign-in-with-apple",
+        "att-prompt-timing",
+        "privacy-label-tracking"
+      ],
+      "confidence": "high",
+      "pods": [
+        "FBSDKCoreKit",
+        "FBSDKCoreKit_Basics",
+        "FBSDKLoginKit",
+        "FBSDKShareKit",
+        "FBAEMKit"
+      ]
     },
     "@react-native-google-signin/google-signin": {
-      "apple_listed_sdk": ["AppAuth", "GoogleSignIn", "GTMAppAuth"],
-      "triggers": ["sign-in-with-apple"],
-      "confidence": "high"
+      "apple_listed_sdk": [
+        "AppAuth",
+        "GoogleSignIn",
+        "GTMAppAuth"
+      ],
+      "triggers": [
+        "sign-in-with-apple"
+      ],
+      "confidence": "high",
+      "pods": [
+        "GoogleSignIn",
+        "AppAuth",
+        "GTMAppAuth",
+        "GTMSessionFetcher"
+      ]
     },
     "expo-auth-session": {
-      "triggers": ["sign-in-with-apple"],
+      "triggers": [
+        "sign-in-with-apple"
+      ],
       "notes": "Only trips 4.8 when used for third-party social login that sets up the primary account.",
       "confidence": "medium"
     },
     "@invertase/react-native-apple-authentication": {
-      "satisfies": ["sign-in-with-apple"],
+      "satisfies": [
+        "sign-in-with-apple"
+      ],
       "confidence": "high"
     },
     "expo-apple-authentication": {
-      "satisfies": ["sign-in-with-apple"],
-      "ios_entitlements": ["com.apple.developer.applesignin"],
+      "satisfies": [
+        "sign-in-with-apple"
+      ],
+      "ios_entitlements": [
+        "com.apple.developer.applesignin"
+      ],
       "confidence": "high"
     },
     "@react-native-firebase/app": {
-      "apple_listed_sdk": ["FirebaseCore", "FirebaseCoreDiagnostics", "FirebaseInstallations"],
-      "confidence": "high"
+      "apple_listed_sdk": [
+        "FirebaseCore",
+        "FirebaseCoreDiagnostics",
+        "FirebaseInstallations"
+      ],
+      "confidence": "high",
+      "pods": [
+        "FirebaseCore",
+        "FirebaseCoreInternal",
+        "FirebaseInstallations",
+        "GoogleUtilities"
+      ]
     },
     "@react-native-firebase/auth": {
-      "apple_listed_sdk": ["FirebaseAuth"],
-      "triggers": ["sign-in-with-apple", "account-deletion"],
-      "confidence": "high"
+      "apple_listed_sdk": [
+        "FirebaseAuth"
+      ],
+      "triggers": [
+        "sign-in-with-apple",
+        "account-deletion"
+      ],
+      "confidence": "high",
+      "pods": [
+        "FirebaseAuth"
+      ]
     },
     "@react-native-firebase/analytics": {
-      "android_permissions": ["com.google.android.gms.permission.AD_ID"],
-      "triggers": ["privacy-label-analytics", "data-safety-analytics"],
-      "confidence": "high"
+      "android_permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ],
+      "triggers": [
+        "privacy-label-analytics",
+        "data-safety-analytics"
+      ],
+      "confidence": "high",
+      "pods": [
+        "FirebaseAnalytics",
+        "GoogleAppMeasurement"
+      ]
     },
     "@supabase/supabase-js": {
-      "triggers": ["account-deletion", "sign-in-with-apple"],
+      "triggers": [
+        "account-deletion",
+        "sign-in-with-apple"
+      ],
       "notes": "Presence of auth implies accounts exist, which pulls in 5.1.1(v).",
       "confidence": "medium"
     },
     "@clerk/clerk-expo": {
-      "triggers": ["account-deletion", "sign-in-with-apple"],
+      "triggers": [
+        "account-deletion",
+        "sign-in-with-apple"
+      ],
       "confidence": "medium"
     },
     "react-native-health": {
-      "ios_usage_descriptions": ["NSHealthShareUsageDescription", "NSHealthUpdateUsageDescription"],
-      "ios_entitlements": ["com.apple.developer.healthkit"],
-      "triggers": ["health-category-rules"],
+      "ios_usage_descriptions": [
+        "NSHealthShareUsageDescription",
+        "NSHealthUpdateUsageDescription"
+      ],
+      "ios_entitlements": [
+        "com.apple.developer.healthkit"
+      ],
+      "triggers": [
+        "health-category-rules"
+      ],
       "confidence": "high"
     },
     "expo-health-connect": {
-      "android_permissions": ["android.permission.health.READ_STEPS"],
-      "triggers": ["health-category-rules"],
+      "android_permissions": [
+        "android.permission.health.READ_STEPS"
+      ],
+      "triggers": [
+        "health-category-rules"
+      ],
       "confidence": "low"
     },
     "expo-dev-client": {
-      "triggers": ["dev-artifacts-in-production"],
+      "triggers": [
+        "dev-artifacts-in-production"
+      ],
       "confidence": "high"
     },
     "expo-background-fetch": {
-      "android_permissions": ["android.permission.RECEIVE_BOOT_COMPLETED"],
-      "triggers": ["background-modes-justification"],
+      "android_permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED"
+      ],
+      "triggers": [
+        "background-modes-justification"
+      ],
       "confidence": "medium"
     },
     "expo-task-manager": {
-      "triggers": ["background-modes-justification"],
+      "triggers": [
+        "background-modes-justification"
+      ],
       "confidence": "medium"
+    },
+    "expo-system-ui": {
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryUserDefaults"
+      ],
+      "verified_against": "expo-system-ui ios/PrivacyInfo.xcprivacy (SDK 56)",
+      "confidence": "high"
+    },
+    "react-native": {
+      "required_reason_api": [
+        "NSPrivacyAccessedAPICategoryFileTimestamp",
+        "NSPrivacyAccessedAPICategoryUserDefaults",
+        "NSPrivacyAccessedAPICategorySystemBootTime"
+      ],
+      "notes": "React Native core ships several manifests across its subspecs.",
+      "verified_against": "react-native ios PrivacyInfo.xcprivacy files (0.8x)",
+      "confidence": "high"
     }
   },
-
   "usage_description_defaults": {
     "_comment": "Expo config plugins inject these templated strings. Apple rejects generic purpose strings under 5.1.1(i) because they do not explain the specific use.",
     "patterns": [
@@ -220,7 +453,6 @@
       "(?i)^\\s*$"
     ]
   },
-
   "android_foreground_service_types": {
     "_comment": "Android 14+ requires a declared foregroundServiceType and a matching FOREGROUND_SERVICE_* permission.",
     "map": {
@@ -236,7 +468,6 @@
       "specialUse": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
     }
   },
-
   "android_sensitive_permissions": {
     "_comment": "Permissions that require prominent disclosure, a Data safety entry, or a Play declaration form.",
     "declaration_form_required": [

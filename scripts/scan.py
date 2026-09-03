@@ -40,6 +40,7 @@ class Scan:
         self.offline = offline
         self.map = load_map()
         self.findings = []
+        self.passes = []
         self.gaps = []
         self.facts = {"project_root": self.root}
 
@@ -160,25 +161,88 @@ class Scan:
                 break
 
         nm = self.p("node_modules")
-        if os.path.isdir(nm):
+        self.sdk_declared = {}
+        self.node_modules_present = os.path.isdir(nm)
+        if self.node_modules_present:
             count = 0
             for dirpath, dirs, files in os.walk(nm):
                 depth = dirpath[len(nm):].count(os.sep)
                 if depth > 4:
                     dirs[:] = []
                     continue
+                # a manifest inside a library's own example/test app is not
+                # that library's manifest
+                dirs[:] = [x for x in dirs if x.lower() not in
+                           ("example", "examples", "__tests__", "test", "tests",
+                            "docs", "fixtures", "__fixtures__", "demo")]
                 for fn in files:
-                    if fn == "PrivacyInfo.xcprivacy":
-                        sdk_manifests.append(os.path.relpath(
-                            os.path.join(dirpath, fn), self.root))
-                        count += 1
+                    if fn != "PrivacyInfo.xcprivacy":
+                        continue
+                    full = os.path.join(dirpath, fn)
+                    sdk_manifests.append(os.path.relpath(full, self.root))
+                    count += 1
+                    rel = os.path.relpath(full, nm).split(os.sep)
+                    pkg = os.sep.join(rel[:2]) if rel and rel[0].startswith("@") else rel[0]
+                    try:
+                        with open(full, "rb") as fh:
+                            d = plistlib.load(fh)
+                        cats = {e.get("NSPrivacyAccessedAPIType")
+                                for e in d.get("NSPrivacyAccessedAPITypes") or []
+                                if e.get("NSPrivacyAccessedAPIType")}
+                    except Exception:            # noqa: BLE001
+                        cats = set()
+                    self.sdk_declared.setdefault(pkg, set()).update(cats)
                 if count > 400:
                     break
-        else:
-            self.gap("node_modules",
-                     "node_modules is not installed, so SDK-shipped privacy manifests "
-                     "could not be verified. Run `npm install` and re-scan.")
+        # CocoaPods is where a React Native wrapper's real native SDK lives, so
+        # for a prebuilt project it is the authoritative source. RevenueCat,
+        # FBSDK and AppsFlyer all ship their manifest in the pod, not in npm.
+        self.pod_declared = {}
+        pods = self.p("ios", "Pods")
+        self.pods_present = os.path.isdir(pods)
+        if self.pods_present:
+            for dirpath, dirs, files in os.walk(pods):
+                dirs[:] = [x for x in dirs if x not in
+                           ("Headers", "Target Support Files", "Local Podspecs")]
+                for fn in files:
+                    if not fn.endswith(".xcprivacy"):
+                        continue
+                    full = os.path.join(dirpath, fn)
+                    pod = os.path.relpath(full, pods).split(os.sep)[0]
+                    try:
+                        with open(full, "rb") as fh:
+                            d = plistlib.load(fh)
+                        cats = {e.get("NSPrivacyAccessedAPIType")
+                                for e in d.get("NSPrivacyAccessedAPITypes") or []
+                                if e.get("NSPrivacyAccessedAPIType")}
+                    except Exception:            # noqa: BLE001
+                        cats = set()
+                    self.pod_declared.setdefault(pod, set()).update(cats)
+
+        if not self.node_modules_present:
+            self.gap("SDK privacy manifests",
+                     "node_modules is not installed, so ShipCheck could not read which "
+                     "privacy manifests your SDKs actually ship. Run `npm install` and "
+                     "re-scan — this is the difference between guessing and knowing.")
+        self.facts["pods_present"] = self.pods_present
+        self.facts["pod_manifest_count"] = len(self.pod_declared)
         return app_manifest, sdk_manifests
+
+    def has_native_ios(self, pkg):
+        """Does this npm package contain native iOS code?
+
+        Returns None when the package is not installed -- "not on disk" is not
+        evidence that it ships no privacy manifest, it just means we cannot say.
+        """
+        base = self.p("node_modules", *pkg.split("/"))
+        if not os.path.isdir(base):
+            return None
+        if os.path.isdir(os.path.join(base, "ios")):
+            return True
+        try:
+            return any(f.endswith(".podspec") for f in os.listdir(base))
+        except OSError:
+            return None
 
     def read_manifest_categories(self, relpath):
         try:
@@ -278,54 +342,131 @@ class Scan:
                          confidence="medium")
 
     def check_required_reason(self, deps, app_manifest, sdk_manifests):
-        needed = {}
+        """Required-reason API coverage.
+
+        Apple's rule, verbatim in corpus/apple/required-reason-api.md: an SDK
+        reports its own API use in its own manifest, and "your third-party SDK
+        can't rely on the privacy manifest files for apps that link" it. The
+        converse matters just as much and is where a naive checker goes wrong:
+        if a package ships a manifest declaring a category, the APP does not
+        also have to declare it.
+
+        So node_modules is the authority when it is there. The static map only
+        says "this package touches required-reason API at all"; what it actually
+        declares is read off disk.
+        """
+        touches = {}
         for pkg in deps:
             entry = self.map["packages"].get(pkg)
-            if not entry:
-                continue
-            for cat in entry.get("required_reason_api") or []:
-                needed.setdefault(cat, []).append(pkg)
-        self.facts["required_reason_categories"] = {
-            k: v for k, v in sorted(needed.items())}
+            if entry and entry.get("required_reason_api"):
+                touches[pkg] = set(entry["required_reason_api"])
+        self.facts["packages_touching_required_reason"] = sorted(touches)
 
-        if not needed:
+        if not touches:
             return
+
+        if not self.node_modules_present:
+            # Do not guess. Guessing here produces a critical finding on a
+            # correctly-configured app, which is worse than saying nothing.
+            if not app_manifest:
+                self.add("PRIVACY-MANIFEST-MISSING", "high",
+                         "No PrivacyInfo.xcprivacy in the app target",
+                         clause="apple:required-reason-api",
+                         evidence="Packages that touch required-reason API: %s. "
+                                  "node_modules is absent, so ShipCheck cannot tell "
+                                  "which of these already declare it themselves."
+                                  % ", ".join(sorted(touches)),
+                         fix="Install dependencies and re-scan for an exact answer. "
+                             "If your app's own native code touches these APIs you "
+                             "need ios/<App>/PrivacyInfo.xcprivacy (or "
+                             "`expo.ios.privacyManifests` in app.json); if only your "
+                             "SDKs do, they must each ship their own.",
+                         confidence="medium",
+                         corpus="apple/required-reason-api.md",
+                         itms="ITMS-91053")
+            return
+
+        uncovered, covered, unverifiable = {}, {}, {}
+        not_installed = []
+        for pkg, cats in touches.items():
+            native = self.has_native_ios(pkg)
+            if native is None:
+                not_installed.append(pkg)
+                continue
+            if not native:
+                # A JS-only package cannot call a required-reason API itself; its
+                # storage goes through AsyncStorage / expo-file-system, which
+                # declare their own. Flagging it is noise.
+                continue
+            declared = self.sdk_declared.get(pkg)
+            if declared:
+                covered[pkg] = sorted(declared)
+                continue
+            pod_names = (self.map["packages"].get(pkg) or {}).get("pods") or []
+            if pod_names:
+                if not self.pods_present:
+                    unverifiable[pkg] = pod_names
+                    continue
+                if any(p in self.pod_declared for p in pod_names):
+                    covered[pkg] = sorted(
+                        {c for p in pod_names for c in self.pod_declared.get(p, ())})
+                    continue
+            uncovered[pkg] = sorted(cats)
+
+        if not_installed:
+            self.gap("Uninstalled dependencies",
+                     "These are in package.json but not under node_modules, so their "
+                     "privacy manifests could not be checked: %s. Run a full install "
+                     "and re-scan." % ", ".join(sorted(not_installed)))
+        if unverifiable:
+            self.gap("Pod-delivered privacy manifests",
+                     "These packages ship their native SDK through CocoaPods, and "
+                     "ios/Pods is not present, so ShipCheck cannot confirm the pod "
+                     "carries its privacy manifest: %s. Run `npx expo prebuild` (or "
+                     "`pod install`) and re-scan."
+                     % ", ".join(sorted(unverifiable)))
+        self.facts["sdk_self_declared"] = {k: sorted(v) for k, v in
+                                           sorted(self.sdk_declared.items())}
+        self.facts["packages_without_own_manifest"] = sorted(uncovered)
+
+        for pkg, cats in sorted(uncovered.items()):
+            self.add("SDK-NO-MANIFEST-%s" % pkg.replace("/", "-").replace("@", ""),
+                     "high",
+                     "%s uses required-reason API but ships no privacy manifest" % pkg,
+                     clause="apple:required-reason-api",
+                     evidence="No PrivacyInfo.xcprivacy found under node_modules/%s. "
+                              "Expected it to declare: %s" % (pkg, ", ".join(cats)),
+                     fix="Upgrade %s to a version that ships its own "
+                         "PrivacyInfo.xcprivacy. If no such version exists, declare "
+                         "the categories in your app's manifest as a stopgap and open "
+                         "an issue upstream — Apple emails ITMS-91053/91061 on upload "
+                         "and, since 1 May 2024, blocks the build." % pkg,
+                     confidence="medium",
+                     corpus="apple/required-reason-api.md",
+                     itms="ITMS-91061")
+
         if not app_manifest:
-            self.add("PRIVACY-MANIFEST-MISSING", "critical",
+            self.add("PRIVACY-MANIFEST-MISSING", "high",
                      "No PrivacyInfo.xcprivacy in the app target",
                      clause="apple:required-reason-api",
-                     evidence="Packages using required-reason API: %s"
-                              % ", ".join(sorted({p for v in needed.values() for p in v})),
-                     fix="Create ios/<YourApp>/PrivacyInfo.xcprivacy (or set "
-                         "`expo.ios.privacyManifests` in app.json) declaring "
-                         "NSPrivacyAccessedAPITypes for: %s. Since 1 May 2024 App Store "
-                         "Connect rejects uploads that use these APIs without it."
-                         % ", ".join(sorted(needed)),
+                     evidence="%d SDK manifest(s) found under node_modules, but the "
+                              "app target has none. An app manifest is also where "
+                              "NSPrivacyTracking and NSPrivacyCollectedDataTypes live."
+                              % len(sdk_manifests),
+                     fix="Add `expo.ios.privacyManifests` to app.json (Expo SDK 50+) "
+                         "or ios/<App>/PrivacyInfo.xcprivacy, declaring any "
+                         "required-reason API your own native code uses plus your "
+                         "data-collection and tracking posture.",
+                     confidence="medium",
                      corpus="apple/required-reason-api.md",
                      itms="ITMS-91053")
-            return
-        got = self.read_manifest_categories(app_manifest)
-        if got is None:
-            self.add("PRIVACY-MANIFEST-UNREADABLE", "high",
-                     "PrivacyInfo.xcprivacy could not be parsed",
-                     evidence=app_manifest,
-                     fix="It must be a valid plist. Open it in Xcode to repair.")
-            return
-        missing = sorted(set(needed) - got["categories"])
-        for cat in missing:
-            self.add("REASON-MISSING-%s" % cat.replace(
-                "NSPrivacyAccessedAPICategory", ""), "critical",
-                "Privacy manifest does not declare %s" % cat,
+        elif covered:
+            self.passes.append(dict(
+                title="Required-reason API declarations",
                 clause="apple:required-reason-api",
-                evidence="Used by %s; %s declares %s"
-                         % (", ".join(needed[cat]), app_manifest,
-                            ", ".join(sorted(got["categories"])) or "nothing"),
-                fix="Add an NSPrivacyAccessedAPITypes entry with "
-                    "NSPrivacyAccessedAPIType = %s and an approved reason code "
-                    "from corpus/apple/required-reason-codes.md." % cat,
-                corpus="apple/required-reason-codes.md",
-                itms="ITMS-91053")
-
+                note="%d package(s) ship their own privacy manifest and declare their "
+                     "own API use (%s), so your app manifest does not need to repeat "
+                     "them." % (len(covered), ", ".join(sorted(covered)))))
 
     def check_listed_sdks(self, deps, sdk_manifests):
         """SDKs on Apple's published list must ship a manifest and a signature.
@@ -342,22 +483,50 @@ class Scan:
         self.facts["apple_listed_sdks"] = sorted(n for n, _ in listed)
         if not listed:
             return
-        pkgs = sorted({p for _, p in listed})
-        names = sorted({n for n, _ in listed})
+        if not self.node_modules_present:
+            self.gap("Apple-listed SDK manifests",
+                     "These dependencies bundle SDKs on Apple's published list (%s), "
+                     "which must ship a privacy manifest and signature. Without "
+                     "node_modules ShipCheck cannot check whether the resolved "
+                     "versions do." % ", ".join(sorted(n for n, _ in listed)))
+            return
+
+        def sdk_covered(pkg):
+            if pkg in self.sdk_declared:
+                return True
+            pods = (self.map["packages"].get(pkg) or {}).get("pods") or []
+            return any(p in self.pod_declared for p in pods)
+
+        missing = sorted({p for _, p in listed if not sdk_covered(p)})
+        ok = sorted({p for _, p in listed if sdk_covered(p)})
+        if missing and not self.pods_present:
+            self.gap("Apple-listed SDK manifests",
+                     "%s deliver their SDK through CocoaPods and ios/Pods is absent, "
+                     "so ShipCheck cannot confirm the pod ships a manifest and "
+                     "signature. Run `npx expo prebuild` and re-scan."
+                     % ", ".join(missing))
+            missing = []
+        if ok:
+            self.passes.append(dict(
+                title="Apple-listed SDKs ship privacy manifests",
+                clause="apple:third-party-sdk-requirements",
+                note=", ".join(ok)))
+        if not missing:
+            return
+        names = sorted({n for n, p in listed if p in missing})
         self.add("SDK-MANIFEST-REQUIRED", "high",
-                 "%d SDK(s) on Apple's list must ship a privacy manifest and "
-                 "signature" % len(names),
+                 "%s bundles SDK(s) on Apple's list but ships no privacy manifest"
+                 % (missing[0] if len(missing) == 1
+                    else "%d packages bundle" % len(missing)),
                  clause="apple:third-party-sdk-requirements",
-                 evidence="Pulled in by %s: %s. %d SDK-shipped manifests were found "
-                          "under node_modules."
-                          % (", ".join(pkgs), ", ".join(names), len(sdk_manifests)),
-                 fix="Upgrade each to a version that ships its own "
-                     "PrivacyInfo.xcprivacy and signature. Patching the pod by hand "
-                     "does not satisfy the signature requirement. This is the most "
-                     "common cause of the ITMS-91061 upload rejection in Expo "
-                     "projects. Cross-check the current list in "
-                     "corpus/apple/third-party-sdk-requirements.md.",
-                 confidence="medium",
+                 evidence="No PrivacyInfo.xcprivacy under node_modules/%s. Bundles: %s"
+                          % (", node_modules/".join(missing), ", ".join(names)),
+                 fix="Upgrade %s to a version that ships its own privacy manifest and "
+                     "signature. Patching the pod by hand does not satisfy the "
+                     "signature requirement. This is the most common cause of the "
+                     "ITMS-91061 upload rejection in Expo projects."
+                     % ", ".join(missing),
+                 confidence="high",
                  corpus="apple/third-party-sdk-requirements.md",
                  itms="ITMS-91061")
 
@@ -760,7 +929,8 @@ class Scan:
         self.check_urls(md)
 
         self.findings.sort(key=lambda f: -SEV.get(f["severity"], 0))
-        return dict(facts=self.facts, findings=self.findings, gaps=self.gaps)
+        return dict(facts=self.facts, findings=self.findings,
+                    passes=self.passes, gaps=self.gaps)
 
 
 # ---------------------------------------------------------------- helpers
