@@ -37,9 +37,16 @@ same day → Product Hunt two weeks later.
 
 Total cash outlay: $0 until the first sale.
 
-## Known gap before you charge
+## A deliberate non-feature: seat counting
 
-The agency tier advertises **five team seats**. Seats are not implemented —
-`server/validate.js` treats `agency` exactly like `unlimited` (any number of
-apps, no seat accounting). Either build seats, or sell the tier as "unlimited
-apps + priority guideline updates" until you do.
+The agency tier is sold as "unlimited apps, shareable across your team", not as
+a fixed seat count, and the copy everywhere now says that.
+
+Enforcing seats would mean identifying each machine or user, which means sending
+a device or account identifier on every licence check. The plugin sends only a
+key, a version and an opaque per-app token, and "your code never leaves your
+machine" is the thing that differentiates this from a web scanner. Trading that
+for seat accounting on a $149 tier is a bad deal.
+
+If you later want per-seat pricing, do it in Lemon Squeezy with separate
+licence keys per teammate rather than by adding telemetry to the plugin.

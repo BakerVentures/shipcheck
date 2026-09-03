@@ -22,7 +22,7 @@ Pass `--app-id <bundle identifier>` when the project has one. Tiers:
 | `free` | risk score + the top 3 findings |
 | `single` | $29 one-time, bound to **one** app, unlimited scans of it forever |
 | `unlimited` | $49/year, any number of apps |
-| `agency` | $149/year, any number of apps plus team seats |
+| `agency` | $149/year, any number of apps, shareable across a team |
 
 A `single` licence binds to the first bundle id it sees. If the user hits
 "already bound to another app", that is expected — they need the $49/year plan,

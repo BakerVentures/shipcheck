@@ -140,7 +140,7 @@ as licensed. An outage on our side never blocks your release.
 | Every finding, with clause text + fixes | | ✅ | ✅ | ✅ |
 | `/shipcheck:reply` rejection drafter | | ✅ | ✅ | ✅ |
 | Unlimited re-scans | | ✅ *(that app)* | ✅ | ✅ |
-| Team seats | | | | ✅ |
+| Shareable across a team | | | | ✅ |
 
 The $29 tier binds to one bundle identifier the first time you scan, and then
 runs forever on that app. Ship more than one app and the yearly plan is cheaper

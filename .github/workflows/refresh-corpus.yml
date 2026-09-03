@@ -1,0 +1,58 @@
+name: Refresh policy corpus
+
+# "Never checking against last year's rules" is the product claim. A corpus that
+# only refreshes when someone remembers to run a script does not back it.
+on:
+  schedule:
+    - cron: "17 6 * * 1"      # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Re-fetch corpus and diff against the cached hashes
+        id: fetch
+        run: |
+          python3 scripts/fetch_corpus.py --diff 2>&1 | tee /tmp/refresh.log
+          echo "failures=$(python3 -c "import json;print(json.load(open('corpus/manifest.json'))['failure_count'])")" >> "$GITHUB_OUTPUT"
+
+      - name: Self-test against the refreshed corpus
+        run: python3 scripts/selftest.py
+
+      - name: Summarise
+        run: |
+          {
+            echo '## Corpus refresh'
+            echo
+            echo '```'
+            sed -n '/POLICY CHANGELOG/,$p' /tmp/refresh.log | head -120
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open a PR if policy text moved
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: corpus/weekly-refresh
+          title: "Corpus refresh: Apple/Google policy changed"
+          commit-message: "Refresh policy corpus"
+          body-path: /tmp/refresh.log
+          labels: corpus
+          delete-branch: true
+
+      - name: Fail if any source could not be fetched
+        if: steps.fetch.outputs.failures != '0'
+        run: |
+          echo "::error::${{ steps.fetch.outputs.failures }} corpus source(s) failed to fetch."
+          echo "A silently stale corpus is the one way ShipCheck gives dangerous advice."
+          exit 1
