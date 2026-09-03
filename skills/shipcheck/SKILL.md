@@ -58,23 +58,40 @@ scan without it is not worth delivering.
 
 ## Step 2 — judgment checks
 
-For each area below, read the relevant corpus file, then look at the actual
-project. Add findings the script cannot reach.
+Move fast. This step has a habit of ballooning into reading every corpus file
+"just in case" — don't. Read a corpus file only when you already suspect a
+specific finding and need the exact clause to cite. **Batch your reads**: when
+you know you'll need three corpus files, issue all three `Read` calls in one
+turn, not three separate turns.
 
-Work through `corpus/patterns/rn-expo-rejections.md` and handle every entry
-marked `detect: judgment`. The high-value ones:
+First, triage from `facts` alone, before reading anything, to cut the search
+space:
 
-| Area | Read from corpus | Look at |
+- No `Subscriptions`/IAP packages in `facts.dependencies` → skip 3.1.2 entirely,
+  don't read `apple/subscriptions.md`.
+- Category isn't Health, Dating, Kids, or Gambling → skip the category-specific
+  corpus files (`5.1.3`, `5.1.4`, `5.3`, `1.1.4`) entirely.
+- `facts.metadata` has no screenshot descriptions → skip 2.3.3.
+- Android platform not requested → skip the Play-specific rows below.
+
+Then, only for what's left standing, check `corpus/patterns/rn-expo-rejections.md`
+for the matching `detect: judgment` entries and read the one or two corpus
+files each cites — the pattern file tells you which file, so you don't need
+this table to also enumerate them:
+
+| Area | Look at | Corpus (read only if this area is live) |
 |---|---|---|
-| Metadata accuracy (2.3.x) | `apple/asrg.sections/2.3*.md` | description, keywords, What's New, screenshot descriptions |
-| Paywall disclosure (3.1.2) | `apple/asrg.sections/3.1.2*.md`, `apple/subscriptions.md`, `apple/hig-in-app-purchase.md` | the `Paywall` + `Subscriptions` metadata, and the paywall component in source |
-| Minimum functionality (4.2) | `apple/asrg.sections/4.2*.md` | dependency list, route count, whether `react-native-webview` carries the app |
-| Login services (4.8) | `apple/asrg.sections/4.8.md` | check the exemptions before asserting |
-| Privacy labels vs SDKs | `apple/app-privacy-details.md`, `apple/describing-data-use.md` | analytics/attribution SDKs vs the `Data collected` field |
-| Listed SDKs | `apple/third-party-sdk-requirements.md` | cross-reference `facts.dependencies` against the live SDK list |
-| Category rules | `apple/asrg.sections/1.1*.md`, `1.4.1`, `5.1.3`, `5.1.4`, `5.3` | the declared category and age rating |
-| Data safety (Play) | `google/data-safety.md`, `google/user-data-policy.md` | permissions vs declared data |
-| Testing gate (Play) | `google/testing-requirements.md` | quote the current tester count and duration from the file, never from memory |
+| Metadata accuracy (2.3.x) | description, keywords, What's New, screenshot descriptions | `apple/asrg.sections/2.3*.md` |
+| Paywall disclosure (3.1.2) | `Paywall` + `Subscriptions` metadata, paywall component in source | `apple/asrg.sections/3.1.2*.md` |
+| Minimum functionality (4.2) | dependency list, route count, `react-native-webview` share of the app | `apple/asrg.sections/4.2*.md` |
+| Login services (4.8) | check the exemptions before asserting | `apple/asrg.sections/4.8.md` |
+| Privacy labels vs SDKs | analytics/attribution SDKs vs `Data collected` field | `apple/app-privacy-details.md` |
+| Category rules | declared category and age rating | the one matching file, not all four |
+| Data safety (Play) | permissions vs declared data | `google/data-safety.md` |
+| Testing gate (Play) | quote the tester count/duration from the file, never memory | `google/testing-requirements.md` |
+
+A scan with no subscriptions, no screenshots described, and a plain category
+should touch maybe 3-4 corpus files total in this step, not all nine rows.
 
 Rules for judgment findings:
 
