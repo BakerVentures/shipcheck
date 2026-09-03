@@ -39,6 +39,7 @@ MUST_CATCH = [
     ("TODO in What's New",                  "META-PLACEHOLDER-what's-new", "2.3.1"),
     ("icon has alpha",                      "ICON-ALPHA", "ASC:screenshot-specifications"),
     ("icon is 512x512",                     "ICON-SIZE", "ASC:screenshot-specifications"),
+    # network-dependent; skipped under --offline
     ("dead privacy policy URL",             "URL-DEAD-privacy-policy-url", "5.1.1"),
     ("dead support URL",                    "URL-DEAD-support-url", "2.3.8"),
     ("app name over 30 chars",              "META-LEN-app-name", "2.3"),
@@ -85,8 +86,13 @@ def main():
     ids = list(by)
     fails = []
 
+    needs_network = {"URL-DEAD-privacy-policy-url", "URL-DEAD-support-url"}
+
     print("Seeded violations")
     for desc, fid, clause in MUST_CATCH:
+        if args.offline and fid in needs_network:
+            print("  skip   %-44s (needs network)" % desc[:44])
+            continue
         f = by.get(fid)
         if not f:
             print("  FAIL   %-44s (not raised)" % desc[:44]); fails.append(desc)

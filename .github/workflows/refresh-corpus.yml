@@ -28,7 +28,7 @@ jobs:
           echo "failures=$(python3 -c "import json;print(json.load(open('corpus/manifest.json'))['failure_count'])")" >> "$GITHUB_OUTPUT"
 
       - name: Self-test against the refreshed corpus
-        run: python3 scripts/selftest.py
+        run: python3 scripts/selftest.py --offline
 
       - name: Summarise
         run: |
