@@ -56,7 +56,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 <div class="wrap">
 <header>
   <span class="brand">shipcheck</span>
-  <nav><a href="#checks">What it checks</a><a href="#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+  <nav><a href="#checks">What it checks</a><a href="#cli">CLI & CI</a><a href="#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
 </header>
 
 <h1>Find out what Apple will reject before Apple does.</h1>
@@ -101,6 +101,21 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
   <li><span class="c">Build</span><span>Icon dimensions and alpha, export compliance flag, dev-menu and Expo Go artifacts in production, minimum-functionality signals for guideline 4.2.</span></li>
   <li><span class="c">Android</span><span>Manifest permissions versus Data safety declarations, target API level, privacy policy link, closed-testing requirement, prominent-disclosure for runtime permissions.</span></li>
 </ul>
+</section>
+
+<section id="cli">
+<h2>Also runs without Claude Code</h2>
+<p>The deterministic half — everything except store-listing judgment — is a zero-dependency CLI, so it runs in CI or under any other agent.</p>
+<div class="install" style="margin-bottom:24px">
+  <code id="cmd2">git clone https://github.com/BakerVentures/shipcheck &amp;&amp; shipcheck/bin/shipcheck scan .</code>
+  <button onclick="navigator.clipboard.writeText(document.getElementById('cmd2').textContent);this.textContent='Copied'">Copy</button>
+  <small>Exits 1 on a critical finding, so it gates a pipeline.</small>
+</div>
+<pre class="term" aria-label="GitHub Action example" style="margin-bottom:12px"><span class="d"># .github/workflows/shipcheck.yml</span>
+- uses: <b>BakerVentures/shipcheck@v1</b>
+  with:
+    fail-on: critical</pre>
+<p style="margin-top:16px">The judgment checks — store listing, paywall disclosure, category rules, guideline 4.2 — need a model reading current guideline text, so those stay in the Claude Code plugin, where your own Claude does that work at no cost to us.</p>
 </section>
 
 <section>

@@ -21,6 +21,29 @@ sys.path.insert(0, HERE)
 import report                                        # noqa: E402
 
 FIXTURE = os.path.join(ROOT, "examples", "bad-expo-app")
+BARE_RN_FIXTURE = os.path.join(ROOT, "examples", "bare-rn-app")
+
+# examples/bare-rn-app has no app.json/app.config -- it exists specifically to
+# catch the class of bug where a check silently assumes Expo's config shape
+# and either crashes or returns nothing useful on a bare React Native project.
+BARE_RN_MUST_CATCH = [
+    ("bundle id read from Info.plist, no app.json present",
+     lambda facts: facts.get("bundle_id") == "com.example.barern"),
+    ("app name read from Info.plist CFBundleName",
+     lambda facts: facts.get("app_name") == "BareRN"),
+    ("icon found via Xcode AppIcon.appiconset, not Expo's assets/icon.png",
+     lambda facts: (facts.get("icon") or {}).get("label") == "AppIcon.appiconset"),
+]
+BARE_RN_MUST_FIND = [
+    ("Geolocation.getCurrentPosition called, no NSLocationWhenInUseUsageDescription",
+     "PLIST-MISSING-NSLocationWhenInUseUsageDescription"),
+]
+BARE_RN_MUST_NOT_FIND = [
+    ("BUNDLE-ID-MISSING must not fire when Info.plist has CFBundleIdentifier",
+     "BUNDLE-ID-MISSING"),
+    ("ICON-MISSING must not fire when an AppIcon.appiconset 1024 entry exists",
+     "ICON-MISSING"),
+]
 
 # seeded violation -> (finding id, expected clause)
 MUST_CATCH = [
@@ -67,6 +90,36 @@ MUST_NOT_FIRE = [
      lambda ids: "PLIST-MISSING-NSMicrophoneUsageDescription" not in ids
                  and "PLIST-UNUSED-NSMicrophoneUsageDescription" in ids),
 ]
+
+
+def run_bare_rn_checks():
+    fails = []
+    subprocess.run([sys.executable, os.path.join(HERE, "scan.py"),
+                    "--project", BARE_RN_FIXTURE, "--offline",
+                    "--out", "/tmp/shipcheck-selftest-bare-rn.json"],
+                   check=True, capture_output=True)
+    with open("/tmp/shipcheck-selftest-bare-rn.json", encoding="utf-8") as f:
+        data = json.load(f)
+    facts = data["facts"]
+    ids = {f["id"] for f in data["findings"]}
+
+    print("\nBare React Native project (no app.json)")
+    for desc, pred in BARE_RN_MUST_CATCH:
+        if pred(facts):
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s" % desc); fails.append(desc)
+    for desc, fid in BARE_RN_MUST_FIND:
+        if fid in ids:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s (not raised)" % desc); fails.append(desc)
+    for desc, fid in BARE_RN_MUST_NOT_FIND:
+        if fid not in ids:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s" % desc); fails.append(desc)
+    return fails
 
 
 def main():
@@ -118,6 +171,8 @@ def main():
     else:
         print("  ok     all %d clause references resolve to cached corpus files"
               % len({f["clause"] for f in data["findings"] if f["clause"]}))
+
+    fails += run_bare_rn_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))
