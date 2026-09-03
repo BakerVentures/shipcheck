@@ -3,12 +3,16 @@
     "name": "Bad App",
     "slug": "bad-expo-app",
     "version": "1.0.0",
-    "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "com.example.badapp",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos",
         "NSLocationWhenInUseUsageDescription": "We need your location."
+      },
+      "icon": {
+        "light": "./assets/icon.png",
+        "dark": "./assets/icon-dark.png",
+        "tinted": "./assets/icon-tinted.png"
       }
     },
     "android": {

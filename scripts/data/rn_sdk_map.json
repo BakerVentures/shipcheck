@@ -431,6 +431,121 @@
       "notes": "React Native core ships several manifests across its subspecs.",
       "verified_against": "react-native ios PrivacyInfo.xcprivacy files (0.8x)",
       "confidence": "high"
+    },
+    "react-native-image-picker": {
+      "ios_usage_descriptions": [
+        "NSPhotoLibraryUsageDescription",
+        "NSCameraUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.CAMERA"
+      ],
+      "confidence": "high"
+    },
+    "@react-native-community/geolocation": {
+      "ios_usage_descriptions": [
+        "NSLocationWhenInUseUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "confidence": "high"
+    },
+    "react-native-geolocation-service": {
+      "ios_usage_descriptions": [
+        "NSLocationWhenInUseUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "confidence": "high"
+    },
+    "react-native-permissions": {
+      "notes": "Meta-package that requests whatever permission you ask it for at runtime; it does not itself imply a specific usage-description key. Not enough signal to map to a key on its own -- the skill should grep for PERMISSIONS.IOS.* usage to see which ones are actually requested.",
+      "confidence": "low"
+    },
+    "react-native-camera": {
+      "ios_usage_descriptions": [
+        "NSCameraUsageDescription",
+        "NSMicrophoneUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "notes": "Archived/unmaintained; flag for migration to react-native-vision-camera or expo-camera if seen.",
+      "confidence": "high"
+    },
+    "react-native-vision-camera": {
+      "ios_usage_descriptions": [
+        "NSCameraUsageDescription",
+        "NSMicrophoneUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "confidence": "high"
+    },
+    "@react-native-community/audio-toolkit": {
+      "ios_usage_descriptions": [
+        "NSMicrophoneUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "confidence": "medium"
+    },
+    "react-native-contacts": {
+      "ios_usage_descriptions": [
+        "NSContactsUsageDescription"
+      ],
+      "android_permissions": [
+        "android.permission.READ_CONTACTS"
+      ],
+      "confidence": "high"
+    },
+    "@react-native-community/push-notification-ios": {
+      "android_permissions": [
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "confidence": "medium"
+    },
+    "react-native-push-notification": {
+      "android_permissions": [
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "confidence": "medium"
+    },
+    "@notifee/react-native": {
+      "android_permissions": [
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "confidence": "medium"
+    },
+    "react-native-fast-image": {
+      "pods": [
+        "SDWebImage"
+      ],
+      "confidence": "low"
+    },
+    "react-native-svg": {
+      "confidence": "low"
+    },
+    "react-native-reanimated": {
+      "confidence": "low"
+    },
+    "react-native-gesture-handler": {
+      "confidence": "low"
+    },
+    "react-native-screens": {
+      "confidence": "low"
+    },
+    "react-native-safe-area-context": {
+      "confidence": "low"
     }
   },
   "usage_description_defaults": {
@@ -501,13 +616,13 @@
   },
   "usage_description_call_sites": {
     "_comment": "Regexes that show the app actually calls the API a usage-description key protects. A missing key with a call site is a runtime crash and a 2.1 rejection. A missing key with no call site is an unused dependency, which is a cleanup note, not a blocker. Severity is set from this.",
-    "NSCameraUsageDescription": "launchCameraAsync|requestCameraPermissions|useCameraPermissions|CameraView|<Camera\\b|getCameraPermissions",
+    "NSCameraUsageDescription": "launchCameraAsync|requestCameraPermissions|useCameraPermissions|CameraView|<Camera\\b|getCameraPermissions|react-native-image-picker.*launchCamera|VisionCamera|Camera\\.getCameraPermissionStatus",
     "NSMicrophoneUsageDescription": "Audio\\.Recording|requestMicrophonePermissions|useMicrophonePermissions|startRecording|AudioModule|expo-audio",
-    "NSPhotoLibraryUsageDescription": "launchImageLibraryAsync|requestMediaLibraryPermissions|MediaLibrary\\.|getAssetsAsync",
+    "NSPhotoLibraryUsageDescription": "launchImageLibraryAsync|requestMediaLibraryPermissions|MediaLibrary\\.|getAssetsAsync|launchImageLibrary\\(",
     "NSPhotoLibraryAddUsageDescription": "saveToLibraryAsync|createAssetAsync|MediaLibrary\\.save",
-    "NSLocationWhenInUseUsageDescription": "getCurrentPositionAsync|requestForegroundPermissionsAsync|watchPositionAsync|useForegroundPermissions",
+    "NSLocationWhenInUseUsageDescription": "getCurrentPositionAsync|requestForegroundPermissionsAsync|watchPositionAsync|useForegroundPermissions|Geolocation\\.getCurrentPosition|Geolocation\\.watchPosition",
     "NSLocationAlwaysAndWhenInUseUsageDescription": "requestBackgroundPermissionsAsync|startLocationUpdatesAsync",
-    "NSContactsUsageDescription": "Contacts\\.|getContactsAsync|requestContactsPermission",
+    "NSContactsUsageDescription": "Contacts\\.|getContactsAsync|requestContactsPermission|Contacts\\.getAll|react-native-contacts",
     "NSCalendarsUsageDescription": "Calendar\\.|getCalendarsAsync|createEventAsync",
     "NSRemindersUsageDescription": "getRemindersAsync|Reminder",
     "NSFaceIDUsageDescription": "authenticateAsync|LocalAuthentication",

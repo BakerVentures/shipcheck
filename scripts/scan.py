@@ -317,27 +317,90 @@ class Scan:
                 cats.add(t)
         return dict(categories=cats, raw=d)
 
+    def find_appiconset_1024(self):
+        """The Xcode asset-catalog icon (bare RN and prebuilt Expo ios/ both use
+        this). Contents.json names the 1024x1024 marketing-icon filename; older
+        Expo bare templates instead ship a single non-Contents.json PNG folder,
+        which this also handles by falling back to any square PNG >= 1024px."""
+        ios_dir = self.p("ios")
+        if not os.path.isdir(ios_dir):
+            return None
+        for dirpath, dirs, files in os.walk(ios_dir):
+            if "Pods" in dirpath or ".xcodeproj" in dirpath or ".xcworkspace" in dirpath:
+                dirs[:] = []
+                continue
+            if os.path.basename(dirpath) != "AppIcon.appiconset":
+                continue
+            contents = os.path.join(dirpath, "Contents.json")
+            if os.path.exists(contents):
+                try:
+                    with open(contents, encoding="utf-8") as f:
+                        c = json.load(f)
+                    for img in c.get("images") or []:
+                        if img.get("size") == "1024x1024" and img.get("filename"):
+                            fp = os.path.join(dirpath, img["filename"])
+                            if os.path.exists(fp):
+                                return os.path.relpath(fp, self.root)
+                except (OSError, json.JSONDecodeError):
+                    pass
+            for fn in os.listdir(dirpath):
+                if fn.lower().endswith(".png"):
+                    fp = os.path.join(dirpath, fn)
+                    info = png_info(fp)
+                    if info and info["width"] >= 1024 and info["width"] == info["height"]:
+                        return os.path.relpath(fp, self.root)
+        return None
+
+    def _icon_candidates(self, cfg):
+        """Return {variant_label: relative_path}, in priority order.
+
+        Expo SDK 53+ supports per-appearance icons as an object:
+            "ios": {"icon": {"light": "...", "dark": "...", "tinted": "..."}}
+        Older config and most bare RN projects just have a plain string. Both
+        shapes have to be handled or a config that predates this feature
+        crashes the whole scan -- which is what happened on a real project.
+        """
+        out = {}
+        ios_icon = (cfg.get("ios") or {}).get("icon")
+        if isinstance(ios_icon, dict):
+            for variant in ("light", "dark", "tinted"):
+                v = ios_icon.get(variant)
+                if isinstance(v, str) and v:
+                    out["ios.icon.%s" % variant] = v.lstrip("./")
+        elif isinstance(ios_icon, str) and ios_icon:
+            out["ios.icon"] = ios_icon.lstrip("./")
+        top_icon = cfg.get("icon")
+        if isinstance(top_icon, str) and top_icon and "icon" not in out:
+            out["icon"] = top_icon.lstrip("./")
+        for fallback in ("assets/icon.png", "assets/images/icon.png"):
+            if not out and self.exists(fallback):
+                out["(default location)"] = fallback
+        return out
+
     def check_icon(self, cfg):
-        icon_rel = (cfg.get("ios") or {}).get("icon") or cfg.get("icon")
-        candidates = []
-        if icon_rel:
-            candidates.append(icon_rel.lstrip("./"))
-        candidates += ["assets/icon.png", "assets/images/icon.png"]
+        candidates = self._icon_candidates(cfg)
         path = None
-        for c in candidates:
-            if self.exists(c):
-                path = c
+        primary_label = None
+        for label, rel in candidates.items():
+            if self.exists(rel):
+                path = rel
+                primary_label = label
                 break
+        if not path:
+            path = self.find_appiconset_1024()
+            primary_label = "AppIcon.appiconset"
         if not path:
             self.add("ICON-MISSING", "critical",
                      "App icon not found",
                      clause="ASC:screenshot-specifications",
-                     evidence="No icon at %s" % ", ".join(candidates),
+                     evidence="No icon at %s, and no AppIcon.appiconset with a "
+                              "1024x1024 entry under ios/"
+                              % (", ".join(candidates.values()) or "any configured path"),
                      fix="Add a 1024x1024 PNG with no alpha channel and point "
                          "`expo.icon` (or `expo.ios.icon`) at it.")
             return
         info = png_info(self.p(path))
-        self.facts["icon"] = dict(path=path, **(info or {}))
+        self.facts["icon"] = dict(path=path, label=primary_label, **(info or {}))
         if not info:
             self.add("ICON-UNREADABLE", "medium", "App icon is not a readable PNG",
                      evidence=path,
@@ -348,19 +411,46 @@ class Scan:
             self.add("ICON-SIZE", "high",
                      "App icon is %dx%d, not 1024x1024" % (w, h),
                      clause="ASC:screenshot-specifications",
-                     evidence="%s is %dx%d" % (path, w, h),
+                     evidence="%s (%s) is %dx%d" % (path, primary_label, w, h),
                      fix="Export a 1024x1024 PNG. App Store Connect rejects the "
                          "upload outright at any other size.")
         if info["has_alpha"]:
             self.add("ICON-ALPHA", "critical",
                      "App icon contains an alpha channel",
                      clause="ASC:screenshot-specifications",
-                     evidence="%s has color type %d%s"
-                              % (path, info["color_type"],
+                     evidence="%s (%s) has color type %d%s"
+                              % (path, primary_label, info["color_type"],
                                  " and a tRNS chunk" if info["trns"] else ""),
                      fix="Flatten the icon onto an opaque background and re-export "
                          "without transparency (color type 2, no tRNS). App Store "
                          "Connect rejects icons with alpha at upload time.")
+
+        # dark/tinted variants must independently satisfy the same rules --
+        # Apple validates each icon asset in the catalog, not just the primary.
+        for label, rel in candidates.items():
+            if rel == path or not self.exists(rel):
+                continue
+            vi = png_info(self.p(rel))
+            if not vi:
+                continue
+            if vi["has_alpha"]:
+                self.add("ICON-ALPHA-%s" % label.split(".")[-1], "critical",
+                         "%s icon contains an alpha channel" % label,
+                         clause="ASC:screenshot-specifications",
+                         evidence="%s has color type %d%s"
+                                  % (rel, vi["color_type"],
+                                     " and a tRNS chunk" if vi["trns"] else ""),
+                         fix="Flatten the %s icon variant onto an opaque background "
+                             "and re-export without transparency." % label)
+            if (vi["width"], vi["height"]) != (1024, 1024):
+                self.add("ICON-SIZE-%s" % label.split(".")[-1], "medium",
+                         "%s icon is %dx%d, not 1024x1024"
+                         % (label, vi["width"], vi["height"]),
+                         clause="ASC:screenshot-specifications",
+                         evidence="%s is %dx%d" % (rel, vi["width"], vi["height"]),
+                         fix="Export the %s variant at 1024x1024 to match the "
+                             "others." % label,
+                         confidence="medium")
 
     def check_usage_descriptions(self, deps, plist):
         weak_res = [re.compile(p) for p in
@@ -1009,6 +1099,12 @@ class Scan:
         if self.platform in ("ios", "both"):
             plist = self.collect_info_plist(cfg)
             self.facts["info_plist_keys"] = sorted(plist.keys())
+            if not self.facts["bundle_id"]:
+                self.facts["bundle_id"] = plist.get("CFBundleIdentifier")
+            if not self.facts["app_name"]:
+                self.facts["app_name"] = plist.get("CFBundleDisplayName") or plist.get("CFBundleName")
+            if not self.facts["version"]:
+                self.facts["version"] = plist.get("CFBundleShortVersionString")
             app_manifest, sdk_manifests = self.find_privacy_manifests()
             self.facts["app_privacy_manifest"] = app_manifest
             self.facts["sdk_privacy_manifest_count"] = len(sdk_manifests)
