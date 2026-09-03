@@ -1,0 +1,50 @@
+ShipCheck — Proprietary Software License
+Copyright (c) 2026 Ryan Baker. All rights reserved.
+
+This software and its accompanying data (the "Software") are proprietary and
+confidential. They are licensed, not sold.
+
+1. GRANT. Subject to this License and to payment of any applicable fee, you are
+   granted a personal, non-exclusive, non-transferable, revocable license to
+   install and use the Software to evaluate applications that you own or are
+   authorised to work on.
+
+2. RESTRICTIONS. You may not, in whole or in part:
+   (a) redistribute, resell, sublicense, rent, lease, or host the Software as a
+       service for third parties;
+   (b) copy the Software or its corpus, pattern files, prompts, or reports for
+       incorporation into any other product, whether commercial or free;
+   (c) modify, reverse engineer, decompile, or create derivative works, except
+       to the limited extent that applicable law expressly permits it despite
+       this restriction;
+   (d) remove or obscure any proprietary notice; or
+   (e) circumvent, disable, or interfere with any licensing, tier, or
+       entitlement mechanism.
+
+3. OWNERSHIP. All right, title, and interest in the Software, including the
+   curated rejection-pattern corpus and the report format, remain with the
+   copyright holder. No rights are granted except as expressly stated here.
+
+4. THIRD-PARTY CONTENT. The Software caches publicly available policy documents
+   published by Apple Inc. and Google LLC. Those documents remain the property
+   of their respective owners, are reproduced for reference only, and are not
+   licensed to you by this License. ShipCheck is not affiliated with,
+   authorised by, or endorsed by Apple Inc. or Google LLC.
+
+5. NO WARRANTY. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+6. NO GUARANTEE OF APPROVAL. The Software produces advisory findings only. App
+   Store and Google Play review outcomes are determined solely by Apple and
+   Google. Nothing in the Software constitutes a prediction, warranty, or legal
+   advice, and a clean report is not a guarantee of approval.
+
+7. LIMITATION OF LIABILITY. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE
+   FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+   CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH
+   THE SOFTWARE OR ITS USE, INCLUDING ANY LOST REVENUE OR DELAYED RELEASE
+   ARISING FROM AN APP STORE OR GOOGLE PLAY REVIEW OUTCOME.
+
+8. TERMINATION. This License terminates automatically if you breach it. On
+   termination you must stop using and delete all copies of the Software.

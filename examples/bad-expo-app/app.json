@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Bad App",
+    "slug": "bad-expo-app",
+    "version": "1.0.0",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "com.example.badapp",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos",
+        "NSLocationWhenInUseUsageDescription": "We need your location."
+      }
+    },
+    "android": {
+      "package": "com.example.badapp",
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.QUERY_ALL_PACKAGES",
+        "android.permission.CAMERA"
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "shipcheck",
+  "owner": { "name": "Ryan Baker", "url": "https://github.com/rbaker" },
+  "description": "ShipCheck — App Store and Google Play rejection-risk checking for React Native and Expo apps.",
+  "version": "0.1.0",
+  "plugins": [
+    {
+      "name": "shipcheck",
+      "source": "./",
+      "displayName": "ShipCheck",
+      "description": "Scans an RN/Expo project plus its store listing metadata and produces a ranked rejection-risk report with guideline citations and exact fixes.",
+      "version": "0.1.0",
+      "author": { "name": "Ryan Baker" },
+      "license": "LicenseRef-Proprietary",
+      "category": "compliance",
+      "keywords": ["app-store", "google-play", "react-native", "expo", "app-review", "compliance"]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "bad-expo-app",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~51.0.0",
+    "expo-router": "~3.5.0",
+    "expo-camera": "~15.0.0",
+    "expo-image-picker": "~15.0.0",
+    "expo-location": "~17.0.0",
+    "expo-file-system": "~17.0.0",
+    "expo-device": "~6.0.0",
+    "expo-dev-client": "~4.0.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-google-signin/google-signin": "^11.0.0",
+    "react-native-fbsdk-next": "^13.0.0",
+    "react-native-purchases": "^7.0.0",
+    "@supabase/supabase-js": "^2.43.0",
+    "react": "18.2.0",
+    "react-native": "0.74.1"
+  },
+  "devDependencies": { "typescript": "^5.3.0" }
+}

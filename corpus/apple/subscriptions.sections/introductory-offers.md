@@ -1,0 +1,5 @@
+<!-- source=subscriptions clause=introductory-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-03T19:54:29+00:00 -->
+
+### Introductory offers
+
+Introductory offers allow new subscribers to experience your subscription before paying full price. Display offers within your app using [StoreKit](/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/implementing_introductory_offers_in_your_app), and [promote](/help/app-store-connect/configure-in-app-purchase-settings/promote-in-app-purchases/) the offer’s In-App Purchase to display it on the App Store. When promoted, your offer appears on your product page and may display in search results as well as on the Today, Games, and Apps tabs — helping to further discovery of your offer. You can [create an introductory offer](/help/app-store-connect/manage-subscriptions/set-up-introductory-offers-for-auto-renewable-subscriptions/) for each subscription per territory. Customers can redeem one introductory offer per subscription group.

@@ -1,0 +1,8 @@
+.shipcheck/
+shipcheck-report.md
+shipcheck-reply.md
+node_modules/
+.DS_Store
+*.pyc
+__pycache__/
+server/node_modules/

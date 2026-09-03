@@ -1,0 +1,16 @@
+<!-- source=age-ratings clause=age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-03T19:54:31+00:00 -->
+
+### Age rating values
+
+These ratings apply to all regions that don’t have any additional regional requirements.
+
+Learn about age rating values with region-specific requirements for [Australia](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#australia-age-rating-values), [Brazil](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#brazil-age-rating-values), and [Korea](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#republic-of-korea-age-rating-values).
+
+| Rating | Definition |
+| --- | --- |
+| 4+ | Apps with this rating contain no objectionable material but may contain instances of the following content that may not be suitable for children under the age of 4: **In-App Controls:** Parental controls Age assurance **Capabilities:** User-generated content Messaging and chat Advertising **Chance-Based Activities:** Infrequent contests |
+| 9+ | Apps with this rating may contain instances of the following content that may not be suitable for children under the age of 9: **Mature Themes** Infrequent profanity and crude humor Infrequent horror or fear themes **Medical or Wellness** Health and wellness topics **Sexuality or Nudity** Infrequent mature or suggestive themes **Violence** Infrequent cartoon or fantasy violence Infrequent guns or other weapons **Chance-Based Activities** Loot boxes |
+| 13+ | Apps with this rating may contain instances of the following content that may not be suitable for children under the age of 13: **Capabilities:** Social media Social media disabled for users under 13 **Mature Themes:** Frequent profanity and crude humor Frequent horror or fear themes Infrequent alcohol, tobacco, or drug use or references **Medical or Wellness:** Infrequent medical or treatment information **Sexuality or Nudity:** Infrequent sexual content or nudity **Violence:** Frequent cartoon or fantasy violence Infrequent realistic violence Frequent guns or other weapons **Chance-Based Activities:** Infrequent simulated gambling Frequent contests |
+| 16+ | Apps with this rating may contain instances of the following content that may not be suitable for children under the age of 16: **Capabilities:** Unrestricted web access **Medical or Wellness:** Frequent medical or treatment information **Sexuality or Nudity:** Frequent mature or suggestive themes |
+| 18+ | Apps with this rating may contain instances of the following content that may not be suitable for children under the age of 18: **Mature Themes:** Frequent alcohol, tobacco, or drug use or references **Sexuality or Nudity:** Frequent sexual content or nudity **Violence:** Frequent realistic violence **Chance-Based Activities:** Gambling Frequent simulated gambling |
+| Unrated | Apps with this rating may contain instances of the following content that can’t be published on the App Store. It may be published on alternative app marketplaces or websites: **Sexuality or Nudity:** Infrequent or Frequent graphic sexual content and nudity **Violence:** Infrequent or Frequent prolonged graphic or sadistic realistic violence |

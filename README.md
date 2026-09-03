@@ -1,0 +1,141 @@
+# ShipCheck
+
+**Find out why Apple will reject your app before Apple tells you.**
+
+ShipCheck is a Claude Code plugin that scans a React Native or Expo project plus
+your store-listing metadata and produces a ranked rejection-risk report — each
+finding carrying the exact guideline clause, the text of that clause, what the
+reviewer will likely say, and the specific fix.
+
+Apple rejects a large share of submissions, and each rejection costs a review
+cycle. Most of those rejections are things a script and a current copy of the
+rules can see from the outside.
+
+---
+
+## Install
+
+```
+/plugin marketplace add rbaker/shipcheck
+/plugin install shipcheck@shipcheck
+```
+
+Then, in your Expo/RN project:
+
+```
+/shipcheck:scan
+```
+
+First run drops a `shipcheck.metadata.md` template in your project root. Fill it
+in with what you will actually paste into App Store Connect, then scan again —
+roughly half of App Store rejections are metadata problems that cannot be seen
+from code.
+
+Requires Python 3.9+ (preinstalled on macOS). No pip packages, no Node
+dependencies, no build step.
+
+## Commands
+
+| Command | What it does |
+|---|---|
+| `/shipcheck:scan` | Full iOS + Android rejection-risk report → `shipcheck-report.md` |
+| `/shipcheck:android` | Google Play only: Data safety, permissions, target API, testing gate |
+| `/shipcheck:refresh` | Re-fetch Apple/Google policy and print a changelog of what changed |
+| `/shipcheck:reply` | Draft a Resolution Center reply to a rejection you received |
+| `/shipcheck:license` | Store or check your license key |
+
+## What it checks
+
+**iOS** — privacy manifest and required-reason API declarations (app and SDK);
+`NSUsageDescription` strings for permissions pulled in transitively by Expo
+modules, including Expo's generic default strings that reviewers reject;
+Sign in with Apple when third-party login is present (4.8); subscription terms
+and paywall disclosure (3.1.2); restore purchases (3.1.1); in-app account
+deletion (5.1.1(v)); demo account behind a login wall (2.1); placeholder text
+and broken links in metadata (2.3); screenshots claiming features not in the
+build (2.3.3); ATT prompt timing and wording; minimum functionality / web
+wrapper risk (4.2); category rules for health, dating, kids and gambling; age
+rating mismatches; export compliance; dev-client artifacts in production builds;
+1024px icon with an alpha channel.
+
+**Android** — manifest permissions versus Data safety declarations; sensitive
+permissions needing a Play Console declaration; prominent disclosure for runtime
+permissions; target API level against the current floor; foreground service
+types and their permissions; account deletion including the web route Play
+requires and Apple does not; Play Billing disclosures; and the closed-testing
+gate for new personal developer accounts.
+
+## Why the corpus matters
+
+Apple and Google change these pages constantly. ShipCheck does not hardcode
+policy text. It fetches **37 official Apple and Google pages** and caches them
+with a fetch date and a SHA-256, chunked so a citation points at an exact clause
+— the App Store Review Guidelines are split into **137 numbered clauses**, each
+with a deep link back to Apple's page.
+
+`/shipcheck:refresh` re-fetches everything and diffs it against the previous
+hash, so you can see exactly what policy text changed and when. Findings quote
+the clause **off disk**, which means a citation in your report is text ShipCheck
+actually fetched, not text a model remembered.
+
+Only structural facts are hardcoded — file paths, plist key names, permission
+strings — because those are stable.
+
+## Privacy guarantee
+
+**Your code never leaves your machine.**
+
+All reasoning runs inside your own Claude Code session. There is no ShipCheck
+server that sees your project. The only outbound requests ShipCheck makes are:
+
+1. Fetching public Apple/Google policy pages (`/shipcheck:refresh`).
+2. Reachability checks on the URLs *you* put in `shipcheck.metadata.md`
+   (skip with `--offline`).
+3. A license check containing **only your license key and the plugin version**.
+
+That third one is verifiable rather than promised: read `scripts/license.py`.
+The function `_payload()` is the entire request body — a key and a version
+string. No project path, no dependency list, no metadata, no findings.
+
+If the license endpoint is unreachable, ShipCheck fails **open** and treats you
+as licensed. An outage on our side never blocks your release.
+
+## Free vs paid
+
+The free scan gives you the risk score and the three findings most likely to get
+your build rejected. The full report — every finding, with clause text, reviewer
+language, and file-level fixes — and `/shipcheck:reply` need a license key.
+
+```
+/shipcheck:license YOUR-KEY-HERE
+```
+
+Stored at `~/.shipcheck/license`, cached for 7 days.
+
+## Layout
+
+```
+.claude-plugin/     plugin.json, marketplace.json
+skills/shipcheck/   SKILL.md — the reasoning procedure
+commands/           the five slash commands
+scripts/            fetch_corpus.py, scan.py, report.py, license.py
+                    htmlmd.py, docc.py, asrg.py  (extractors)
+                    data/rn_sdk_map.json         (structural rules)
+corpus/             cached policy, chunked, + manifest.json
+corpus/patterns/    hand-curated RN/Expo rejection patterns
+server/validate.js  license endpoint (deploy yourself)
+examples/           a deliberately non-compliant Expo app, for testing
+```
+
+## Not a guarantee
+
+ShipCheck is advisory. App Review outcomes are decided by Apple and Google. A
+clean report means the things ShipCheck knows how to check look right — it does
+not mean you will be approved. Findings marked *Not checked* are gaps, not
+passes; read that section.
+
+Not affiliated with Apple Inc. or Google LLC.
+
+---
+
+© 2026 Ryan Baker. Proprietary — see [LICENSE](LICENSE).

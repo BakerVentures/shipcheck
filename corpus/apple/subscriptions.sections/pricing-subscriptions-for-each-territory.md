@@ -1,0 +1,9 @@
+<!-- source=subscriptions clause=pricing-subscriptions-for-each-territory url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-03T19:54:29+00:00 -->
+
+### Pricing subscriptions for each territory
+
+Apps with auto-renewable subscriptions can choose from 800 price points across all available currencies and price tiers, with an additional 100 higher price points available [upon request](/contact/request/app-store-higher-price-points/). You can set the prices you think are appropriate for subscribers in different locations, and you have the flexibility to price your subscriptions at parity across storefronts.
+
+**Pricing tool.** The App Store Connect pricing tool can help you manage pricing based on current exchange rates. If there’s a tax change or currency adjustment in a particular region, the price of subscriptions won’t generally be affected unless you decide to pass the change on to your users. If you want to change the price of a subscription in a specific market, it’s important to understand which markets are tax inclusive before you take action. For example, if you decide to lower the subscription price for users in Germany, the revenue you’ll receive will be the purchase price minus the European Union’s value added tax (VAT) and minus Apple’s commission. The default pricing in the App Store Connect pricing tool is inclusive of applicable taxes that Apple collects and remits. For more information, review Schedule 2 of the Apple Developer Program License Agreement, which describes territories that have different tax treatments.
+
+App Store Connect also lets you [assign tax categories](/help/app-store-connect/manage-app-information/set-a-tax-category/) to your apps and In-App Purchases. These categories are based on your app’s content (for example, videos, books, or news publications) and determine which tax regulations apply in each territory, allowing Apple to administer tax for you at specific rates.

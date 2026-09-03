@@ -1,0 +1,13 @@
+<!-- source=subscriptions clause=ranking-subscriptions-within-the-group url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-03T19:54:29+00:00 -->
+
+### Ranking subscriptions within the group
+
+If you offer multiple subscriptions with different prices tiers, you can assign each to a level in App Store Connect. Ranking your subscriptions determines the upgrade, downgrade, and crossgrade paths available. Arrange your subscriptions in order from the one that offers the most (level 1) to the one that offers the least. For subscriptions with lower service or content offerings, you might assign level 2 or 3, depending on your intended subscription experience. You can add more than one subscription to each level if the offerings are equal. For details, see [Overview of an Auto-renewable Subscription Group Setup](/help/app-store-connect/manage-subscriptions/offer-auto-renewable-subscriptions/).
+
+People can manage their subscriptions in their account settings on the App Store, where they see all renewal options and subscription groups, and can choose to upgrade, crossgrade, or downgrade between subscriptions as often as they like. You can also use the [showManageSubscriptions(in:)](/documentation/storekit/appstore/3803198-showmanagesubscriptions/) method to allow them to do this within your app. When someone makes a change in their subscription level, the timing of the change varies depending on what has happened:
+
+**Upgrade.** Someone purchases a subscription that offers a higher level of service than their current subscription. They’re immediately upgraded and receive a refund of the prorated amount of their original subscription. If you’d like people to immediately access more content or features, rank the subscription higher to make it an upgrade.
+
+**Downgrade.** Someone selects a subscription that offers a lower level of service than their current subscription. The subscription continues until the next renewal date, then is renewed at the lower level and price.
+
+**Crossgrade.** Someone switches to a new subscription of the equivalent level. If both subscriptions are pay-up-front subscriptions and the same duration, the new subscription begins immediately. If the durations are different, the new subscription goes into effect at the next renewal date. When at least one subscription is a monthly subscription with a 12-month commitment, the commitment durations and billing plan types of the subscriptions are also considered. [Learn more](/help/app-store-connect/reference/in-app-purchases-and-subscriptions/auto-renewable-subscription-information/)
