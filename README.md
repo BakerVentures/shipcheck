@@ -57,6 +57,30 @@ from code.
 Requires Python 3.9+ (preinstalled on macOS). No pip packages, no Node
 dependencies, no build step.
 
+## Also runs without Claude Code
+
+The deterministic half is a zero-dependency Python CLI, so it works in CI or
+from any other agent:
+
+```bash
+shipcheck scan .          # terminal report; exits 1 on a critical finding
+shipcheck init .          # add the store-listing metadata template
+shipcheck report .        # write shipcheck-report.md
+shipcheck corpus          # what the cached policy corpus contains
+```
+
+In GitHub Actions:
+
+```yaml
+- uses: BakerVentures/shipcheck@v1
+  with:
+    fail-on: critical
+```
+
+The judgment checks — store listing, paywall disclosure, category rules,
+guideline 4.2 — need a model reading current guideline text, so those live in
+the Claude Code plugin where your own Claude does that work.
+
 ## Commands
 
 | Command | What it does |

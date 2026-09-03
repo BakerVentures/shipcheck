@@ -1,0 +1,102 @@
+name: "ShipCheck"
+description: "Catch App Store and Google Play rejections in CI, before you submit."
+branding:
+  icon: "check-circle"
+  color: "purple"
+inputs:
+  path:
+    description: "Path to the React Native / Expo project"
+    required: false
+    default: "."
+  platform:
+    description: "ios, android, or both"
+    required: false
+    default: "both"
+  fail-on:
+    description: "Fail the job at this severity or above: critical, high, medium, never"
+    required: false
+    default: "critical"
+  offline:
+    description: "Skip outbound URL reachability checks"
+    required: false
+    default: "false"
+  report:
+    description: "Also write shipcheck-report.md"
+    required: false
+    default: "true"
+outputs:
+  score:
+    description: "Rejection-risk score, 0-100"
+    value: ${{ steps.run.outputs.score }}
+  critical:
+    description: "Number of critical findings"
+    value: ${{ steps.run.outputs.critical }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - id: run
+      shell: bash
+      run: |
+        set -uo pipefail
+        ARGS=("${{ inputs.path }}" "--platform" "${{ inputs.platform }}")
+        [ "${{ inputs.offline }}" = "true" ] && ARGS+=("--offline")
+
+        "${{ github.action_path }}/bin/shipcheck" scan "${ARGS[@]}" | tee /tmp/shipcheck.txt
+        if [ "${{ inputs.report }}" = "true" ]; then
+          "${{ github.action_path }}/bin/shipcheck" report "${ARGS[@]}" || true
+        fi
+
+        python3 - <<'PY' >> "$GITHUB_OUTPUT"
+        import json, os, subprocess, sys
+        sys.path.insert(0, os.path.join(os.environ["ACTION_PATH"], "scripts"))
+        from scan import Scan
+        import report as R
+        d = Scan(os.environ["IN_PATH"], os.environ["IN_PLATFORM"],
+                 os.environ["IN_OFFLINE"] == "true").run()
+        f = d["findings"]
+        counts = {s: sum(1 for x in f if x["severity"] == s) for s in
+                  ("critical", "high", "medium", "low")}
+        print("score=%d" % R.score(f))
+        for k, v in counts.items():
+            print("%s=%d" % (k, v))
+        json.dump(counts, open("/tmp/shipcheck-counts.json", "w"))
+        PY
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        IN_PATH: ${{ inputs.path }}
+        IN_PLATFORM: ${{ inputs.platform }}
+        IN_OFFLINE: ${{ inputs.offline }}
+
+    - shell: bash
+      run: |
+        {
+          echo '## ShipCheck'
+          echo
+          echo '```'
+          sed 's/\x1b\[[0-9;]*m//g' /tmp/shipcheck.txt
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+
+    - shell: bash
+      run: |
+        FAIL_ON="${{ inputs.fail-on }}"
+        [ "$FAIL_ON" = "never" ] && exit 0
+        python3 - <<'PY'
+        import json, os, sys
+        counts = json.load(open("/tmp/shipcheck-counts.json"))
+        order = ["critical", "high", "medium", "low"]
+        gate = os.environ["FAIL_ON"]
+        if gate not in order:
+            sys.exit(0)
+        n = sum(counts.get(s, 0) for s in order[:order.index(gate) + 1])
+        if n:
+            print("::error::ShipCheck found %d finding(s) at %s or above." % (n, gate))
+            sys.exit(1)
+        print("ShipCheck: nothing at %s or above." % gate)
+        PY
+      env:
+        FAIL_ON: ${{ inputs.fail-on }}

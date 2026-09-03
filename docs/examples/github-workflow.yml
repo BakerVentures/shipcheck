@@ -1,0 +1,33 @@
+# Drop this in .github/workflows/shipcheck.yml
+name: ShipCheck
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  rejection-risk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # node_modules and ios/Pods make the privacy-manifest checks exact rather
+      # than a guess, so install if you can afford the minute.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+
+      - uses: BakerVentures/shipcheck@v1
+        with:
+          path: .
+          platform: both
+          fail-on: critical
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shipcheck-report
+          path: shipcheck-report.md

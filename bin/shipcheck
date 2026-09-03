@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""ShipCheck CLI.
+
+The deterministic half of ShipCheck, runnable without Claude Code — in CI, from
+a Makefile, or from any other agent. Same scanner, same corpus, same citations.
+
+The judgment half (store-listing metadata, paywall disclosure, 4.2, category
+rules) needs a model reading current guideline text, and lives in the Claude
+Code plugin where the user's own Claude does that work.
+
+    shipcheck scan [path]        terminal report; exits 1 on a critical finding
+    shipcheck report [path]      write shipcheck-report.md
+    shipcheck init [path]        drop a shipcheck.metadata.md template
+    shipcheck refresh            re-fetch policy corpus and diff
+    shipcheck corpus             show what the cached corpus contains
+
+Standard library only. Python 3.9+.
+"""
+import argparse
+import json
+import os
+import subprocess
+import shutil
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+SCRIPTS = os.path.join(ROOT, "scripts")
+sys.path.insert(0, SCRIPTS)
+
+import report as report_mod                          # noqa: E402
+from scan import Scan                                # noqa: E402
+
+USE_COLOR = sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
+
+
+def c(code, text):
+    return "\033[%sm%s\033[0m" % (code, text) if USE_COLOR else text
+
+
+BADGE = {
+    "critical": lambda: c("1;31", "CRITICAL"),
+    "high":     lambda: c("31", "HIGH    "),
+    "medium":   lambda: c("33", "MEDIUM  "),
+    "low":      lambda: c("2", "LOW     "),
+    "info":     lambda: c("2", "INFO    "),
+}
+ORDER = ["critical", "high", "medium", "low", "info"]
+
+
+def wrap(text, width, indent):
+    out, line = [], ""
+    for word in str(text).split():
+        if len(line) + len(word) + 1 > width:
+            out.append(line)
+            line = word
+        else:
+            line = (line + " " + word).strip()
+    if line:
+        out.append(line)
+    return ("\n" + " " * indent).join(out)
+
+
+def run_scan(path, platform, offline):
+    return Scan(path, platform, offline).run()
+
+
+def cmd_scan(args):
+    data = run_scan(args.path, args.platform, args.offline)
+    findings = report_mod.rank(data["findings"])
+    facts = data["facts"]
+    width = min(shutil.get_terminal_size((100, 24)).columns, 100)
+
+    print()
+    print("  %s  %s%s" % (c("1", "shipcheck"),
+                          facts.get("app_name") or os.path.basename(
+                              os.path.abspath(args.path)),
+                          "  v%s" % facts["version"] if facts.get("version") else ""))
+    cm = os.path.join(ROOT, "corpus", "manifest.json")
+    if os.path.exists(cm):
+        with open(cm, encoding="utf-8") as f:
+            m = json.load(f)
+        print("  %s" % c("2", "policy corpus: %d sources, fetched %s"
+                         % (m.get("source_count", 0),
+                            (m.get("generated_at") or "?")[:10])))
+    print()
+
+    if not findings:
+        print("  %s  nothing blocking found" % c("1;32", "CLEAR"))
+    score = report_mod.score(findings)
+
+    shown = None
+    for f in findings:
+        sev = f.get("severity", "info")
+        if sev != shown:
+            shown = sev
+            print()
+        blocks = report_mod.blocks(f)
+        head = "  %s  %s" % (BADGE.get(sev, BADGE["info"])(),
+                             wrap(f["title"], width - 14, 12))
+        print(head)
+        tags = []
+        if f.get("clause"):
+            tags.append(f["clause"])
+        if f.get("itms"):
+            tags.append(f["itms"])
+        tags.append(report_mod.BLOCK_LABEL[blocks])
+        if f.get("confidence") and f["confidence"] != "high":
+            tags.append("confidence: %s" % f["confidence"])
+        print("            %s" % c("2", " · ".join(tags)))
+        if f.get("evidence") and args.verbose:
+            print("            %s" % c("2", wrap(f["evidence"], width - 14, 12)))
+        if f.get("fix"):
+            # keep the first two lines: the plist/gradle fixes put the actual
+            # key on line two, so truncating at the newline loses the answer
+            fix = " ".join(l.strip() for l in f["fix"].split("\n")[:2] if l.strip())
+            print("            %s %s" % (c("2", "fix:"), wrap(fix, width - 18, 17)))
+
+    counts = {s: sum(1 for f in findings if f["severity"] == s) for s in ORDER}
+    print()
+    print("  " + "─" * (width - 4))
+    verdict = (c("1;31", "NOT READY") if counts["critical"]
+               else c("1;33", "REVIEW") if counts["high"]
+               else c("1;32", "LOOKS CLEAR"))
+    print("  %s — risk %d/100 · %s" % (
+        verdict, score,
+        " · ".join("%d %s" % (counts[s], s) for s in ORDER if counts[s])))
+
+    upload = sum(1 for f in findings if report_mod.blocks(f) == "upload")
+    meta = sum(1 for f in findings if report_mod.blocks(f) == "metadata")
+    if upload:
+        print("  %d block the upload." % upload)
+    if meta:
+        print("  %d are metadata only — fixable in App Store Connect, no new build."
+              % meta)
+
+    for g in data["gaps"]:
+        print("  %s %s — %s" % (c("33", "not checked:"), g["what"],
+                                wrap(g["why"], width - 20, 4)))
+
+    if not facts.get("metadata_present"):
+        print()
+        print("  %s" % c("1", "Half of App Store rejections are store-listing "
+                              "problems (guideline 2.3)."))
+        print("  Those cannot be seen from code. Run %s to add the listing,"
+              % c("1", "shipcheck init"))
+        print("  then %s in Claude Code for the judgment checks."
+              % c("1", "/shipcheck:scan"))
+    print()
+    return 1 if counts["critical"] else 0
+
+
+def cmd_report(args):
+    data = run_scan(args.path, args.platform, args.offline)
+    out = args.out or os.path.join(args.path, "shipcheck-report.md")
+    tmp = os.path.join(args.path, ".shipcheck")
+    os.makedirs(tmp, exist_ok=True)
+    fp = os.path.join(tmp, "findings.json")
+    with open(fp, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, default=str)
+    subprocess.run([sys.executable, os.path.join(SCRIPTS, "report.py"),
+                    "--findings", fp, "--out", out], check=True)
+    return 0
+
+
+def cmd_init(args):
+    dest = os.path.join(args.path, "shipcheck.metadata.md")
+    if os.path.exists(dest) and not args.force:
+        print("shipcheck.metadata.md already exists (use --force to overwrite)")
+        return 1
+    shutil.copyfile(os.path.join(ROOT, "templates", "shipcheck.metadata.md"), dest)
+    print("Wrote %s" % dest)
+    print("Fill it in with what you will paste into App Store Connect, then "
+          "re-run.")
+    return 0
+
+
+def cmd_refresh(args):
+    return subprocess.run(
+        [sys.executable, os.path.join(SCRIPTS, "fetch_corpus.py"), "--diff"]).returncode
+
+
+def cmd_corpus(args):
+    with open(os.path.join(ROOT, "corpus", "manifest.json"), encoding="utf-8") as f:
+        m = json.load(f)
+    print("%d sources · %d chunks · %d failures · fetched %s"
+          % (m["source_count"], sum(s["section_count"] for s in m["sources"]),
+             m["failure_count"], m["generated_at"][:10]))
+    for s in m["sources"]:
+        flag = " (substituted)" if s.get("substituted_from") else ""
+        print("  %-8s %-32s %5d chars  %3d sections%s"
+              % (s["vendor"], s["id"][:32], s["chars"], s["section_count"], flag))
+    return 0
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="shipcheck",
+                                 description=__doc__.split("\n")[2])
+    sub = ap.add_subparsers(dest="cmd")
+
+    def common(p):
+        p.add_argument("path", nargs="?", default=".")
+        p.add_argument("--platform", default="both",
+                       choices=["ios", "android", "both"])
+        p.add_argument("--offline", action="store_true",
+                       help="skip outbound URL reachability checks")
+        return p
+
+    s = common(sub.add_parser("scan", help="terminal report"))
+    s.add_argument("-v", "--verbose", action="store_true")
+    s.set_defaults(fn=cmd_scan)
+
+    r = common(sub.add_parser("report", help="write shipcheck-report.md"))
+    r.add_argument("--out", default="")
+    r.set_defaults(fn=cmd_report)
+
+    i = sub.add_parser("init", help="add a shipcheck.metadata.md template")
+    i.add_argument("path", nargs="?", default=".")
+    i.add_argument("--force", action="store_true")
+    i.set_defaults(fn=cmd_init)
+
+    sub.add_parser("refresh", help="re-fetch policy corpus").set_defaults(fn=cmd_refresh)
+    sub.add_parser("corpus", help="show cached corpus").set_defaults(fn=cmd_corpus)
+
+    args = ap.parse_args()
+    if not getattr(args, "fn", None):
+        ap.print_help()
+        return 0
+    return args.fn(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
