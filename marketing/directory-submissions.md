@@ -14,8 +14,17 @@ Safety notes: read-only against the project; network calls limited to public App
 travisvn/awesome-claude-skills:
 - [shipcheck](https://github.com/BakerVentures/shipcheck) — App Store / Google Play rejection-risk scanner for React Native and Expo apps, checked against live guidelines.
 
-hesreallyhim/awesome-claude-code:
-- [shipcheck](https://github.com/BakerVentures/shipcheck) — Pre-submission App Store and Google Play compliance scanner for RN/Expo projects.
+hesreallyhim/awesome-claude-code -- DO NOT PR. Their CONTRIBUTING.md is explicit:
+"Do not open a PR. Just fill out the form... It is not possible to submit a
+resource recommendation using the `gh` CLI." Submit instead via their issue
+form: https://github.com/hesreallyhim/awesome-claude-code/issues/new?template=recommend-resource.yml
+Two more blockers to clear first, both stated in their own rules:
+  - the resource must be 14+ days old with ongoing commits, OR have 100+ stars
+    (this repo has neither yet -- wait, or come back once it does)
+  - "if your project requires any form of signup or payment, this is a
+    blocker for reviewing it" -- shipcheck's paid tier makes this a real
+    obstacle, not just a formality. Worth reading their full CONTRIBUTING.md
+    before deciding whether to submit at all.
 
 Also submit at: claudemarketplaces.com, claudeskills.info, awesomeclaude.ai, agentskill.club, mcpmarket.com. Each has a paste-the-URL form.
 
