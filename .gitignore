@@ -18,3 +18,4 @@ server/node_modules/
 !examples/bad-expo-app/shipcheck-report.md
 
 bindings.json
+evals/results/
