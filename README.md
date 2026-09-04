@@ -12,7 +12,7 @@ reviewer will likely say, and the specific fix.
 ```
 $ /shipcheck:scan
 
-shipcheck · guidelines fetched 2026-09-03 · risk 71/100
+shipcheck · guidelines fetched 2026-09-04 · risk 71/100
 
 HIGH  5.1.1(v)    Account deletion not found
       Reviewer will say: "Your app supports account creation but does not

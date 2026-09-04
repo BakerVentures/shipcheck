@@ -10,7 +10,7 @@ shipcheck is a Claude Code plugin that scans your React Native or Expo project a
 Runs in your own Claude Code, so your code never leaves your machine. Every app gets a free scan.
 
 Maker first comment:
-Hey everyone. I ship a subscription app in Expo and the rejections that hurt were never in my code: an SDK missing its privacy manifest, a paywall missing the renewal period, a screenshot of a flagged feature. shipcheck catches those. The guidelines are fetched live and hashed, so it also diffs what Apple changed since your last scan. Free first scan, $29 per app after that. Ask me anything about what it does and doesn't catch.
+Hey everyone. I ship a subscription app in Expo and the rejections that hurt were never in my code: an SDK missing its privacy manifest, a paywall missing the renewal period, a screenshot of a flagged feature. shipcheck catches those. The guidelines are fetched live and hashed, so it also diffs what Apple changed since your last scan. Free scan on every app, $29 to unlock the full report for that app. Ask me anything about what it does and doesn't catch.
 
 Launch checklist:
 - Launch Tuesday–Thursday at 12:01am PT (or a weekend if you want a quieter board).
