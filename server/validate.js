@@ -39,7 +39,21 @@ const path = require('path');
 const app = express();
 app.use(express.json({ limit: '4kb' }));
 
-const LS_VALIDATE = 'https://api.lemonsqueezy.com/v1/licenses/validate';
+// Malformed JSON otherwise falls through to Express's default HTML error
+// page, which includes the full server filesystem path and a stack trace --
+// harmless to the plugin (license.py fails open on any non-JSON response
+// either way) but a real information leak to anyone who sends a bad body on
+// purpose. Clean JSON, no internals, same shape as every other response here.
+app.use((err, _req, res, next) => {
+  if (err instanceof SyntaxError && 'body' in err) {
+    return res.status(200).json({ valid: false, error: 'malformed request body' });
+  }
+  return next(err);
+});
+
+// Overridable for local testing against a mock upstream; defaults to the
+// real Lemon Squeezy endpoint in every real deployment.
+const LS_VALIDATE = process.env.LS_VALIDATE_URL || 'https://api.lemonsqueezy.com/v1/licenses/validate';
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 7 * 24 * 60 * 60 * 1000);
 const STORE_ID = process.env.LEMONSQUEEZY_STORE_ID || '';
 const SINGLE_APP_SEATS = Number(process.env.SINGLE_APP_SEATS || 1);
