@@ -68,6 +68,7 @@ from any other agent:
 
 ```bash
 shipcheck scan .          # terminal report; exits 1 on a critical finding
+shipcheck scan . --json   # same scan, machine-readable output for scripting
 shipcheck init .          # add the store-listing metadata template
 shipcheck report .        # write shipcheck-report.md
 shipcheck corpus          # what the cached policy corpus contains

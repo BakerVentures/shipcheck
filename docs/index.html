@@ -21,7 +21,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA;--cta-bg:#1B2430;--cta-fg:#FFFFFF}
+@media (prefers-color-scheme: dark) {
+  :root{--bg:#0F1419;--panel:#171D26;--ink:#E4E9EF;--muted:#8FA3B5;--line:#2A3341;--red:#FF6B7A;--amber:#F2C14E;--green:#6FCF97;--cta-bg:#E4E9EF;--cta-fg:#0F1419}
+}
 *{box-sizing:border-box}
 html{background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 body{margin:0}
@@ -39,21 +42,26 @@ h1{font-size:clamp(30px,5vw,44px);line-height:1.1;letter-spacing:-.02em;font-wei
 .term b{font-weight:500;color:#fff}
 .install{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 56px}
 .install code{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font:14px "IBM Plex Mono",monospace}
-.install button{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:11px 16px;font:500 14px "IBM Plex Sans",sans-serif;cursor:pointer}
+.install button{background:var(--cta-bg);color:var(--cta-fg);border:0;border-radius:6px;padding:11px 16px;font:500 14px "IBM Plex Sans",sans-serif;cursor:pointer}
 .install button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 .install small{color:var(--muted);width:100%}
+.stat{font-size:14px;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin:0 0 40px}
+.stat b{color:var(--ink);font-weight:600}
+.stat a{color:inherit;text-decoration:underline;text-decoration-color:var(--line)}
 h2{font-size:22px;letter-spacing:-.01em;font-weight:600;margin:0 0 12px}
 section{margin:0 0 52px}
 section p{max-width:620px;margin:0 0 12px}
 .checks{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
 .checks li{display:grid;grid-template-columns:78px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
 .checks .c{font:500 13px "IBM Plex Mono",monospace;color:var(--muted);padding-top:2px}
-.pricing{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pricing{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.agency-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;padding:14px 20px;margin:14px 0 0;font-size:14px;color:var(--muted)}
+.agency-row a{color:var(--ink);font-weight:500;white-space:nowrap}
 .plan{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px}
 .plan .price{font-size:30px;font-weight:600;letter-spacing:-.02em;margin:4px 0}
 .plan .per{color:var(--muted);font-size:14px}
 .plan p{margin:10px 0 16px;color:var(--muted);font-size:15px}
-.plan a{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;border-radius:6px;padding:10px 14px;font-weight:500;font-size:14px}
+.plan a{display:inline-block;background:var(--cta-bg);color:var(--cta-fg);text-decoration:none;border-radius:6px;padding:10px 14px;font-weight:500;font-size:14px}
 .plan.free{border-style:dashed;background:transparent}
 .plan.free a{background:transparent;color:var(--ink);border:1px solid var(--ink)}
 .faq dt{font-weight:600;margin-top:16px}
@@ -100,6 +108,8 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
   <button onclick="navigator.clipboard.writeText(document.getElementById('cmd').textContent);this.textContent='Copied'">Copy install command</button>
   <small>Runs inside your own Claude Code. Your code never leaves your machine.</small>
 </div>
+
+<p class="stat">Apple's App Review team evaluated <b>9.1 million</b> submissions in 2025 and rejected <b>over 2 million</b> of them — including <b>443,000+ for privacy violations</b> alone. Most of those are one missing plist entry or a transitive SDK's privacy manifest. (<a href="https://www.apple.com/newsroom/2026/05/the-app-store-stopped-over-2-point-2-billion-usd-in-fraudulent-transactions-in-2025/">Apple Newsroom, May 2026</a>)</p>
 
 <img src="assets/how-it-works.png" alt="Three steps: scan the project and store listing, check against live Apple and Google policy, get a ranked report with fixes" style="width:100%;max-width:100%;height:auto;border-radius:8px;margin:0 0 52px;display:block">
 <section id="checks">
@@ -158,13 +168,8 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
     <p>Everything above across every project you ship.</p>
     <a href="REPLACE_CHECKOUT_YEARLY">Buy unlimited</a>
   </div>
-  <div class="plan">
-    <div class="price">$149</div>
-    <div class="per">per year, agencies</div>
-    <p>Unlimited apps, shareable across your team, priority guideline updates.</p>
-    <a href="REPLACE_CHECKOUT_AGENCY">Buy for a team</a>
-  </div>
 </div>
+<p class="agency-row">Need team seats? <b style="color:var(--ink)">$149/yr</b> — unlimited apps, shareable across your team, priority guideline updates. <a href="REPLACE_CHECKOUT_AGENCY">Buy for a team &rarr;</a></p>
 </section>
 
 <section>
@@ -173,6 +178,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
   <dt>Does my code get uploaded anywhere?</dt><dd>No. The scan runs in your own Claude Code session. The only network calls are fetching Apple and Google's public policy pages and, if you buy a license, a key check that sends the key and plugin version and nothing else.</dd>
   <dt>Does it guarantee approval?</dt><dd>No. It catches the rejections that come from the guidelines and from common React Native and Expo configuration mistakes. It can't run your app or predict a reviewer's mood.</dd>
   <dt>Why React Native and Expo specifically?</dt><dd>Because that's where the config-level rejections cluster: transitive permission strings, SDK privacy manifests, Expo Go leftovers. Native Swift projects work too, with less depth.</dd>
+  <dt>Why not just ask Claude to review my app against the guidelines?</dt><dd>Because "the guidelines" in Claude's training data are however old the model's cutoff is, and Apple and Google change these pages constantly. shipcheck fetches the live pages, hashes them, and cites the clause off disk — <code>/shipcheck:refresh</code> shows you exactly what changed since your last scan. A citation in your report is text it actually fetched, not text a model remembered.</dd>
   <dt>Refunds?</dt><dd>Fourteen days, no questions. Email the address on your receipt.</dd>
 </dl>
 </section>

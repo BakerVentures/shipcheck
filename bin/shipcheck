@@ -69,6 +69,14 @@ def cmd_scan(args):
     data = run_scan(args.path, args.platform, args.offline)
     findings = report_mod.rank(data["findings"])
     facts = data["facts"]
+
+    if args.json:
+        counts = {s: sum(1 for f in findings if f["severity"] == s) for s in ORDER}
+        out = dict(facts=facts, findings=findings, gaps=data["gaps"],
+                   score=report_mod.score(findings), counts=counts)
+        print(json.dumps(out, indent=2, ensure_ascii=False, default=str))
+        return 1 if counts["critical"] else 0
+
     width = min(shutil.get_terminal_size((100, 24)).columns, 100)
 
     print()
@@ -208,6 +216,9 @@ def main():
 
     s = common(sub.add_parser("scan", help="terminal report"))
     s.add_argument("-v", "--verbose", action="store_true")
+    s.add_argument("--json", action="store_true",
+                   help="machine-readable output instead of the terminal report "
+                        "(for CI or scripting); exit code is unchanged")
     s.set_defaults(fn=cmd_scan)
 
     r = common(sub.add_parser("report", help="write shipcheck-report.md"))
