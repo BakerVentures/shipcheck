@@ -61,21 +61,41 @@ runs:
           "${{ github.action_path }}/bin/shipcheck" report "${ARGS[@]}" || true
         fi
 
-        python3 - <<'PY' >> "$GITHUB_OUTPUT"
-        import json, os, subprocess, sys
-        sys.path.insert(0, os.path.join(os.environ["ACTION_PATH"], "scripts"))
-        from scan import Scan
-        import report as R
-        d = Scan(os.environ["IN_PATH"], os.environ["IN_PLATFORM"],
-                 os.environ["IN_OFFLINE"] == "true").run()
-        f = d["findings"]
-        counts = {s: sum(1 for x in f if x["severity"] == s) for s in
-                  ("critical", "high", "medium", "low")}
-        print("score=%d" % R.score(f))
-        for k, v in counts.items():
-            print("%s=%d" % (k, v))
-        json.dump(counts, open("/tmp/shipcheck-counts.json", "w"))
+        # Decoupled from the GITHUB_OUTPUT redirect on purpose: chaining
+        # `python3 <<'PY' >> "$GITHUB_OUTPUT"` directly means any failure --
+        # inside the python or in setting up the redirect itself -- aborts
+        # silently under errexit, which is exactly how the outputs went
+        # missing the first time this action ran for real. Write to a plain
+        # file first, print it either way so a failure is visible in the log
+        # instead of swallowed, then append it to GITHUB_OUTPUT as its own
+        # simple, separately-diagnosable step.
+        python3 - > /tmp/shipcheck-outputs.txt 2>&1 <<'PY' || true
+        import json, os, sys, traceback
+        try:
+            sys.path.insert(0, os.path.join(os.environ["ACTION_PATH"], "scripts"))
+            from scan import Scan
+            import report as R
+            d = Scan(os.environ["IN_PATH"], os.environ["IN_PLATFORM"],
+                     os.environ["IN_OFFLINE"] == "true").run()
+            f = d["findings"]
+            counts = {s: sum(1 for x in f if x["severity"] == s) for s in
+                      ("critical", "high", "medium", "low")}
+            json.dump(counts, open("/tmp/shipcheck-counts.json", "w"))
+            print("score=%d" % R.score(f))
+            for k, v in counts.items():
+                print("%s=%d" % (k, v))
+        except Exception:
+            # Whatever went wrong, surface it plainly in the log instead of
+            # silently producing no outputs -- that silence is exactly what
+            # made the first real run of this action pass a test for the
+            # wrong reason.
+            traceback.print_exc()
         PY
+
+        echo "----- outputs script log -----"
+        cat /tmp/shipcheck-outputs.txt
+        echo "-------------------------------"
+        grep -E '^(score|critical|high|medium|low)=' /tmp/shipcheck-outputs.txt >> "$GITHUB_OUTPUT" || true
       env:
         ACTION_PATH: ${{ github.action_path }}
         IN_PATH: ${{ inputs.path }}

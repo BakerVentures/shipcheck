@@ -1,6 +1,6 @@
 {
   "name": "shipcheck-validate",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "ShipCheck license validation endpoint (Lemon Squeezy).",
   "main": "validate.js",
