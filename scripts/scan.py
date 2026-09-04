@@ -431,7 +431,8 @@ class Scan:
                      fix="Export the icon as a standard 8-bit PNG.")
             return
         w, h = info["width"], info["height"]
-        if (w, h) != (1024, 1024):
+        size_ok = (w, h) == (1024, 1024)
+        if not size_ok:
             self.add("ICON-SIZE", "high",
                      "App icon is %dx%d, not 1024x1024" % (w, h),
                      clause="ASC:screenshot-specifications",
@@ -448,6 +449,11 @@ class Scan:
                      fix="Flatten the icon onto an opaque background and re-export "
                          "without transparency (color type 2, no tRNS). App Store "
                          "Connect rejects icons with alpha at upload time.")
+        elif size_ok:
+            self.passes.append(dict(
+                title="1024px icon has no alpha channel",
+                clause="ASC:screenshot-specifications",
+                note="%s (%s) is 1024x1024 with no transparency." % (path, primary_label)))
 
         # dark/tinted variants must independently satisfy the same rules --
         # Apple validates each icon asset in the catalog, not just the primary.
@@ -747,6 +753,12 @@ class Scan:
                          "equivalent privacy-preserving login option whenever a "
                          "third-party service sets up the primary account.",
                      corpus="apple/asrg.sections/4.8.md")
+        elif third_party and satisfied:
+            self.passes.append(dict(
+                title="Sign in with Apple present",
+                clause="4.8",
+                note="Third-party login from %s is paired with %s."
+                     % (", ".join(third_party), ", ".join(satisfied))))
 
     def check_iap(self, deps, cfg):
         iap = [p for p in deps
@@ -804,6 +816,12 @@ class Scan:
                          "it every single upload stops and asks you the export "
                          "compliance question before it can be submitted.",
                      corpus="apple/export-compliance.md")
+        else:
+            self.passes.append(dict(
+                title="Export compliance key is set",
+                clause="ASC:export-compliance",
+                note="ITSAppUsesNonExemptEncryption = %r"
+                     % plist["ITSAppUsesNonExemptEncryption"]))
 
     def check_dev_artifacts(self, deps, cfg):
         eas = None
@@ -1050,17 +1068,26 @@ class Scan:
                          fix="Fill it in. A missing privacy policy URL is an "
                              "automatic rejection under 5.1.1(i).")
 
+        any_placeholder = False
         for field, v in md.items():
             if not v:
                 continue
             m = self.PLACEHOLDER.search(v)
             if m:
+                any_placeholder = True
                 self.add("META-PLACEHOLDER-%s" % field.replace(" ", "-"), "critical",
                          "Placeholder text in %s" % field.title(),
                          clause="2.3.1",
                          evidence='%s contains "%s"' % (field.title(), m.group(0)),
                          fix="Replace it with real copy. Placeholder or template text "
                              "in the listing is a guaranteed 2.3 rejection.")
+        if not any_placeholder:
+            self.passes.append(dict(
+                title="No placeholder text in metadata",
+                clause="2.3.1",
+                note="Checked %d filled-in field(s) against common placeholder patterns "
+                     "(lorem ipsum, TODO, TBD, example.com, ...) -- none matched."
+                     % sum(1 for v in md.values() if v)))
 
         kw = md.get("keywords", "")
         if kw and ", " in kw:

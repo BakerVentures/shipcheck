@@ -194,7 +194,8 @@ def render(data, tier_info, corpus_manifest=None, corpus_dir=None):
     L.append("## Findings")
     L.append("")
     if not findings:
-        L.append("Nothing found. See *Likely to pass* below for what was checked.")
+        L.append("Nothing found." +
+                 (" See *Likely to pass* below for what was checked." if passes else ""))
         L.append("")
 
     for i, f in enumerate(shown, 1):

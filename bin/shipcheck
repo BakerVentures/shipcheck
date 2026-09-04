@@ -122,9 +122,9 @@ def cmd_scan(args):
     verdict = (c("1;31", "NOT READY") if counts["critical"]
                else c("1;33", "REVIEW") if counts["high"]
                else c("1;32", "LOOKS CLEAR"))
-    print("  %s — risk %d/100 · %s" % (
-        verdict, score,
-        " · ".join("%d %s" % (counts[s], s) for s in ORDER if counts[s])))
+    breakdown = " · ".join("%d %s" % (counts[s], s) for s in ORDER if counts[s])
+    print("  %s — risk %d/100%s" % (
+        verdict, score, " · " + breakdown if breakdown else ""))
 
     upload = sum(1 for f in findings if report_mod.blocks(f) == "upload")
     meta = sum(1 for f in findings if report_mod.blocks(f) == "metadata")
