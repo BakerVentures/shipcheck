@@ -49,3 +49,51 @@ assumption didn't hold:
 Topics: claude-code, claude-code-plugin, app-store, app-review, expo, react-native, ios, google-play, aso
 About: Catch App Store and Google Play rejections before you submit. Claude Code plugin for React Native and Expo.
 Website: your GitHub Pages URL
+(Already set on the live repo -- verified 2026-09-04.)
+
+## claude-plugins-community (Anthropic's official community catalog)
+Researched 2026-09-04. This is the real, lowest-friction submission path found so
+far -- no OAuth grant to a third party, no new account: it's a form at
+platform.claude.com/plugins/submit gated behind your own existing Anthropic
+Console login (the individual-author path; the claude.ai form is for Team/
+Enterprise orgs instead). Approved plugins get pinned into
+`anthropics/claude-plugins-community`'s `marketplace.json`, which syncs
+nightly -- distinct from `claude-plugins-official`, which is Anthropic's
+hand-picked list with no public application process at all.
+
+I ran `claude plugin validate --strict .` and `claude plugin validate --strict
+.claude-plugin/plugin.json` against this repo -- both pass, so the plugin
+itself won't be the blocker if you submit.
+
+**This step needs you**, not me: it's your Console login. Suggested content
+for the form (matches what's already live in plugin.json/README.md, so it
+won't drift):
+
+- Name: shipcheck
+- Display name: ShipCheck
+- One-line: App Store / Google Play rejection-risk checker for React Native
+  and Expo apps. Scans your project and store metadata, cites the exact
+  guideline clause, and gives you the fix.
+- Category: Developer tools / Mobile
+- Repo: https://github.com/BakerVentures/shipcheck
+- Homepage: https://bakerventures.github.io/shipcheck/
+- Marketplace source: BakerVentures/shipcheck (this repo's own
+  `.claude-plugin/marketplace.json` is already the install source used in the
+  README's `/plugin marketplace add` instructions)
+- Safety notes: read-only against the project; network calls limited to
+  public Apple/Google policy pages and an optional license check sending key
+  + version + an opaque per-app token only. No project contents transmitted.
+
+Context on the wider ecosystem (why this matters less than it might seem):
+the community + official marketplaces together hold 9,000+ plugins/skills as
+of mid-2026 (4,000+ skills, 770+ MCP servers, 2,500+ third-party
+marketplaces per one July 2026 estimate) -- a single new listing is easy to
+get lost in. The guideline-explainer SEO pages under `docs/guidelines/`
+(built and shipped 2026-09-04) are the more durable channel for the same
+reason: organic search doesn't require getting noticed inside a crowded
+directory. Treat this submission as free and worth doing, not as the primary
+growth lever.
+
+No dedicated Claude-Code-plugin-developer Discord or plugin-specific
+newsletter/roundup was found in a research pass -- inconclusive rather than
+ruled out, worth a second look later rather than assumed absent.
