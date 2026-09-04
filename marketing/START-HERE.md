@@ -64,6 +64,11 @@ even on request.
    `scripts/license.py` to your Render URL and commit it, or tell early users
    to `export SHIPCHECK_VALIDATE_URL=...`.
 5. Set F5Bot keywords per `reddit-playbook.md`.
+6. **The landing page promises a 14-day no-questions refund** (`docs/index.html`,
+   the "Refunds?" FAQ line). That's a real commitment to customers, not just
+   copy — set the matching refund window in Lemon Squeezy's store settings so
+   the policy is actually true the moment someone buys, and decide who
+   monitors the receipt-reply inbox for refund requests.
 
 ## Launch order
 
