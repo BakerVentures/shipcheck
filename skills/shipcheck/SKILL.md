@@ -174,6 +174,14 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/report.py" \
 licence tier. Do not compute the score yourself and do not hand-write the
 report file.
 
+This must be the last thing that touches `findings.json`. If you notice one
+more thing worth checking, or add a finding or a pass after this point, edit
+`.shipcheck/findings.json` and re-run this command before finishing — do not
+leave `shipcheck-report.md` stale relative to what you actually determined.
+A report that under-counts its own passes looks *less* trustworthy than one
+with fewer passes listed accurately, and the free tier's gated-findings count
+also has to match what is really in the file.
+
 ## Step 5 — tell the user what to do next
 
 In chat, give them: the score, the count by severity, and the three things to
