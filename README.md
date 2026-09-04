@@ -30,6 +30,8 @@ PASS  4.8 Sign in with Apple present · 2.1 no placeholder text ·
       1024px icon has no alpha · export compliance key set
 ```
 
+![shipcheck:reply drafting a Resolution Center response](docs/demo/shipcheck-reply.gif)
+
 Apple rejects a large share of submissions, and each rejection costs a review
 cycle. Most rejections of React Native and Expo apps are configuration problems
 you cannot see from JavaScript: a permission string pulled in by a transitive

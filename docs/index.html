@@ -7,6 +7,17 @@
 <meta name="description" content="A Claude Code plugin that scans your React Native / Expo project and store listing against the live App Store Review Guidelines and Google Play policies, then tells you exactly what Apple will reject and how to fix it.">
 <meta property="og:title" content="shipcheck — catch App Store rejections before you submit">
 <meta property="og:description" content="Scan your Expo/React Native app against the live App Store guidelines. Free scan on every app.">
+<meta property="og:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bakerventures.github.io/shipcheck/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="shipcheck — catch App Store rejections before you submit">
+<meta name="twitter:description" content="Scan your Expo/React Native app against the live App Store guidelines. Free scan on every app.">
+<meta name="twitter:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -90,6 +101,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
   <small>Runs inside your own Claude Code. Your code never leaves your machine.</small>
 </div>
 
+<img src="assets/how-it-works.png" alt="Three steps: scan the project and store listing, check against live Apple and Google policy, get a ranked report with fixes" style="width:100%;max-width:100%;height:auto;border-radius:8px;margin:0 0 52px;display:block">
 <section id="checks">
 <h2>What it checks</h2>
 <p>The guideline corpus is fetched live and cached with a date and hash, so you're never checking against last year's rules. <code>/shipcheck:refresh</code> shows you what Apple changed since your last scan.</p>
@@ -121,7 +133,8 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 
 <section>
 <h2>Already rejected?</h2>
-<p>Paste the Resolution Center message into <code>/shipcheck:reply</code>. It reads the cited guideline, checks what you've changed, and drafts the reply in the register reviewers actually respond to.</p>
+<p>Paste the Resolution Center message into <code>/shipcheck:reply</code>. It reads the cited guideline, checks what you've changed, and drafts the reply in the register reviewers actually respond to. If the fix isn't actually in the code yet, it says so and makes it &mdash; it won't draft a reply claiming something that isn't true.</p>
+<img src="demo/shipcheck-reply.gif" alt="shipcheck:reply reading a real App Store rejection, confirming the fix is not yet in the code, writing it, and drafting the Resolution Center response" style="max-width:100%;border-radius:8px;border:1px solid var(--line);margin:16px 0 0" loading="lazy">
 </section>
 
 <section id="pricing">
