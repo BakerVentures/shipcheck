@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=apply-for-production-access url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-03T19:54:38+00:00 -->
+<!-- source=testing-requirements clause=apply-for-production-access url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-04T07:14:13+00:00 -->
 
 ## Apply for production access
 
@@ -28,17 +28,7 @@ To complete this section, follow these steps:
 3. Summarize the feedback received from testers and describe how feedback was collected.
 4. Click **Next**.
 
-Important:
-
-If you click
-
-Discard
-
-or leave the page without clicking
-
-Next
-
-, your changes are not saved.
+**Important:** If you click **Discard** or leave the page without clicking **Next**, your changes are not saved.
 
 Part 2: About your app/game
 
@@ -48,26 +38,12 @@ To complete this section, follow these steps:
 
 1. Specify the target audience for your app or game. Be as specific as possible.
 2. Describe your app or game value proposition:
-  For apps:
-  Describe how your app provides value to users. For details, see
-  app quality on Google Play
-  on the Android Developers site.
-  For games:
-  Describe what makes your game unique.
+  **For apps:** Describe how your app provides value to users. For details, see [app quality on Google Play](https://developer.android.com/quality) on the Android Developers site.
+  **For games:** Describe what makes your game unique.
 3. Select an estimated install range for your app or game during its first year.
 4. Click **Next**.
 
-Important:
-
-If you click
-
-Discard
-
-or leave the page without clicking
-
-Next
-
-, your changes are not saved.
+**Important:** If you click **Discard** or leave the page without clicking **Next**, your changes are not saved.
 
 Part 3: About your production readiness
 
@@ -78,19 +54,6 @@ To complete this section, follow these steps:
 1. Describe any changes made to your app or game based on what you learned from your closed test.
 2. Describe how you determined that your app or game was ready for production.
 3. Click **Apply**.
-  Important:
-  If you click
-  Discard
-  or quit without applying for production access, your changes won't be saved.
+  **Important:** If you click **Discard** or quit without applying for production access, your changes won't be saved.
 
-Important:
-
-If you click
-
-Discard
-
-or leave the page without clicking
-
-Apply
-
-, your changes are not saved.
+**Important:** If you click **Discard** or leave the page without clicking **Apply**, your changes are not saved.

@@ -3,8 +3,8 @@ shipcheck_source_id: permissions-policy
 title: "Permissions and APIs that Access Sensitive Information"
 url: https://support.google.com/googleplay/android-developer/answer/16558241
 final_url: https://support.google.com/googleplay/android-developer/answer/16558241?hl=en
-fetched_at: 2026-09-03T19:54:39+00:00
-sha256: 19d29b019b4def2b67d60295f098da3ff8aa0d49b16000ff78e4c5f1e71c9d13
+fetched_at: 2026-09-04T07:14:14+00:00
+sha256: cc08f03dc0508b369521ba0756ea140efa858173deb5a2d1063693577c3d65ab
 vendor: google
 substituted_from: https://support.google.com/googleplay/android-developer/answer/9888170
 note: "Google redirected the old permissions answer ID here."
@@ -169,11 +169,7 @@ Files and directory attributes on a user’s device are regarded as personal and
 
 **Policy Summary**
 
-Accessing a user's installed app inventory is sensitive data. Google Play policy strictly limits broad visibility (
-
-QUERY_ALL_PACKAGES
-
-), allowing it only for core app functionality that requires extensive knowledge of installed apps for interoperability. You must prioritize using finite, targeted queries to access specific apps when possible, which is more privacy-friendly. Under no circumstances can data from the installed app inventory be sold or shared for advertising or analytics monetization. Please review the full policy to ensure compliance.
+Accessing a user's installed app inventory is sensitive data. Google Play policy strictly limits broad visibility (``QUERY_ALL_PACKAGES``), allowing it only for core app functionality that requires extensive knowledge of installed apps for interoperability. You must prioritize using finite, targeted queries to access specific apps when possible, which is more privacy-friendly. Under no circumstances can data from the installed app inventory be sold or shared for advertising or analytics monetization. Please review the full policy to ensure compliance.
 
 **Full Policy**
 
@@ -181,21 +177,11 @@ The inventory of installed apps queried from a device are regarded as personal a
 
 Apps that have a core purpose to launch, search, or interoperate with other apps on the device, may obtain scope-appropriate visibility to other installed apps on the device as outlined below:
 
-- **Broad app visibility:**Broad visibility is the capability of an app to have extensive (or “broad”) visibility of the installed apps (“packages”) on a device.
-  For apps targeting
-  API level 30 or later
-  , broad visibility to installed apps via the
-  QUERY_ALL_PACKAGES
-  permission is restricted to specific use cases where awareness of and/or interoperability with any and all apps on the device are required for the app to function.
+- **Broad app visibility:** Broad visibility is the capability of an app to have extensive (or “broad”) visibility of the installed apps (“packages”) on a device.
+  For apps targeting [API level 30 or later](https://developer.android.com/studio/releases/platforms), broad visibility to installed apps via the [``QUERY_ALL_PACKAGES``](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages) permission is restricted to specific use cases where awareness of and/or interoperability with any and all apps on the device are required for the app to function.
   - You may not use ``QUERY_ALL_PACKAGES`` if your app can operate with a more [targeted scoped package visibility declaration](https://developer.android.com/training/basics/intents/package-visibility#declare-other-apps)(for example, querying and interacting with specific packages instead of requesting broad visibility).
-  Use of alternative methods to approximate the broad visibility level associated with
-  QUERY_ALL_PACKAGES
-  permission are also restricted to user-facing core app functionality and interoperability with any apps discovered via this method.
-  Please see this
-  Help Center article
-  for allowable use cases for the
-  QUERY_ALL_PACKAGES
-  permission.
+  Use of alternative methods to approximate the broad visibility level associated with ``QUERY_ALL_PACKAGES`` permission are also restricted to user-facing core app functionality and interoperability with any apps discovered via this method.
+  Please see this [Help Center article](https://support.google.com/googleplay/android-developer/answer/10158779) for allowable use cases for the ``QUERY_ALL_PACKAGES`` permission.
 - **Limited app visibility**: Limited visibility is when an app minimizes access to data by querying for specific apps using more targeted (instead of “broad”) methods(for example, querying for specific apps that satisfy your app’s manifest declaration). You may use this method to query for apps in cases where your app has policy compliant interoperability, or management of these apps.
 - Visibility to the inventory of installed apps on a device must be directly related to the core purpose or core functionality that users access within your app.
 
@@ -235,9 +221,9 @@ The use of the Accessibility API must be documented in the Google Play listing.
 
 #### Guidelines for **IsAccessibilityTool**
 
-Apps with a core functionality intended to directly support people with disabilities are eligible to use the **IsAccessibilityTool**to appropriately publicly designate themselves as an accessibility app.
+Apps with a core functionality intended to directly support people with disabilities are eligible to use the **IsAccessibilityTool** to appropriately publicly designate themselves as an accessibility app.
 
-Apps not eligible for **IsAccessibilityTool**may not use the flag and must meet prominent disclosure and consent requirements as outlined in the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en&ref_topic=9877467) policy as the accessibility related functionality is not obvious to the user.
+Apps not eligible for **IsAccessibilityTool** may not use the flag and must meet prominent disclosure and consent requirements as outlined in the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en&ref_topic=9877467) policy as the accessibility related functionality is not obvious to the user.
 
 Apps must use more narrowly scoped [APIs and permissions](https://developer.android.com/privacy/best-practices#permissions) in lieu of the Accessibility API when possible to achieve the desired functionality.
 
@@ -260,13 +246,7 @@ Please refer to the [AccessibilityService API](https://support.google.com/google
 
 **Policy Summary**
 
-REQUEST_INSTALL_PACKAGES
-
-permission allows apps to request the installation of other app packages. This permission is restricted to the app's core functionality, specifically when the primary purpose directly involves sending, receiving, or enabling user-initiated installation of app packages. Using this permission to update your app, change its functionality or bundle other APKs for silent or unauthorized installation (except enterprise management) is prohibited. All installations must be a direct, active choice by the user. Apps targeting Android 8+ must hold this permission in order to use
-
-Intent.ACTION_INSTALL_PACKAGE
-
-. Please review the full policy to ensure compliance.
+`REQUEST_INSTALL_PACKAGES` permission allows apps to request the installation of other app packages. This permission is restricted to the app's core functionality, specifically when the primary purpose directly involves sending, receiving, or enabling user-initiated installation of app packages. Using this permission to update your app, change its functionality or bundle other APKs for silent or unauthorized installation (except enterprise management) is prohibited. All installations must be a direct, active choice by the user. Apps targeting Android 8+ must hold this permission in order to use `Intent.ACTION_INSTALL_PACKAGE`. Please review the full policy to ensure compliance.
 
 **Full Policy**
 
@@ -287,15 +267,7 @@ Permitted functionalities include:
 
 Core functionality is defined as the main purpose of the app. The core functionality, as well as any core features that comprise this core functionality, must all be prominently documented and promoted in the app's description.
 
-The
-
-REQUEST_INSTALL_PACKAGES
-
-permission may not be used to perform self updates, modifications, or the bundling of other APKs in the asset file unless for device management purposes. All updates or installing of packages must abide by Google Play’s
-
-Device and Network Abuse policy
-
-and must be initiated and driven by the user.
+The ``REQUEST_INSTALL_PACKAGES`` permission may not be used to perform self updates, modifications, or the bundling of other APKs in the asset file unless for device management purposes. All updates or installing of packages must abide by Google Play’s [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/9888379?hl=en&ref_topic=9877467) and must be initiated and driven by the user.
 
 **Key Considerations**
 
@@ -317,7 +289,7 @@ Starting with Android 16, apps must migrate from the general `android.permission
 
 **Full Policy**
 
-Access to data from sensors that measure physical parameters of the body (such as heart rate, SpO₂, and skin temperature) is considered personal and sensitive user data**.**Apps requesting access are subject to the requirements outlined in the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?#personal-sensitive) and the [Health apps policy](https://support.google.com/googleplay/android-developer/answer/12261419?hl=en#:~:text=laws%20and%20regulations.-,Health%20Apps,-If%20your%20app). This applies to requests for `android.permission.BODY_SENSORS` and `android.permission.BODY_SENSORS_BACKGROUND` permissions across all form factors including phones, tablets, and Wear OS devices.
+Access to data from sensors that measure physical parameters of the body (such as heart rate, SpO₂, and skin temperature) is considered personal and sensitive user data**.** Apps requesting access are subject to the requirements outlined in the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?#personal-sensitive) and the [Health apps policy](https://support.google.com/googleplay/android-developer/answer/12261419?hl=en#:~:text=laws%20and%20regulations.-,Health%20Apps,-If%20your%20app). This applies to requests for `android.permission.BODY_SENSORS` and `android.permission.BODY_SENSORS_BACKGROUND` permissions across all form factors including phones, tablets, and Wear OS devices.
 
 Starting in Android 16, the broad `BODY_SENSORS` permission is being transitioned in favor of granular, more privacy preserving `android.permissions.health.`* permissions for specific data types (for example, `android.permission.health.READ_HEART_RATE`, `android.permission.health.READ_OXYGEN_SATURATION`, `android.permission.health.READ_SKIN_TEMPERATURE`).
 
@@ -365,8 +337,8 @@ Approved use cases include: fitness and wellness, rewards, fitness coaching, cor
 
 Only applications or services with one or more features designed to benefit users' health and fitness are permitted to request access to Health Connect Permissions. These include:
 
-- Applications or services allowing users**to directly journal, report, monitor, and/or analyze** their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions, health records, and/or other health or fitness-related descriptions and measurements.
-- Applications or services allowing users **to store their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions**,**health records,** and/or other health or fitness-related descriptions and measurements on their device, and share their data with other on-device apps that satisfy these use cases.
+- Applications or services allowing users **to directly journal, report, monitor, and/or analyze** their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions, health records, and/or other health or fitness-related descriptions and measurements.
+- Applications or services allowing users **to store their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions**, **health records,** and/or other health or fitness-related descriptions and measurements on their device, and share their data with other on-device apps that satisfy these use cases.
 - Applications or services enabling users to manage chronic conditions, medical treatments, or care support.
 
 Access to Health Connect may not be used in violation of this policy or other applicable Health Connect terms and conditions or policies, including for the following purposes:
@@ -466,17 +438,7 @@ Apps that use the VpnService must:
 
 **Policy Summary**
 
-USE_EXACT_ALARM
-
-permission on Android 13+ is a highly restricted permission used only for apps whose core, user-facing functionality genuinely requires precise timing, like dedicated alarm, timer, or calendar applications with event notifications. If your app does
-
-not
-
-have this specific core need, consider using
-
-SCHEDULE_EXACT_ALARM
-
-permission instead. It provides the same functionality but access must be granted by the user. This policy prevents misuse that impacts system resources. Please review the full policy to ensure compliance.
+`USE_EXACT_ALARM` permission on Android 13+ is a highly restricted permission used only for apps whose core, user-facing functionality genuinely requires precise timing, like dedicated alarm, timer, or calendar applications with event notifications. If your app does *not* have this specific core need, consider using ``SCHEDULE_EXACT_ALARM`` permission instead. It provides the same functionality but access must be granted by the user. This policy prevents misuse that impacts system resources. Please review the full policy to ensure compliance.
 
 **Full Policy**
 
@@ -493,11 +455,7 @@ Your app must use the ``USE_EXACT_ALARM`` functionality only when your app’s c
 
 If you have a use case for exact alarm functionality that’s not covered above, you should evaluate if using ``SCHEDULE_EXACT_ALARM`` as an alternative is an option.
 
-For more information on exact alarm functionality, please see this
-
-developer guidance
-
-.
+For more information on exact alarm functionality, please see this [developer guidance](https://developer.android.com/about/versions/13/features#use-exact-alarm-permission).
 
 **Key Considerations**
 
@@ -514,15 +472,7 @@ developer guidance
 
 **Policy Summary**
 
-On Android 14+, the
-
-USE_FULL_SCREEN_INTENT
-
-permission is auto-granted
-
-only
-
-for apps whose core function is setting alarms or handling calls. For any other use case, you must obtain explicit user consent and clearly explain your need. This policy prevents the misuse of full-screen intents for non-critical purposes and requires that your use does not interfere with or disrupt the user's device, other apps, or overall usability. Please review the full policy to ensure compliance.
+On Android 14+, the ``USE_FULL_SCREEN_INTENT`` permission is auto-granted *only* for apps whose core function is setting alarms or handling calls. For any other use case, you must obtain explicit user consent and clearly explain your need. This policy prevents the misuse of full-screen intents for non-critical purposes and requires that your use does not interfere with or disrupt the user's device, other apps, or overall usability. Please review the full policy to ensure compliance.
 
 **Full Policy**
 

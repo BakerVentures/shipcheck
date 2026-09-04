@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=test-your-app url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-03T19:54:43+00:00 -->
+<!-- source=target-sdk clause=test-your-app url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T07:14:18+00:00 -->
 
 ## Test your app
 
@@ -20,12 +20,7 @@ to guide your testing process. We suggest testing:
   - Test any use cases that trigger Firebase Cloud Messaging messages.
   - Test any use cases that use Alarms.
 - Handles new photos / video being taken Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
-  Check that your app
-  handles the restricted
-  ACTION_NEW_PICTURE
-  and
-  ACTION_NEW_VIDEO
-  broadcasts
+  Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
   correctly (that is, moved to JobScheduler jobs).
   Ensure that any critical use cases that depend on these events still
   work.

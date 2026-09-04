@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-to-android-6-api-level-23 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-03T19:54:43+00:00 -->
+<!-- source=target-sdk clause=migrate-to-android-6-api-level-23 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T07:14:18+00:00 -->
 
 ### Migrate to Android 6 (API level 23)
 

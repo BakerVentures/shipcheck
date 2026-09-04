@@ -1,4 +1,4 @@
-<!-- source=prepare-and-roll-out-a-release clause=step-3-review-and-roll-out-your-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-03T19:54:34+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=step-3-review-and-roll-out-your-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-04T07:14:09+00:00 -->
 
 ## Step 3: Review and roll out your release
 
@@ -12,12 +12,6 @@ To roll out your app, follow these steps:
 4. If you see 'Errors summary' at the top of the page, click **Show more** to review details and resolve any problems.
 5. If updating an existing app, select a rollout percentage.
   Rollout percentage options are unavailable for a first release.
-  For details on targeting staged rollouts to specific countries or regions, see
-  Release app updates with staged rollouts
-  .
+  For details on targeting staged rollouts to specific countries or regions, see [Release app updates with staged rollouts](https://support.google.com/googleplay/android-developer/answer/6346149#staged_country).
 6. Click **Start rollout**.
-  If rolling out a first production release, clicking
-  Start rollout to production
-  publishes your app to all Google Play users in your selected
-  countries or regions
-  .
+  If rolling out a first production release, clicking **Start rollout to production** publishes your app to all Google Play users in your selected [countries or regions](https://support.google.com/googleplay/android-developer/answer/7550024).

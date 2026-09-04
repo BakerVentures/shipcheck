@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=app-update-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-03T19:54:36+00:00 -->
+<!-- source=target-api-level clause=app-update-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-04T07:14:11+00:00 -->
 
 ## App update requirements
 
@@ -10,10 +10,4 @@
 
 *Developers will be able to request an extension to November 1, 2026.
 
-Tip:
-
-For technical guidance on how to change your app’s target API level to meet these requirements, refer to the
-
-migration guide
-
-.
+**Tip:** For technical guidance on how to change your app’s target API level to meet these requirements, refer to the [migration guide](https://developer.android.com/distribute/best-practices/develop/target-sdk.html).

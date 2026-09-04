@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-submit-ios clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T07:14:08+00:00 -->
 
 ## Automate with EAS Workflows
 
@@ -6,15 +6,7 @@
 
 Terminal
 
--
-
-eas
-
-credentials
-
---platform
-
-ios
+`-` `eas credentials --platform ios`
 
 1. Select the `production` build profile.
 2. Log in with your Apple Developer account and follow the prompts.
@@ -48,10 +40,6 @@ This builds an iOS app on every push to `main` and submits it to TestFlight. The
 
 Terminal
 
--
-
-eas
-
-workflow:run submit-ios.yml
+`-` `eas workflow:run submit-ios.yml`
 
 See the [workflow examples guide](/eas/workflows/examples/introduction) for more patterns.

@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=what-developers-need-to-declare-across-data-types url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-03T19:55:34+00:00 -->
+<!-- source=data-safety clause=what-developers-need-to-declare-across-data-types url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T07:14:10+00:00 -->
 
 ### What developers need to declare across data types
 
@@ -8,13 +8,13 @@ Data collection
 
 "Collect" means transmitting data from your app off a user’s device. Please note the following guidelines:
 
-- **Libraries and SDKs:**This includes user data transmitted off device from your app by libraries and/or SDKs used in your app, irrespective of whether data is transmitted to you or a third-party server.
+- **Libraries and SDKs:** This includes user data transmitted off device from your app by libraries and/or SDKs used in your app, irrespective of whether data is transmitted to you or a third-party server.
 - **Webview:** It also includes user data collected from a webview which has been opened from your app, if your app is in control of the code/behavior delivered through that webview.
   You do not need to declare data collection from a webview in which users are navigating the open web.
-- **Ephemeral processing:**User data transmitted off device that is processed ephemerally needs to be included in your form response, but if it meets the standard below, it will **not** be disclosed in your app’s Data safety section on Google Play.
+- **Ephemeral processing:** User data transmitted off device that is processed ephemerally needs to be included in your form response, but if it meets the standard below, it will **not** be disclosed in your app’s Data safety section on Google Play.
   Processing data "ephemerally" means accessing and using it while the data is only stored in memory and retained for no longer than necessary to service the specific request in real-time.
   For example, a weather app that transmits user location off the device to fetch the current weather at the user's location but only uses location data in memory and does not store that data once the request has been fulfilled, can treat its transient use of location as ephemeral. However, using data to build advertising profiles or other user profiles cannot be treated as ephemeral and must be declared as collection or sharing for the relevant purposes.
-- **Pseudonymous data:**User data collected pseudonymously must be disclosed. For example, data that can reasonably be re-associated with a user must be disclosed.
+- **Pseudonymous data:** User data collected pseudonymously must be disclosed. For example, data that can reasonably be re-associated with a user must be disclosed.
 
 #### Not in scope for data collection
 
@@ -28,19 +28,18 @@ Data sharing
 
 "Sharing" refers to transferring user data collected from your app to a third party. This includes user data transferred:
 
-- **Off-device, such as**s**erver to server transfers.**For example, if you transfer user data collected from your app from your server to a third-party server.
-- **On-device transfer to another app.**Transferring user data from your app to another app directly on the device. In this case, you must disclose data sharing in your Data safety section declarations even if your app does not transmit the data off the user’s device.
-- **From your app libraries and SDKs.**Transferring data collected from your app off a user’s device directly to a third party via libraries and/or SDKs included in your app.
-- **From webview which has been opened through your app.**Transferring user data to a third party via a webview which has been opened from your app, if your app is in control of code/behavior delivered through that webview.
+- **Off-device, such as** s**erver to server transfers.** For example, if you transfer user data collected from your app from your server to a third-party server.
+- **On-device transfer to another app.** Transferring user data from your app to another app directly on the device. In this case, you must disclose data sharing in your Data safety section declarations even if your app does not transmit the data off the user’s device.
+- **From your app libraries and SDKs.** Transferring data collected from your app off a user’s device directly to a third party via libraries and/or SDKs included in your app.
+- **From webview which has been opened through your app.** Transferring user data to a third party via a webview which has been opened from your app, if your app is in control of code/behavior delivered through that webview.
   You do not need to declare data sharing from a webview in which users are navigating the open web.
 
 The following types of data transfers do not need to be disclosed as "sharing":
 
-- **Service providers.**Transferring user data to a "service provider" that processes it on behalf of the developer.
-  "Service provider"
-  means an entity that processes user data on behalf of the developer and based on the developer’s instructions.
-- **Legal purposes.**Transferring user data for specific legal purposes, such as in response to a legal obligation or government requests.
-- **User-initiated action or prominent disclosure and user consent.**Transferring user data to a third party based on a specific user-initiated action, where the user reasonably expects the data to be shared, or based on a prominent in-app disclosure and consent that meets the requirements described in our [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+- **Service providers.** Transferring user data to a "service provider" that processes it on behalf of the developer.
+  **"Service provider"** means an entity that processes user data on behalf of the developer and based on the developer’s instructions.
+- **Legal purposes.** Transferring user data for specific legal purposes, such as in response to a legal obligation or government requests.
+- **User-initiated action or prominent disclosure and user consent.** Transferring user data to a third party based on a specific user-initiated action, where the user reasonably expects the data to be shared, or based on a prominent in-app disclosure and consent that meets the requirements described in our [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
 - **Anonymous data.** Transferring user data that has been fully anonymized so that it can no longer be associated with an individual user.
 
 **First and third parties.**

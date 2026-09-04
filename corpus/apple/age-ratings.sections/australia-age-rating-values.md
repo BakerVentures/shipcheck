@@ -1,10 +1,10 @@
-<!-- source=age-ratings clause=australia-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-03T19:54:31+00:00 -->
+<!-- source=age-ratings clause=australia-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T07:14:06+00:00 -->
 
 ### Australia age rating values
 
 As required by [Australia’s guidelines for the classification of computer games](https://www.legislation.gov.au/F2023L01424/latest/text), apps that have at least one of the following content descriptors will display the regional region-specific age rating.
 
-**Note:**Only the age rating values listed below differ from the [age rating values](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#age-rating-values).
+**Note:** Only the age rating values listed below differ from the [age rating values](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#age-rating-values).
 
 | Rating | Definition |
 | --- | --- |

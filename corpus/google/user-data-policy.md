@@ -3,8 +3,8 @@ shipcheck_source_id: user-data-policy
 title: "User Data policy"
 url: https://support.google.com/googleplay/android-developer/answer/10144311
 final_url: https://support.google.com/googleplay/android-developer/answer/10144311?hl=en
-fetched_at: 2026-09-03T19:54:35+00:00
-sha256: ad8b157e3dc7f7d8d84958c8b843325fa8195dc9d04bae8bf2fc57327976c1c7
+fetched_at: 2026-09-04T07:14:10+00:00
+sha256: ae93407ede6628ce2ad566605cfa496c763f9621fc747c169d6fe8cbecd68dc7
 vendor: google
 substituted_from: https://support.google.com/googleplay/android-developer/answer/16810878
 note: "Original answer ID is dead (bounces to support.google.com root)."
@@ -48,17 +48,13 @@ Google's User Data policy requires you to be transparent about how your app hand
 Personal and sensitive user data includes, but isn't limited to, personally identifiable information, financial and payment information, authentication information, phonebook, contacts, [device location](https://developer.android.com/training/location), SMS and call-related data, [health data](https://support.google.com/googleplay/android-developer/answer/12261419#health_apps), [Health Connect](https://support.google.com/googleplay/android-developer/answer/9888170#ahp) data, inventory of other apps on the device, microphone, camera, and other sensitive device or usage data. If your app handles personal and sensitive user data, then you must:
 
 - Limit the access, collection, use and sharing of personal and sensitive user data acquired through the app to app and service functionality and policy-conforming purposes reasonably expected by the user:
-  Apps that extend usage of personal and sensitive user data for serving advertising must comply with Google Play’s
-  Ads policy
-  .
+  Apps that extend usage of personal and sensitive user data for serving advertising must comply with Google Play’s [Ads policy](https://support.google.com/googleplay/android-developer/answer/9857753#location-data).
 
 - You may also transfer data as necessary to [service providers](https://support.google.com/googleplay/android-developer/answer/10787469#service-provider&zippy=%2Csharing%2Cdata-sharing) or for legal reasons such as to comply with a valid governmental request, applicable law, or as part of a merger or acquisition with legally adequate notice to users.
 - Handle all personal and sensitive user data securely, including transmitting it using modern cryptography (for example, over HTTPS).
 - Use a runtime permissions request whenever available, prior to accessing data gated by [Android permissions](https://developer.android.com/guide/topics/permissions/overview).
 - Not sell personal and sensitive user data.
-  "Sale" means the exchange or transfer of personal and sensitive user data to a
-  third party
-  for monetary consideration.
+  "Sale" means the exchange or transfer of personal and sensitive user data to a [third party](https://support.google.com/googleplay/android-developer/answer/10787469#first-and-third&zippy=%2Csharing%2Cdata-sharing) for monetary consideration.
   - User-initiated transfer of personal and sensitive user data (for example, when the user is using a feature of the app to transfer a file to a third party, or when the user chooses to use a dedicated purpose research study app), is not regarded as sale.
 
 **Key Considerations**
@@ -235,15 +231,7 @@ If your app allows users to create an account from within your app, then it must
 
 When you delete an app account based on a user's request, you must also delete the user data associated with that app account. Temporary account deactivation, disabling, or “freezing” the app account does not qualify as account deletion. If you need to retain certain data for legitimate reasons such as security, fraud prevention, or regulatory compliance, you must clearly inform users about your data retention practices (for example, within your privacy policy).
 
-To learn more about account deletion policy requirements, please review this
-
-Help Center
-
-article. For additional information on updating your Data safety form, visit this
-
-article
-
-.
+To learn more about account deletion policy requirements, please review this [Help Center](https://support.google.com/googleplay/android-developer/answer/13327111) article. For additional information on updating your Data safety form, visit this [article](https://support.google.com/googleplay/android-developer/answer/10787469).
 
 **Key Considerations**
 
@@ -269,7 +257,7 @@ The App Set ID is intended to support essential non-ads use cases such as analyt
 Android will introduce a new ID to support essential use cases such as analytics and fraud prevention. Terms for the use of this ID are below.
 
 - **Usage**: App set ID must not be used for ads personalization and ads measurement.
-- **Association with personally-identifiable information or other identifiers:**App set ID may not be connected to any Android identifiers (for example, AAID) or any personal and sensitive data for advertising purposes.
+- **Association with personally-identifiable information or other identifiers:** App set ID may not be connected to any Android identifiers (for example, AAID) or any personal and sensitive data for advertising purposes.
 - **Transparency and consent:** The collection and use of the app set ID and commitment to these terms must be disclosed to users in a legally adequate privacy notification, including your privacy policy. You must obtain users' legally valid consent where required. To learn more about our privacy standards, please review our [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?visit_id=637570411965975172-4240498562&rd=1) policy.
 
 **Key Considerations**

@@ -1,4 +1,4 @@
-<!-- source=prepare-and-roll-out-a-release clause=step-4-review-release-details url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-03T19:54:34+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=step-4-review-release-details url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-04T07:14:09+00:00 -->
 
 ## Step 4: Review release details
 

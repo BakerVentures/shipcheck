@@ -3,8 +3,8 @@ shipcheck_source_id: target-sdk
 title: "Meet Google Play's target API level requirement (Android Developers)"
 url: https://developer.android.com/google/play/requirements/target-sdk
 final_url: https://developer.android.com/google/play/requirements/target-sdk?hl=en
-fetched_at: 2026-09-03T19:54:43+00:00
-sha256: 318ab4f10638424fce3b74e112559d917d363ad47b1a0abc6b35958ad55f8ee3
+fetched_at: 2026-09-04T07:14:18+00:00
+sha256: 1b5371c60b3b4adade2652f0990613ee91967206b670d072e004b69d598a0a84
 vendor: google
 ---
 
@@ -60,19 +60,9 @@ relevant behavior changes list:
 
 - [Bluetooth](/guide/topics/connectivity/bluetooth/permissions): You must replace declarations for the [`BLUETOOTH`](/reference/android/Manifest.permission#BLUETOOTH) and
 - Location: Users can request apps to retrieve only approximate location
-  Intent filters: If your app contains
-  activities
-  ,
-  services
-  ,
-  or
-  broadcast receivers
-  that use
-  intent filters
-  , you must
-  explicitly declare the
-  android:exported
-  attribute for these
+  Intent filters: If your app contains [activities](/guide/components/activities/intro-activities), [services](/guide/components/services),
+  or [broadcast receivers](/guide/components/broadcasts) that use [intent filters](/guide/components/intents-filters#Receiving), you must
+  explicitly declare the [android:exported](/guide/topics/manifest/activity-element#exported) attribute for these
   components.
 - Hibernation: Apps may be put into hibernation mode if they are not used over
 - [Pending intent mutability](/about/versions/12/behavior-changes-12#pending-intent-mutability): You must specify the mutability of each
@@ -126,16 +116,12 @@ The following considerations apply to apps targeting Android 7.0 and higher vers
   Defers alarms, syncs, and jobs
   Restricts GPS and Wi-Fi scans
   Restricts normal-priority
-  Firebase Cloud Messaging
+  [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)
   messages.
 - Permission Changes The system restricts access to app private directories.
   The system restricts access to app private directories.
-  Exposing a
-  file://
-  URI outside of your app triggers a
-  FileUriExposedException
-  . If you need to share files outside of your app, implement
-  FileProvider
+  Exposing a `file://` URI outside of your app triggers a `FileUriExposedException`. If you need to share files outside of your app, implement
+  [`FileProvider`](/training/secure-file-sharing/setup-sharing)
 - The system [forbids linking](/about/versions/nougat/android-7.0-changes#ndk)
 
 For an exhaustive list of changes introduced in Android 7.0 (API level 24), see the [Behavior Changes](/about/versions/nougat/android-7.0-changes)
@@ -158,21 +144,14 @@ The following considerations apply to apps targeting Android 8.0 and higher vers
   - Implicit broadcasts are restricted. For information about handling background events, see the documentation for the [`JobScheduler`](/reference/kotlin/android/app/job/JobScheduler) API.
   Background Location Limits
   - Apps running in the background have limited access to location data.
-    On devices with Google Play services, use the
-    fused location provider
-    to get periodic location
+    On devices with Google Play services, use the [fused location provider](https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient) to get periodic location
     updates.
 - [Notification Channels](/about/versions/oreo/android-8.0#notifications) You should define [notification interruption properties](/training/notify-user/channels#importance) on a per-channel basis. You must assign notifications to a channel for the notifications to appear.
-  You should define
-  notification interruption properties
-  on a per-channel basis.
+  You should define [notification interruption properties](/training/notify-user/channels#importance) on a per-channel basis.
   You must assign notifications to a channel for the notifications to appear.
-  This version of the platform supports
-  NotificationCompat.Builder
-  .
+  This version of the platform supports [`NotificationCompat.Builder`](/reference/kotlin/androidx/core/app/NotificationCompat.Builder).
 - [Privacy](/about/versions/oreo/android-8.0-changes#privacy-all) [ANDROID_ID](/reference/kotlin/android/provider/Settings.Secure#ANDROID_ID) is scoped per app signing key.
-  ANDROID_ID
-  is scoped per app signing key.
+  [ANDROID_ID](/reference/kotlin/android/provider/Settings.Secure#ANDROID_ID) is scoped per app signing key.
 
 For an exhaustive list of changes introduced in Android 8.0 (API level 26), see the [Behavior Changes](/about/versions/oreo/android-8.0-changes)
 page for that version of the platform.
@@ -180,24 +159,21 @@ page for that version of the platform.
 ### Migrate from Android 8 (API 26) to Android 9 (API 28)
 
 - [Power Management](/about/versions/pie/power) [App Standby buckets](/about/versions/pie/power#buckets) bring new
-  App Standby buckets
-  bring new
+  [App Standby buckets](/about/versions/pie/power#buckets) bring new
   background restrictions based on app engagement, such as deferred jobs,
   alarms and quotas on high-priority messages
-  Battery saver improvements
+  [Battery saver improvements](/about/versions/pie/power#battery-saver)
   increase the limitations on app standby apps
 - [Foreground service permission](/about/versions/pie/android-9.0-changes-28#fg-svc) Need to request the normal permission
   Need to request the normal permission
-  FOREGROUND_SERVICE
+  [`FOREGROUND_SERVICE`](/reference/kotlin/android/Manifest.permission#FOREGROUND_SERVICE)
   (not runtime permission)
 - [Privacy changes](/about/versions/pie/android-9.0-changes-all#privacy-changes-all) [Limited access to background sensors](/about/versions/pie/android-9.0-changes-all#bg-sensor-access) Restricted access to call logs, now in [`CALL_LOG`](/reference/kotlin/android/Manifest.permission_group#CALL_LOG)
-  Limited access to background sensors
-  Restricted access to call logs, now in
-  CALL_LOG
+  [Limited access to background sensors](/about/versions/pie/android-9.0-changes-all#bg-sensor-access)
+  Restricted access to call logs, now in [`CALL_LOG`](/reference/kotlin/android/Manifest.permission_group#CALL_LOG)
   permission group
   Restricted access to phone numbers, requiring
-  READ_CALL_LOG
-  permission
+  [`READ_CALL_LOG`](/reference/kotlin/android/Manifest.permission#READ_CALL_LOG) permission
   Restricted access to Wi-Fi information
 
 For an exhaustive list of changes introduced in Android 9.0 (API level
@@ -208,7 +184,7 @@ changes](/about/versions/pie/android-9.0-changes-28).
 
 - [Notifications
   Need to request the normal permission
-  USE_FULL_SCREEN_INTENT
+  [`USE_FULL_SCREEN_INTENT`](/reference/android/Manifest.permission#USE_FULL_SCREEN_INTENT)
   (not runtime permission).
 - Support for [foldables](/guide/topics/ui/foldables) and large
   Multiple activities can now be in the "resumed" state at the same time, but only one actually has focus.
@@ -216,30 +192,27 @@ changes](/about/versions/pie/android-9.0-changes-28).
   - New lifecycle concept of "topmost resumed" which can be detected
     Only one activity can be "topmost resumed."
   When
-  resizeableActivity
-  is set to
-  false
-  , apps can additionally specify a
-  minAspectRatio
+  [`resizeableActivity`](/guide/topics/ui/multi-window#resizeableActivity)
+  is set to `false`, apps can additionally specify a
+  [`minAspectRatio`](/reference/android/R.attr#minAspectRatio)
   which automatically letterboxes the app on narrower aspect ratios.
 - [Privacy changes](/about/versions/10/privacy/changes) [Scoped storage](/training/data-storage#scoped-storage)
-  Scoped storage
+  [Scoped storage](/training/data-storage#scoped-storage)
   - External storage access is limited only to an app-specific
   Restricted access to location while the app is in the background,
   requiring
-  ACCESS_BACKGROUND_LOCATION
+  [`ACCESS_BACKGROUND_LOCATION`](/reference/android/Manifest.permission#ACCESS_BACKGROUND_LOCATION)
   permission.
   Restricted access to non-resettable identifiers such as IMEI and
   serial number.
   Restricted access to physical activity information such as the
   user's step count, requiring
-  ACTIVITY_RECOGNITION
+  [`ACTIVITY_RECOGNITION`](/reference/android/Manifest.permission#ACTIVITY_RECOGNITION)
   permission.
   Restricted access to
-  some
-  telephony, Bluetooth, and Wi-Fi APIs
-  , requiring
-  ACCESS_FINE_LOCATION
+  [some
+  telephony, Bluetooth, and Wi-Fi APIs](/about/versions/10/privacy/changes#location-telephony-bluetooth-wifi), requiring
+  [`ACCESS_FINE_LOCATION`](/reference/android/Manifest.permission#ACCESS_FINE_LOCATION)
   permission.
   Restricted access to Wi-Fi settings
   - Apps can no longer directly enable or disable Wi-Fi and need to
@@ -248,22 +221,15 @@ changes](/about/versions/pie/android-9.0-changes-28).
 ### Migrate from Android 10 (API level 29) to Android 11 (API level 30)
 
 - Privacy
-  Scoped storage enforcement
-  : Apps should adopt the scoped storage model where app-specific, media, and other file types are saved and accessed using dedicated locations.
-  Permissions auto-reset
-  : If users
+  [Scoped storage enforcement](/about/versions/11/privacy/storage) : Apps should adopt the scoped storage model where app-specific, media, and other file types are saved and accessed using dedicated locations.
+  [Permissions auto-reset](/about/versions/11/privacy/permissions#auto-reset): If users
   haven't interacted with an app for a few months, the system auto-resets the app's sensitive permissions.
   This shouldn't affect most apps. If your app primarily works in the background without user interactions, you may
-  consider
-  requesting users to disable
-  auto reset.
-  Background location access
-  : Apps must
-  request foreground and background location permission separately.
-  Granting access to background location permission can only be done in app settings
-  instead of runtime permission dialogs.
-  Package Visibility
-  : When an app queries
+  consider [requesting users to disable
+  auto reset.](/guide/topics/permissions/overview#auto-reset-permissions-unused-apps)
+  [Background location access](/about/versions/11/privacy/location#background-location): Apps must
+  request foreground and background location permission separately. [Granting access to background location permission can only be done in app settings](/training/location/permissions#request-background-location) instead of runtime permission dialogs.
+  [Package Visibility](/training/basics/intents/package-visibility-use-cases): When an app queries
   for the list of installed apps and services on the device, the returned list is filtered.
   - If you use [Text-to-speech](/about/versions/11/behavior-changes-11#tts-engines) or
 
@@ -288,20 +254,12 @@ platform features to modernize your apps and delight your users.
   Support larger aspect ratios (more than 16:9) to take advantage of
   recent advances in hardware. Ensure that your app resizes to fill the
   available screen space. Only declare a maximum aspect ratio as a last
-  resort. For more information about maximum aspect ratios, see
-  Declare
-  Restricted Screen Support
-  .
-  Add
-  multi-window support
-  to help your app increase productivity,
-  and to manage
-  multiple displays
-  .
+  resort. For more information about maximum aspect ratios, see [Declare
+  Restricted Screen Support](/guide/practices/screens-distribution#MaxAspectRatio).
+  Add [multi-window support](/guide/topics/ui/multi-window) to help your app increase productivity,
+  and to manage [multiple displays](/about/versions/oreo/android-8.0#mds).
   If a great minimized app experience would improve the user experience,
-  add support for
-  Picture-in-Picture
-  .
+  add support for [Picture-in-Picture](/guide/topics/ui/picture-in-picture).
   - Optimize for devices with display cutout.
   - Don't assume status bar height. Instead, use [`WindowInsets`](/reference/kotlin/android/view/WindowInsets)
   - Don't assume that the app has the entire window. Instead, confirm
@@ -347,12 +305,7 @@ to guide your testing process. We suggest testing:
   - Test any use cases that trigger Firebase Cloud Messaging messages.
   - Test any use cases that use Alarms.
 - Handles new photos / video being taken Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
-  Check that your app
-  handles the restricted
-  ACTION_NEW_PICTURE
-  and
-  ACTION_NEW_VIDEO
-  broadcasts
+  Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
   correctly (that is, moved to JobScheduler jobs).
   Ensure that any critical use cases that depend on these events still
   work.

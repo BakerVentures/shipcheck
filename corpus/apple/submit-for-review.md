@@ -3,13 +3,13 @@ shipcheck_source_id: submit-for-review
 title: "Overview of submitting for review"
 url: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review
 final_url: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review
-fetched_at: 2026-09-03T19:55:34+00:00
-sha256: 04009e4b9150df154870118a609a720648e59f3edeecf783a3813dd23d729cb3
+fetched_at: 2026-09-04T07:14:07+00:00
+sha256: dedb0f60d360ee80c2ece8120b094d8da62c96101acdd5efc3b58f4af3934599
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/submit-for-review
 ---
 
-### App Store Connect Help
+[App Store Connect Help](/help/app-store-connect/)
 
 [App Store Connect](/help/app-store-connect/) Manage submissions to App Review Overview of submitting for review
 
@@ -23,7 +23,7 @@ Our goal is to make the submission process as convenient and efficient as possib
 
 For example, if you have an app version currently under review, you can also submit an In-App Event in a separate submission, or if you have a custom product page under review, you can also submit an app version in a separate submission.
 
-**Note:**Submissions may not be reviewed in the order you submit them.
+**Note:** Submissions may not be reviewed in the order you submit them.
 
 You can choose to submit items for review together with, or separately from, an app version. If your submission includes an app version, items will be reviewed together with that app version. If your submission doesn’t include an app version, or your submission includes items associated with multiple platforms, items will be reviewed together with the latest version of the platform you specify during the submission process. Use the App Review information section on the latest approved app version for that platform to provide additional information or context that will help App Review during the review process. [Learn about App Review guidelines.](/app-store/review/guidelines/)
 
@@ -61,12 +61,4 @@ In addition to an app version, you can add the following items to a submission t
 - [Apple-hosted asset packs](/help/app-store-connect/manage-submissions-to-app-review/submit-apple-hosted-asset-packs)
 - [Game Center components](/help/app-store-connect/manage-submissions-to-app-review/submit-game-center-components), including new or modified leaderboards, leaderboard sets, achievements, challenges, and activities
 
-Related
-
-App Review Guidelines
-
-Platform version information
-
-Run a test
-
-Create and submit app bundles
+**Related** [App Review Guidelines](/app-store/review/guidelines/) [Platform version information](/help/app-store-connect/reference/app-information/platform-version-information#app-review-information) [Run a test](/help/app-store-connect/create-product-page-optimization-tests/run-a-test) [Create and submit app bundles](/help/app-store-connect/create-an-app-record/create-and-submit-app-bundles)

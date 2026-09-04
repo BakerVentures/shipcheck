@@ -1,4 +1,4 @@
-<!-- source=submit-for-review clause=what-items-can-i-add-to-a-submission url=https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review fetched=2026-09-03T19:55:34+00:00 -->
+<!-- source=submit-for-review clause=what-items-can-i-add-to-a-submission url=https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review fetched=2026-09-04T07:14:07+00:00 -->
 
 ### What items can I add to a submission?
 
@@ -14,12 +14,4 @@ In addition to an app version, you can add the following items to a submission t
 - [Apple-hosted asset packs](/help/app-store-connect/manage-submissions-to-app-review/submit-apple-hosted-asset-packs)
 - [Game Center components](/help/app-store-connect/manage-submissions-to-app-review/submit-game-center-components), including new or modified leaderboards, leaderboard sets, achievements, challenges, and activities
 
-Related
-
-App Review Guidelines
-
-Platform version information
-
-Run a test
-
-Create and submit app bundles
+**Related** [App Review Guidelines](/app-store/review/guidelines/) [Platform version information](/help/app-store-connect/reference/app-information/platform-version-information#app-review-information) [Run a test](/help/app-store-connect/create-product-page-optimization-tests/run-a-test) [Create and submit app bundles](/help/app-store-connect/create-an-app-record/create-and-submit-app-bundles)

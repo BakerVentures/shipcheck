@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guideline 4.8: When You Need Sign in with Apple (2026)</title>
+<meta name="description" content="Apple&#x27;s exact requirement for guideline 4.8 login services, the real exemptions, and the fix for Google/Facebook login in React Native apps.">
+<link rel="canonical" href="https://bakerventures.github.io/shipcheck/guidelines/4-8-sign-in-with-apple.html">
+<meta property="og:title" content="Guideline 4.8: When You Need Sign in with Apple (2026)">
+<meta property="og:description" content="Apple&#x27;s exact requirement for guideline 4.8 login services, the real exemptions, and the fix for Google/Facebook login in React Native apps.">
+<meta property="og:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:var(--red)}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+.eyebrow{font:600 13px "IBM Plex Mono",monospace;color:var(--red);letter-spacing:.04em;margin:40px 0 8px}
+h1{font-size:clamp(26px,4.5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:0 0 18px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px}
+.quote{background:var(--code);color:var(--codeink);border-radius:8px;padding:22px 24px;font:14px/1.7 "IBM Plex Mono",ui-monospace,monospace;margin:0 0 28px}
+.quote .clause{color:#8FA3B5;display:block;margin-bottom:10px;font-weight:500}
+.quote a{color:#F2C14E}
+.quote ul{margin:8px 0 0;padding-left:20px}
+h2{font-size:20px;letter-spacing:-.01em;font-weight:600;margin:36px 0 12px}
+p{margin:0 0 14px;max-width:640px}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 8px}
+code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font:13px "IBM Plex Mono",monospace}
+.fixbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 20px}
+.fixbox .label{font:600 12px "IBM Plex Mono",monospace;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.cta{background:var(--ink);color:#fff;border-radius:10px;padding:26px 28px;margin:44px 0 20px}
+.cta h2{color:#fff;margin-top:0}
+.cta p{color:#B9C2CC}
+.cta code{background:#0F151B;border-color:#2B3642;color:#DCE3EA}
+.source{color:var(--muted);font-size:13px;margin-top:8px}
+footer{color:var(--muted);font-size:13px;padding:24px 0 0;border-top:1px solid var(--line);margin-top:40px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="../">shipcheck</a>
+  <nav><a href="../#checks">What it checks</a><a href="../#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<div class="eyebrow">APP STORE GUIDELINE 4.8</div>
+<h1>Guideline 4.8: do you actually need Sign in with Apple?</h1>
+<p class="lede">If your app offers Google or Facebook login for the primary account, Apple requires an equivalent privacy-preserving option -- with real, specific exemptions most developers don&#x27;t know exist.</p>
+
+<div class="quote">
+  <span class="clause">4.8 Login Services — App Store Review Guidelines</span>
+  <p><strong>4.8![ASR &amp; NR] Login Services</strong></p>
+<p>Apps that use a third-party or social login service (such as Facebook Login, Google Sign-In, Log in with X, Sign In with LinkedIn, Login with Amazon, or WeChat Login) to set up or authenticate the user’s primary account with the app must also offer as an equivalent option another login service with the following features:</p>
+<ul><li>the login service limits data collection to the user’s name and email address;</li><li>the login service allows users to keep their email address private as part of setting up their account; and</li><li>the login service does not collect interactions with your app for advertising purposes without consent.</li></ul>
+<p>A user’s primary account is the account they establish with your app for the purposes of identifying themselves, signing in, and accessing your features and associated services.</p>
+<p>Another login service is not required if: Your app exclusively uses your company’s own account setup and sign-in systems. Your app is an alternative app marketplace, or an app distributed from an alternative app marketplace, that uses a marketplace-specific login for account, download, and commerce features. Your app is an education, enterprise, or business app that requires the user to sign in with an existing education or enterprise account. Your app uses a government or industry-backed citizen identification system or electronic ID to authenticate users. Your app is a client for a specific third-party service and users are required to sign in to their mail, social media, or other third-party account directly to access their content.</p>
+</div>
+
+<h2>The exemptions, verbatim from the guideline</h2>
+<p>Another login service is not required if: your app exclusively uses your own company&#x27;s account system; it&#x27;s an education, enterprise, or business app requiring an existing institutional account; it uses a government or industry-backed citizen ID; or it&#x27;s a client for a specific third-party service where users sign in to that service&#x27;s own account directly. Most consumer apps with Google/Facebook login as a convenience option don&#x27;t qualify for any of these.</p>
+<h2>Why this specifically hits Expo apps</h2>
+<p>`@react-native-google-signin/google-signin` and `react-native-fbsdk-next` are common, well-documented, easy to add. `expo-apple-authentication` is one more package, one more entitlement, and easy to defer to &quot;later.&quot; The guideline doesn&#x27;t care that it was added second -- if Google or Facebook sets up the primary account and there&#x27;s no Apple option, it&#x27;s a 4.8 rejection on the first review, every time.</p>
+
+<h2>The fix</h2>
+<div class="fixbox"><span class="label">Add expo-apple-authentication</span><p>`npx expo install expo-apple-authentication`, render an `AppleAuthenticationButton` alongside the other login options, and set `expo.ios.usesAppleSignIn: true` in app.json to enable the capability. That&#x27;s the whole fix for most apps -- the guideline requires parity, not that Apple be the only or the default option.</p></div>
+
+<div class="cta">
+  <h2>ShipCheck catches this before you submit</h2>
+  <p>A Claude Code plugin for React Native and Expo. Reads your project and store listing, checks them against the live App Store Review Guidelines and Google Play policies -- the same corpus quoted on this page -- and tells you the clause, the reviewer's likely wording, and the fix.</p>
+  <code>/plugin marketplace add BakerVentures/shipcheck</code>
+  <p class="source">Free scan on every app. <a href="../#pricing" style="color:#F2C14E">See pricing &rarr;</a></p>
+</div>
+
+<footer>
+  Guideline text quoted from App Store Review Guidelines, 4.8, fetched 2026-09-04 and cached with a SHA-256 in
+  <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a> --
+  the same corpus <a href="https://github.com/BakerVentures/shipcheck">ShipCheck</a> cites in a real scan, not separately maintained copy.
+  Not affiliated with Apple Inc. or Google LLC. This page is not a guarantee of approval.
+</footer>
+</div>
+</body>
+</html>

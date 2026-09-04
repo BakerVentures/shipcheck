@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=prerequisites url=https://docs.expo.dev/submit/ios/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-submit-ios clause=prerequisites url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T07:14:08+00:00 -->
 
 ## Prerequisites
 
@@ -32,62 +32,10 @@ Install EAS CLI and log in with your Expo account:
 
 Terminal
 
--
+`-` `npm install --global eas-cli && eas login`
 
-npm
+`-` `yarn global add eas-cli && eas login`
 
-install
+`-` `pnpm add --global eas-cli && eas login`
 
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-yarn
-
-global add eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-pnpm
-
-add
-
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-bun
-
-add
-
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
+`-` `bun add --global eas-cli && eas login`

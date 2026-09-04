@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Play Target API Level Requirement (2026): Current Floor and Deadline</title>
+<meta name="description" content="Google Play&#x27;s current target API level requirement for new apps and updates, quoted directly, with the deadline and the fix for React Native / Expo.">
+<link rel="canonical" href="https://bakerventures.github.io/shipcheck/guidelines/google-play-target-api-level.html">
+<meta property="og:title" content="Google Play Target API Level Requirement (2026): Current Floor and Deadline">
+<meta property="og:description" content="Google Play&#x27;s current target API level requirement for new apps and updates, quoted directly, with the deadline and the fix for React Native / Expo.">
+<meta property="og:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:var(--red)}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+.eyebrow{font:600 13px "IBM Plex Mono",monospace;color:var(--red);letter-spacing:.04em;margin:40px 0 8px}
+h1{font-size:clamp(26px,4.5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:0 0 18px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px}
+.quote{background:var(--code);color:var(--codeink);border-radius:8px;padding:22px 24px;font:14px/1.7 "IBM Plex Mono",ui-monospace,monospace;margin:0 0 28px}
+.quote .clause{color:#8FA3B5;display:block;margin-bottom:10px;font-weight:500}
+.quote a{color:#F2C14E}
+.quote ul{margin:8px 0 0;padding-left:20px}
+h2{font-size:20px;letter-spacing:-.01em;font-weight:600;margin:36px 0 12px}
+p{margin:0 0 14px;max-width:640px}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 8px}
+code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font:13px "IBM Plex Mono",monospace}
+.fixbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 20px}
+.fixbox .label{font:600 12px "IBM Plex Mono",monospace;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.cta{background:var(--ink);color:#fff;border-radius:10px;padding:26px 28px;margin:44px 0 20px}
+.cta h2{color:#fff;margin-top:0}
+.cta p{color:#B9C2CC}
+.cta code{background:#0F151B;border-color:#2B3642;color:#DCE3EA}
+.source{color:var(--muted);font-size:13px;margin-top:8px}
+footer{color:var(--muted);font-size:13px;padding:24px 0 0;border-top:1px solid var(--line);margin-top:40px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="../">shipcheck</a>
+  <nav><a href="../#checks">What it checks</a><a href="../#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<div class="eyebrow">GOOGLE PLAY · TARGET API LEVEL</div>
+<h1>Google Play&#x27;s target API level requirement, as of 2026-09-04</h1>
+<p class="lede">This floor moves roughly once a year and Google enforces it at the Play Console upload step -- get it wrong and the release is blocked before any review happens.</p>
+
+<div class="quote">
+  <span class="clause">Target API level requirements — Play Console Help</span>
+  <p>## App update requirements</p>
+<p>| <strong>Android OS version  (API level)</strong> | <strong>When are new app and app update submissions required to target this API level?</strong> |  | | --- | --- | --- | | <strong>New apps</strong> | <strong>App updates</strong> |  | | Android 16 (API level 36)* | August 31, 2026 | August 31, 2026 | | Android 15(API level 35) | August 31, 2025 | August 31, 2025 |</p>
+<p>*Developers will be able to request an extension to November 1, 2026.</p>
+<p><strong>Tip:</strong> For technical guidance on how to change your app’s target API level to meet these requirements, refer to the <a href="https://developer.android.com/distribute/best-practices/develop/target-sdk.html">migration guide</a>.</p>
+</div>
+
+<h2>Why this number is dangerous to memorize</h2>
+<p>It moves. The table above is quoted live from Google&#x27;s own page, fetched 2026-09-04 and re-fetched weekly by ShipCheck&#x27;s corpus refresh -- not typed in by hand once and left to go stale. A blog post or Stack Overflow answer citing &quot;the current requirement&quot; is very often citing last year&#x27;s number.</p>
+<h2>The Expo-specific fix</h2>
+<p>`targetSdkVersion` lives in `android/build.gradle` for a bare or prebuilt project. In a managed Expo project without a checked-in `android/` directory, set it via the `expo-build-properties` config plugin instead -- editing `android/build.gradle` directly gets silently overwritten on the next `expo prebuild`.</p>
+
+<h2>The fix</h2>
+<div class="fixbox"><span class="label">In android/build.gradle</span><p>Set `targetSdkVersion` to the current floor for new apps shown in the table above. If you&#x27;re on a managed Expo workflow, do this through `expo-build-properties` in app.json instead, and rebuild.</p></div>
+
+<div class="cta">
+  <h2>ShipCheck catches this before you submit</h2>
+  <p>A Claude Code plugin for React Native and Expo. Reads your project and store listing, checks them against the live App Store Review Guidelines and Google Play policies -- the same corpus quoted on this page -- and tells you the clause, the reviewer's likely wording, and the fix.</p>
+  <code>/plugin marketplace add BakerVentures/shipcheck</code>
+  <p class="source">Free scan on every app. <a href="../#pricing" style="color:#F2C14E">See pricing &rarr;</a></p>
+</div>
+
+<footer>
+  Guideline text quoted from Play Console Help, target API level requirements, fetched 2026-09-04 and cached with a SHA-256 in
+  <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a> --
+  the same corpus <a href="https://github.com/BakerVentures/shipcheck">ShipCheck</a> cites in a real scan, not separately maintained copy.
+  Not affiliated with Apple Inc. or Google LLC. This page is not a guarantee of approval.
+</footer>
+</div>
+</body>
+</html>

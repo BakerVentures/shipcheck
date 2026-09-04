@@ -3,7 +3,7 @@ shipcheck_source_id: third-party-sdk-requirements
 title: "Third-party SDK requirements"
 url: https://developer.apple.com/support/third-party-SDK-requirements/
 final_url: https://developer.apple.com/support/third-party-SDK-requirements/
-fetched_at: 2026-09-03T19:55:32+00:00
+fetched_at: 2026-09-04T07:14:03+00:00
 sha256: 4a1bf5a97f798b146f07773088bd0c342b103177592b0e1ae8a04fb3095dd313
 vendor: apple
 note: "Authoritative list of SDKs that must ship a privacy manifest and signature."

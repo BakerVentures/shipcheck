@@ -3,8 +3,8 @@ shipcheck_source_id: testing-requirements
 title: "App testing requirements for new personal developer accounts"
 url: https://support.google.com/googleplay/android-developer/answer/14151465
 final_url: https://support.google.com/googleplay/android-developer/answer/14151465?hl=en
-fetched_at: 2026-09-03T19:54:38+00:00
-sha256: ab56353f25c2b882b0539328a5caa9fbe2d64623f7e9ee06086d532e96b4f814
+fetched_at: 2026-09-04T07:14:13+00:00
+sha256: d5681f48d897412b37dc8a4139d5f2736f9b0784389d5382f433d97046747f0b
 vendor: google
 note: "The 12-tester / 14-day closed-testing gate for new personal accounts."
 ---
@@ -61,22 +61,16 @@ Provide beta testers with clear instructions on how to test your app and report 
 
 Provide a clear feedback channel, such as email, a website, or a messaging forum. Testers can also provide private feedback directly through Google Play.
 
-Important:
-
-Inform your testers that they need to remain opted in to your closed test continuously for at least 14 days.
+**Important:** Inform your testers that they need to remain opted in to your closed test continuously for at least 14 days.
 
 To view and respond to user feedback in Play Console, follow these steps:
 
-1. Sign in to Play Console, select your app, and go to the [**Testing feedback**](https://play.google.com/console/developers/app/user-feedback/beta-feedback) page (**Monitor and improve****> Ratings and reviews** **>** **Testing feedback**).
+1. Sign in to Play Console, select your app, and go to the [**Testing feedback**](https://play.google.com/console/developers/app/user-feedback/beta-feedback) page (**Monitor and improve** **> Ratings and reviews** **>** **Testing feedback**).
 2. Select how you want to browse feedback:
-  Filter:
-  To view feedback based on criteria such as date, language, reply state, app version, or device type, select from the available filter options.
-  Search:
-  To search for specific keywords in user feedback, use the search box.
+  **Filter:** To view feedback based on criteria such as date, language, reply state, app version, or device type, select from the available filter options.
+  **Search:** To search for specific keywords in user feedback, use the search box.
 
-Tip:
-
-Maintain a record of received feedback. Reviewing feedback regularly helps identify recurring themes and prioritize future improvements. You must summarize your testing feedback when applying for production access.
+**Tip:** Maintain a record of received feedback. Reviewing feedback regularly helps identify recurring themes and prioritize future improvements. You must summarize your testing feedback when applying for production access.
 
 Throughout your testing period, respond to tester feedback and resolve identified bugs to achieve the following goals:
 
@@ -122,17 +116,7 @@ To complete this section, follow these steps:
 3. Summarize the feedback received from testers and describe how feedback was collected.
 4. Click **Next**.
 
-Important:
-
-If you click
-
-Discard
-
-or leave the page without clicking
-
-Next
-
-, your changes are not saved.
+**Important:** If you click **Discard** or leave the page without clicking **Next**, your changes are not saved.
 
 Part 2: About your app/game
 
@@ -142,26 +126,12 @@ To complete this section, follow these steps:
 
 1. Specify the target audience for your app or game. Be as specific as possible.
 2. Describe your app or game value proposition:
-  For apps:
-  Describe how your app provides value to users. For details, see
-  app quality on Google Play
-  on the Android Developers site.
-  For games:
-  Describe what makes your game unique.
+  **For apps:** Describe how your app provides value to users. For details, see [app quality on Google Play](https://developer.android.com/quality) on the Android Developers site.
+  **For games:** Describe what makes your game unique.
 3. Select an estimated install range for your app or game during its first year.
 4. Click **Next**.
 
-Important:
-
-If you click
-
-Discard
-
-or leave the page without clicking
-
-Next
-
-, your changes are not saved.
+**Important:** If you click **Discard** or leave the page without clicking **Next**, your changes are not saved.
 
 Part 3: About your production readiness
 
@@ -172,22 +142,9 @@ To complete this section, follow these steps:
 1. Describe any changes made to your app or game based on what you learned from your closed test.
 2. Describe how you determined that your app or game was ready for production.
 3. Click **Apply**.
-  Important:
-  If you click
-  Discard
-  or quit without applying for production access, your changes won't be saved.
+  **Important:** If you click **Discard** or quit without applying for production access, your changes won't be saved.
 
-Important:
-
-If you click
-
-Discard
-
-or leave the page without clicking
-
-Apply
-
-, your changes are not saved.
+**Important:** If you click **Discard** or leave the page without clicking **Apply**, your changes are not saved.
 
 ## Next steps after applying for production access
 
@@ -203,7 +160,7 @@ Before applying, double-check that your app adheres to all policy requirements, 
 
 - **App content and features:** Verify that all content, features, and monetization models comply with Google Play policies.
 - **App targeting and content rating:** Confirm that your target age group and store listing settings accurately reflect your app's target audience and content.
-- **Functional reliability:**Ensure your app is stable and free from broken functionality, crashes, or missing screens.
+- **Functional reliability:** Ensure your app is stable and free from broken functionality, crashes, or missing screens.
 - **Test credentials:** If your app requires user authentication, provide valid, working login credentials in Play Console so reviewers can fully test your app's features.
 
 ### Application review outcomes

@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=vietnam-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-03T19:54:31+00:00 -->
+<!-- source=age-ratings clause=vietnam-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T07:14:06+00:00 -->
 
 ### Vietnam age rating values
 

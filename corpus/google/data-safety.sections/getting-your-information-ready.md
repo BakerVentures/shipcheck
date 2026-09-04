@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=getting-your-information-ready url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-03T19:55:34+00:00 -->
+<!-- source=data-safety clause=getting-your-information-ready url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T07:14:10+00:00 -->
 
 ## Getting your information ready
 
@@ -14,4 +14,4 @@ Watch the Data safety form walkthrough video
 
 This video takes you through all the resources and steps required to complete the Data safety form.
 
-Google Play PolicyBytes - Data safety form walkthrough
+[Google Play PolicyBytes - Data safety form walkthrough](//www.youtube.com/watch?v=4rfF3y4xchU)

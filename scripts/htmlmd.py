@@ -123,14 +123,28 @@ def _inline(node):
             continue
         t = c.tag
         if t in ("strong", "b"):
-            inner = _inline(c).strip()
-            parts.append(f"**{inner}**" if inner else "")
+            raw = _inline(c)
+            inner = raw.strip()
+            lead = " " if raw != raw.lstrip() else ""
+            trail = " " if raw != raw.rstrip() else ""
+            # A leading/trailing space belongs to the surrounding sentence,
+            # not the emphasis -- Apple's markup puts it *inside* the tag
+            # (e.g. "<strong>(v) Account Sign-In: </strong>If your app..."),
+            # so a bare .strip() here used to silently glue the next word
+            # onto the closing "**" with no space between them.
+            parts.append(f"{lead}**{inner}**{trail}" if inner else "")
         elif t in ("em", "i"):
-            inner = _inline(c).strip()
-            parts.append(f"*{inner}*" if inner else "")
+            raw = _inline(c)
+            inner = raw.strip()
+            lead = " " if raw != raw.lstrip() else ""
+            trail = " " if raw != raw.rstrip() else ""
+            parts.append(f"{lead}*{inner}*{trail}" if inner else "")
         elif t == "code":
-            inner = _inline(c).strip()
-            parts.append(f"`{inner}`" if inner else "")
+            raw = _inline(c)
+            inner = raw.strip()
+            lead = " " if raw != raw.lstrip() else ""
+            trail = " " if raw != raw.rstrip() else ""
+            parts.append(f"{lead}`{inner}`{trail}" if inner else "")
         elif t == "a":
             inner = _inline(c).strip()
             href = c.attrs.get("href", "").strip()
@@ -190,14 +204,44 @@ def _blocks(node, depth=0):
         # there is no reason to make it rely on that as the only backstop.
         s = _clean(node.text())
         return [s] if s else []
+    INLINE_TAGS = ("a", "strong", "b", "em", "i", "code", "span", "br",
+                   "sub", "sup", "u", "small", "abbr", "cite", "q")
+
+    def _is_inline(child):
+        if isinstance(child, str):
+            return True
+        return isinstance(child, Node) and child.tag in INLINE_TAGS \
+            and not _is_junk(child)
+
     out = []
-    for c in node.children:
-        if isinstance(c, str):
-            s = _clean(c)
+    children = list(node.children)
+    i = 0
+    n = len(children)
+    while i < n:
+        c = children[i]
+        # A run of text/inline-tag siblings appearing as DIRECT children of a
+        # block container -- common in Apple's markup, e.g. a bare <li> whose
+        # content is "text <a href=...>link</a> more text" with no wrapping
+        # <p>. Handling each sibling one at a time here (the old behavior)
+        # sent every text node down the "text" branch and every <a>/<strong>
+        # down the generic "unknown element" recursion below, and each of
+        # those became its own top-level block -- splitting one sentence
+        # across three separate paragraphs around any inline link, mid-word.
+        # Buffer the whole run and render it as one paragraph instead.
+        if _is_inline(c):
+            run = []
+            while i < n and _is_inline(children[i]):
+                run.append(children[i])
+                i += 1
+            fake = Node("span")
+            fake.children = run
+            fake.parent = node
+            s = _clean(_inline(fake))
             if s:
                 out.append(s)
             continue
         if _is_junk(c):
+            i += 1
             continue
         t = c.tag
         if t in ("h1", "h2", "h3", "h4", "h5", "h6"):
@@ -210,7 +254,7 @@ def _blocks(node, depth=0):
                 out.append(s)
         elif t in ("ul", "ol"):
             items = []
-            n = 0
+            count = 0
             for li in c.children:
                 if isinstance(li, Node) and li.tag == "li":
                     # keep nested lists readable
@@ -219,8 +263,8 @@ def _blocks(node, depth=0):
                     s = _clean(_inline(li))
                     if not s and not sub:
                         continue
-                    n += 1
-                    bullet = f"{n}." if t == "ol" else "-"
+                    count += 1
+                    bullet = f"{count}." if t == "ol" else "-"
                     if s:
                         items.append(f"{bullet} {s.splitlines()[0] if s else ''}")
                     for sl in sub:
@@ -250,6 +294,7 @@ def _blocks(node, depth=0):
                 out.append(s)
         else:
             out.extend(_blocks(c, depth + 1))
+        i += 1
     return out
 
 

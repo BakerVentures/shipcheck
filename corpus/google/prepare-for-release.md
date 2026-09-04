@@ -3,8 +3,8 @@ shipcheck_source_id: prepare-for-release
 title: "Prepare your app for release"
 url: https://developer.android.com/studio/publish/preparing
 final_url: https://developer.android.com/studio/publish/preparing?hl=en
-fetched_at: 2026-09-03T19:54:40+00:00
-sha256: e315e851a082f0255ab277a6e5a02b484491a7fc953a223f9f42460fa5b21c30
+fetched_at: 2026-09-04T07:14:15+00:00
+sha256: 2803f8ef1fe886ad792d58b63871aefc722b844bf06a22310ddc9cf52f68293b
 vendor: google
 substituted_from: https://developer.android.com/distribute/best-practices/launch/launch-checklist
 note: "The launch-checklist page is retired; it 302s to a Play Console stub."
@@ -18,19 +18,9 @@ cleanup and code modification tasks that help optimize your app. The build
 process is similar to the debug build process and can be done using JDK and
 Android SDK tools.
 
-Use the
+Use the `play-policy-insights` [Android skill](/tools/agents/android-skills) to audit your app for Google Play Policy compliance.
 
-play-policy-insights
-
-Android skill
-
-to audit your app for Google Play Policy compliance.
-
-To install the skill from the
-
-Android CLI
-
-, run:
+To install the skill from the [Android CLI](/tools/agents/android-cli), run:
 
 ```
 android skills add play-policy-insights

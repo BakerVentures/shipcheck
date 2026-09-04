@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=health-connect-by-android-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-03T19:54:39+00:00 -->
+<!-- source=permissions-policy clause=health-connect-by-android-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T07:14:14+00:00 -->
 
 ## Health Connect by Android Permissions
 
@@ -26,8 +26,8 @@ Approved use cases include: fitness and wellness, rewards, fitness coaching, cor
 
 Only applications or services with one or more features designed to benefit users' health and fitness are permitted to request access to Health Connect Permissions. These include:
 
-- Applications or services allowing users**to directly journal, report, monitor, and/or analyze** their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions, health records, and/or other health or fitness-related descriptions and measurements.
-- Applications or services allowing users **to store their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions**,**health records,** and/or other health or fitness-related descriptions and measurements on their device, and share their data with other on-device apps that satisfy these use cases.
+- Applications or services allowing users **to directly journal, report, monitor, and/or analyze** their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions, health records, and/or other health or fitness-related descriptions and measurements.
+- Applications or services allowing users **to store their physical activity, sleep, mental well-being, nutrition, health measurements, physical descriptions**, **health records,** and/or other health or fitness-related descriptions and measurements on their device, and share their data with other on-device apps that satisfy these use cases.
 - Applications or services enabling users to manage chronic conditions, medical treatments, or care support.
 
 Access to Health Connect may not be used in violation of this policy or other applicable Health Connect terms and conditions or policies, including for the following purposes:

@@ -123,7 +123,7 @@ gate for new personal developer accounts.
 Apple and Google change these pages constantly. ShipCheck does not hardcode
 policy text. It fetches **37 official Apple and Google pages** and caches them
 with a fetch date and a SHA-256, chunked so a citation points at an exact clause
-— the App Store Review Guidelines are split into **137 numbered clauses**, each
+— the App Store Review Guidelines are split into **138 numbered clauses**, each
 with a deep link back to Apple's page.
 
 `/shipcheck:refresh` re-fetches everything and diffs it against the previous

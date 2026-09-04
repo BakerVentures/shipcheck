@@ -3,12 +3,12 @@ shipcheck_source_id: export-compliance
 title: "Overview of export compliance"
 url: https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance
 final_url: https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance
-fetched_at: 2026-09-03T19:55:48+00:00
-sha256: c43680fb6ac211efcb8869d2afb3795fdb7047c50b1ce3ea220c14ad37b64fba
+fetched_at: 2026-09-04T07:14:07+00:00
+sha256: 7cfd85641bba161780caf6356cda14a8609373d26fb1735e2ad85032f10f10ba
 vendor: apple
 ---
 
-### App Store Connect Help
+[App Store Connect Help](/help/app-store-connect/)
 
 [App Store Connect](/help/app-store-connect/) Manage app information Overview of export compliance
 

@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=build-a-production-app url=https://docs.expo.dev/submit/ios/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-submit-ios clause=build-a-production-app url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T07:14:08+00:00 -->
 
 ## Build a production app
 
@@ -6,18 +6,6 @@ You need a production .ipa to submit. Create one with [EAS Build](/build/introdu
 
 Terminal
 
--
-
-eas
-
-build
-
---platform
-
-ios
-
---profile
-
-production
+`-` `eas build --platform ios --profile production`
 
 Alternatively, build on your own computer with `eas build --platform ios --profile production --local` or with Xcode.

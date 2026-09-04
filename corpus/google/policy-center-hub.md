@@ -3,8 +3,8 @@ shipcheck_source_id: policy-center-hub
 title: "Play Console Help: Policy Center hub"
 url: https://support.google.com/googleplay/android-developer/topic/9858052
 final_url: https://support.google.com/googleplay/android-developer/topic/9858052?hl=en
-fetched_at: 2026-09-03T19:54:34+00:00
-sha256: 7a6a5404b7439715ee63afedaa4e31e70791859075bedddf893713cb442f8b71
+fetched_at: 2026-09-04T07:14:09+00:00
+sha256: ef43cccb5485b4cdea40a0d69d91e8a18be890cc9397ac359513a3671fbf295e
 vendor: google
 note: "Added in Phase 0: navigable, server-rendered index of the Developer Program Policies."
 ---
@@ -13,11 +13,7 @@ note: "Added in Phase 0: navigable, server-rendered index of the Developer Progr
 
 ### Let's build the world's most trusted source for apps and games
 
-Your innovation is what drives our shared success, but with it comes responsibility. These Developer Program Policies, along with the
-
-Developer Distribution Agreement
-
-, ensure that together we continue to deliver the world's most innovative and trusted apps to over a billion people through Google Play. We invite you to explore our policies below.
+Your innovation is what drives our shared success, but with it comes responsibility. These Developer Program Policies, along with the [Developer Distribution Agreement](https://play.google.com/about/developer-distribution-agreement.html), ensure that together we continue to deliver the world's most innovative and trusted apps to over a billion people through Google Play. We invite you to explore our policies below.
 
 ## [Learn about policies and publishing on Google Play](https://www.youtube.com/watch?v=ZDS4diFfBmQ)
 

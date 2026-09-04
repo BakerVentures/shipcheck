@@ -1,4 +1,4 @@
-<!-- source=screenshot-specifications clause=apple-tv url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-09-03T19:55:48+00:00 -->
+<!-- source=screenshot-specifications clause=apple-tv url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-09-04T07:14:05+00:00 -->
 
 ### Apple TV
 

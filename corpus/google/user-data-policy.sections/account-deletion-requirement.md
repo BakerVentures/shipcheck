@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=account-deletion-requirement url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-03T19:54:35+00:00 -->
+<!-- source=user-data-policy clause=account-deletion-requirement url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-04T07:14:10+00:00 -->
 
 ## Account Deletion Requirement
 
@@ -12,15 +12,7 @@ If your app allows users to create an account from within your app, then it must
 
 When you delete an app account based on a user's request, you must also delete the user data associated with that app account. Temporary account deactivation, disabling, or “freezing” the app account does not qualify as account deletion. If you need to retain certain data for legitimate reasons such as security, fraud prevention, or regulatory compliance, you must clearly inform users about your data retention practices (for example, within your privacy policy).
 
-To learn more about account deletion policy requirements, please review this
-
-Help Center
-
-article. For additional information on updating your Data safety form, visit this
-
-article
-
-.
+To learn more about account deletion policy requirements, please review this [Help Center](https://support.google.com/googleplay/android-developer/answer/13327111) article. For additional information on updating your Data safety form, visit this [article](https://support.google.com/googleplay/android-developer/answer/10787469).
 
 **Key Considerations**
 

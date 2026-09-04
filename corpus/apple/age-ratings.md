@@ -3,14 +3,14 @@ shipcheck_source_id: age-ratings
 title: "Age ratings values and definitions"
 url: https://developer.apple.com/help/app-store-connect/reference/age-ratings
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions
-fetched_at: 2026-09-03T19:54:31+00:00
-sha256: 4bac227c2095ddc6535fdaa153b93213b6d2f9cf9e663be583f12203851fb77b
+fetched_at: 2026-09-04T07:14:06+00:00
+sha256: a7c233f6e11dcf54360c325b548b6bdc80ec8655bdb8e25417611752bf5aaac1
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/age-ratings-definitions
 note: "Original 404s. Apple restructured age ratings (13+/16+/18+ tiers)."
 ---
 
-### App Store Connect Help
+[App Store Connect Help](/help/app-store-connect/)
 
 [App Store Connect](/help/app-store-connect/) Reference [App information](/help/app-store-connect/reference/app-information/) Age ratings values and definitions
 
@@ -34,7 +34,7 @@ The tables below provide detailed information about the different age rating cat
 | Category | Examples of included features and content |
 | --- | --- |
 | In-App Controls | **Parental Controls:** Settings or tools that allow parents/guardians to monitor, manage, or restrict a child's access to in-app content or features that may not be suitable. *May include: tools to enable content blocking or filtering; setting usage limits; or restrictions on using certain features, such as making purchases or using communication features.* **Age Assurance:** Mechanism to confirm an individual's age meets the age requirement for accessing specific content or services. *May include: declared age range API; age estimation capabilities; age verification via government-issued passport, drivers license, national ID, or other means of age assurance.* |
-| Capabilities | **Unrestricted Web Access:** Users can navigate to any webpage within the app or freely browse the web. *May include: embedded browser functionality or browser app.* **User-Generated Content:** Includes the broad distribution of content created by users as a component of the app's intended user experience. *May include: broadly distributed videos, photos, text, and/or audio created by users of the app.* **Social Media:**Redistribution, amplification, or interaction with user-generated content through a social feed or similar discovery method that visibly spreads content to many users. *May include: feeds that allow users to engage with and amplify user-generated content through features such as views, likes, comments, and shares.* **Social Media Disabled for Users Under 13:** Users under 13 don't have access to social media capabilities. At a minimum, the [Declared Age Range API](https://developer.apple.com/documentation/declaredagerange) is called to check users' age ranges before enabling social media features. Only age-appropriate UGC is delivered. **Messaging and Chat:** Users can directly communicate with one another through features within the app. *May include: text, voice and/or video chat, direct and/or group messaging, or public posting.* **Advertising:** Paid promotion of products or services within the app. *May include: banner ads, video and playable ads, rich media ads, or native ad formats.* |
+| Capabilities | **Unrestricted Web Access:** Users can navigate to any webpage within the app or freely browse the web. *May include: embedded browser functionality or browser app.* **User-Generated Content:** Includes the broad distribution of content created by users as a component of the app's intended user experience. *May include: broadly distributed videos, photos, text, and/or audio created by users of the app.* **Social Media:** Redistribution, amplification, or interaction with user-generated content through a social feed or similar discovery method that visibly spreads content to many users. *May include: feeds that allow users to engage with and amplify user-generated content through features such as views, likes, comments, and shares.* **Social Media Disabled for Users Under 13:** Users under 13 don't have access to social media capabilities. At a minimum, the [Declared Age Range API](https://developer.apple.com/documentation/declaredagerange) is called to check users' age ranges before enabling social media features. Only age-appropriate UGC is delivered. **Messaging and Chat:** Users can directly communicate with one another through features within the app. *May include: text, voice and/or video chat, direct and/or group messaging, or public posting.* **Advertising:** Paid promotion of products or services within the app. *May include: banner ads, video and playable ads, rich media ads, or native ad formats.* |
 | Mature Themes | **Profanity or Crude Humor:** Offensive or vulgar language that may be considered rude, obscene, or inappropriate. *May include: swearing, derogatory slurs, insult-based humor, or jokes about bodily functions.* **Horror/Fear Themes:** Content or storylines that evoke feelings of anxiety, dread, or terror. *May include: supernatural or psychological elements; body horror; or fear of the unknown, isolation, or death.* **Alcohol, Tobacco, or Drug Use or References:** References to or depictions of the consumption of alcohol, tobacco products, or other licit or illicit substances. *May include: drunken behavior, cigarette smoking, or the taking of illegal drugs.* |
 | Medical or Wellness | **Medical or Treatment Information:** Content that provides diagnoses or guidance around the management of medical conditions or health and wellness. *May include: medication guidance, emergency medical care, or treatment information.* **Health or Wellness Topics:** Content that provides self-care or lifestyle recommendations. *May include: calorie tracking, dieting advice, or exercise recommendations.* |
 | Sexuality or Nudity | **Mature or Suggestive Themes:** Content that implies or indirectly references sexual or mature topics without being explicit or topics for older audiences due to the complex, intense, or sensitive nature, which may deal with real-world issues or content unsuitable for children. *May include: sexual innuendo, sensual or suggestive imagery, censored or implied nudity, real-world crimes, psychological trauma or abuse, moral or ethical dilemmas, or war or political strife.* **Sexual Content or Nudity:** Non-explicit depictions of sexual behavior, including brief or partial nudity. *May include: mild romantic intimacy, implied sexual activity, or erotic or sensual dialog.* **Graphic Sexual Content and Nudity:** Explicit, detailed depictions of sexual activity or nudity. *May include: uncensored or full-frontal nudity; realistic, illustrative, or pornographic portrayals of sex.* |
@@ -60,7 +60,7 @@ Learn about age rating values with region-specific requirements for [Australia](
 
 As required by [Australia’s guidelines for the classification of computer games](https://www.legislation.gov.au/F2023L01424/latest/text), apps that have at least one of the following content descriptors will display the regional region-specific age rating.
 
-**Note:**Only the age rating values listed below differ from the [age rating values](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#age-rating-values).
+**Note:** Only the age rating values listed below differ from the [age rating values](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#age-rating-values).
 
 | Rating | Definition |
 | --- | --- |
@@ -97,7 +97,7 @@ Possible values for self-rated Brazil age pictograms are:
 
 For all apps made available in Korea, the following region-specific rating values will display:
 
-**Note:**Apps and games with Frequent or Intense simulated gambling content are only available on the App Store in Korea if you provide a Rating Classification Number (RCN).
+**Note:** Apps and games with Frequent or Intense simulated gambling content are only available on the App Store in Korea if you provide a Rating Classification Number (RCN).
 
 | Rating | Definition |
 | --- | --- |
@@ -106,7 +106,7 @@ For all apps made available in Korea, the following region-specific rating value
 | 15+ | Apps that contain: **Capabilities:** Unrestricted web access Social media Social media disabled for users under 13 **Medical or Wellness:** Frequent medical or treatment information |
 | 19+ | Apps that contain: **Mature Themes:** Frequent alcohol, tobacco, or drug use or references **Sexuality or Nudity:** Frequent sexual content or nudity **Violence:** Frequent realistic violence **Chance-Based Activities:** Frequent simulated gambling |
 
-**Note:**You’ll receive a message from App Review if the [Korean Games Rating and Administration Committee(GRAC)](https://www.grac.or.kr/english/) issues an official rating for your app that is different from your app’s age rating. If you receive this notice, follow the instructions in the [override age rating for Korea](/help/app-store-connect/manage-app-information/set-an-app-age-rating/#override-region-specific-ratings) section and re-submit your app for review.
+**Note:** You’ll receive a message from App Review if the [Korean Games Rating and Administration Committee(GRAC)](https://www.grac.or.kr/english/) issues an official rating for your app that is different from your app’s age rating. If you receive this notice, follow the instructions in the [override age rating for Korea](/help/app-store-connect/manage-app-information/set-an-app-age-rating/#override-region-specific-ratings) section and re-submit your app for review.
 
 ### Vietnam age rating values
 
@@ -176,12 +176,6 @@ Possible values for Korea regional ratings are:
 
 * The GRAC may issue a KR-15 regional rating with an updated pictogram, or text that indicates KR-19 regional age rating for some apps.
 
-**Note:**You’ll receive a message from App Review if the [Korean Games Rating and Administration Committee(GRAC)](https://www.grac.or.kr/english/) issues an official rating for your app that is different from your app’s age rating. If you receive this notice, follow the instructions in the [override age rating for Korea](/help/app-store-connect/manage-app-information/set-an-app-age-rating/#override-region-specific-ratings) section and re-submit your app for review.
+**Note:** You’ll receive a message from App Review if the [Korean Games Rating and Administration Committee(GRAC)](https://www.grac.or.kr/english/) issues an official rating for your app that is different from your app’s age rating. If you receive this notice, follow the instructions in the [override age rating for Korea](/help/app-store-connect/manage-app-information/set-an-app-age-rating/#override-region-specific-ratings) section and re-submit your app for review.
 
-Related
-
-Set an app age rating
-
-App information
-
-Platform version information
+**Related** [Set an app age rating](/help/app-store-connect/manage-app-information/set-an-app-age-rating) [App information](/help/app-store-connect/reference/app-information/app-information) [Platform version information](/help/app-store-connect/reference/app-information/platform-version-information)

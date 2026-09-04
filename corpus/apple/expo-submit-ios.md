@@ -3,18 +3,18 @@ shipcheck_source_id: expo-submit-ios
 title: "Expo: Submit to the App Store"
 url: https://docs.expo.dev/submit/ios/
 final_url: https://docs.expo.dev/submit/ios/
-fetched_at: 2026-09-03T19:55:49+00:00
-sha256: 8c45facd11b28a07bdc3754d366f69be7af8b905be810aef07ff21cdab83e146
+fetched_at: 2026-09-04T07:14:08+00:00
+sha256: 348d91ea3264018b38f78b093f9c4f3aa5b84f2745157c7f5e391b18eaf05a4e
 vendor: apple
 ---
 
 # Submit to the Apple App Store with EAS Submit
 
-Edit page
+[Edit page](https://github.com/expo/expo/edit/main/docs/pages/submit/ios.mdx)
 
 Learn how to submit your iOS app to the Apple App Store with EAS Submit.
 
-Edit page
+[Edit page](https://github.com/expo/expo/edit/main/docs/pages/submit/ios.mdx)
 
 ---
 
@@ -52,65 +52,13 @@ Install EAS CLI and log in with your Expo account:
 
 Terminal
 
--
+`-` `npm install --global eas-cli && eas login`
 
-npm
+`-` `yarn global add eas-cli && eas login`
 
-install
+`-` `pnpm add --global eas-cli && eas login`
 
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-yarn
-
-global add eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-pnpm
-
-add
-
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-bun
-
-add
-
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
+`-` `bun add --global eas-cli && eas login`
 
 ## Build a production app
 
@@ -118,19 +66,7 @@ You need a production .ipa to submit. Create one with [EAS Build](/build/introdu
 
 Terminal
 
--
-
-eas
-
-build
-
---platform
-
-ios
-
---profile
-
-production
+`-` `eas build --platform ios --profile production`
 
 Alternatively, build on your own computer with `eas build --platform ios --profile production --local` or with Xcode.
 
@@ -140,15 +76,7 @@ Once the build is ready, submit it to the Apple App Store:
 
 Terminal
 
--
-
-eas
-
-submit
-
---platform
-
-ios
+`-` `eas submit --platform ios`
 
 The command will walk you through selecting a build, prompt for your Apple ID on first run, and upload the binary to App Store Connect. The build appears in [TestFlight](/submit/testflight) after processing (usually 10-15 minutes). To release to production, log in to [App Store Connect](https://appstoreconnect.apple.com/) and submit the build for App Review.
 
@@ -162,9 +90,7 @@ eas.json
 { "submit": { "production": { "ios": { "ascAppId": "your-app-store-connect-app-id" } } } }
 ```
 
-How to find
-
-ascAppId
+How to find `ascAppId`
 
 1. Sign in to [App Store Connect](https://appstoreconnect.apple.com/) and select your team.
 2. Navigate to [Apps](https://appstoreconnect.apple.com/apps).
@@ -181,15 +107,7 @@ Pass `--auto-submit` to `eas build` to hand the finished build off to EAS Submit
 
 Terminal
 
--
-
-eas
-
-build
-
---platform
-
-ios --auto-submit
+`-` `eas build --platform ios --auto-submit`
 
 See [Automate submissions](/build/automate-submissions) for details.
 
@@ -199,15 +117,7 @@ See [Automate submissions](/build/automate-submissions) for details.
 
 Terminal
 
--
-
-eas
-
-credentials
-
---platform
-
-ios
+`-` `eas credentials --platform ios`
 
 1. Select the `production` build profile.
 2. Log in with your Apple Developer account and follow the prompts.
@@ -241,11 +151,7 @@ This builds an iOS app on every push to `main` and submits it to TestFlight. The
 
 Terminal
 
--
-
-eas
-
-workflow:run submit-ios.yml
+`-` `eas workflow:run submit-ios.yml`
 
 See the [workflow examples guide](/eas/workflows/examples/introduction) for more patterns.
 
@@ -255,19 +161,7 @@ You can run `eas submit` from any CI/CD service, such as GitHub Actions, GitLab 
 
 Terminal
 
--
-
-eas
-
-submit
-
---platform
-
-ios
-
---profile
-
-production
+`-` `eas submit --platform ios --profile production`
 
 This requires a [personal access token](/accounts/programmatic-access#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.
 
@@ -275,6 +169,4 @@ This requires a [personal access token](/accounts/programmatic-access#personal-a
 
 If EAS Submit is temporarily unavailable, you can upload to the Apple App Store manually from a Mac with Xcode.
 
-Manually submit an iOS app with Xcode
-
-Archive and upload an iOS app to App Store Connect using Xcode on macOS.
+[Manually submit an iOS app with XcodeArchive and upload an iOS app to App Store Connect using Xcode on macOS.](/submit/ios-manual)

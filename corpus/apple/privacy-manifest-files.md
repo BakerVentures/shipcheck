@@ -3,7 +3,7 @@ shipcheck_source_id: privacy-manifest-files
 title: "Privacy manifest files"
 url: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
 final_url: https://developer.apple.com/tutorials/data/documentation/bundleresources/privacy-manifest-files.json
-fetched_at: 2026-09-04T01:32:38+00:00
+fetched_at: 2026-09-04T07:14:02+00:00
 sha256: 3f2f6900668f9465623b9838614d8db3d43d453514951642cfb36c512d0905fa
 vendor: apple
 ---

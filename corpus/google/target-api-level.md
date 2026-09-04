@@ -3,8 +3,8 @@ shipcheck_source_id: target-api-level
 title: "Meet Google Play's target API level requirement"
 url: https://support.google.com/googleplay/android-developer/answer/11926878
 final_url: https://support.google.com/googleplay/android-developer/answer/11926878?hl=en
-fetched_at: 2026-09-03T19:54:36+00:00
-sha256: a3601c1c98431c8cefc97ec08ba5b78850a79b973e5ff19787547cef4f6a4edb
+fetched_at: 2026-09-04T07:14:11+00:00
+sha256: aa879dc556400bbca3eda654e105f4df830a45a9baeb8ff3ab043d1da9424426
 vendor: google
 ---
 
@@ -44,13 +44,7 @@ Exceptions to these requirements include the following:
 
 *Developers will be able to request an extension to November 1, 2026.
 
-Tip:
-
-For technical guidance on how to change your app’s target API level to meet these requirements, refer to the
-
-migration guide
-
-.
+**Tip:** For technical guidance on how to change your app’s target API level to meet these requirements, refer to the [migration guide](https://developer.android.com/distribute/best-practices/develop/target-sdk.html).
 
 ### Wear OS app requirements
 
@@ -132,19 +126,11 @@ If you want to stop serving your app to new users even on older devices, you can
 
 ## Where can I find the extension form to continue distributing to all Google Play users until November 1, 2026?
 
-Only apps that are not compliant with the policy will receive a policy warnings and notification in Play Console. The extension form is available through the details page of the warning or issue on the
-
-Policy status
-
-page in Play Console.
+Only apps that are not compliant with the policy will receive a policy warnings and notification in Play Console. The extension form is available through the details page of the warning or issue on the **[Policy status](https://play.google.com/console/developers/app/policy-centre)** page in Play Console.
 
 ## I have apps that I no longer want published on Google Play. What can I do?
 
-Please refer to
-
-this Help Center article
-
-for instructions on how to unpublish your app.
+Please refer to [this Help Center article](https://support.google.com/googleplay/android-developer/answer/9859350?hl=en) for instructions on how to unpublish your app.
 
 ## How will my users who already downloaded my app previously be impacted?
 

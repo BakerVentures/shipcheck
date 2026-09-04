@@ -3,18 +3,18 @@ shipcheck_source_id: expo-submit-android
 title: "Expo: Submit to Google Play"
 url: https://docs.expo.dev/submit/android/
 final_url: https://docs.expo.dev/submit/android/
-fetched_at: 2026-09-03T19:55:49+00:00
-sha256: 2afc917cf016fcbe1f4bfb6fa72d08cb4ac82e96bcf299849cb212abb3e187fa
+fetched_at: 2026-09-04T07:14:19+00:00
+sha256: 57a8113bd50136a7ce85336009b84634b4dbd72c7d9c4c0d3fac4cdac4d902d4
 vendor: google
 ---
 
 # Submit to the Google Play Store with EAS Submit
 
-Edit page
+[Edit page](https://github.com/expo/expo/edit/main/docs/pages/submit/android.mdx)
 
 Learn how to submit your Android app to the Google Play Store with EAS Submit.
 
-Edit page
+[Edit page](https://github.com/expo/expo/edit/main/docs/pages/submit/android.mdx)
 
 ---
 
@@ -73,65 +73,13 @@ Install EAS CLI and log in with your Expo account:
 
 Terminal
 
--
+`-` `npm install --global eas-cli && eas login`
 
-npm
+`-` `yarn global add eas-cli && eas login`
 
-install
+`-` `pnpm add --global eas-cli && eas login`
 
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-yarn
-
-global add eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-pnpm
-
-add
-
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
-
--
-
-bun
-
-add
-
---global
-
-eas-cli
-
-&&
-
-eas
-
-login
+`-` `bun add --global eas-cli && eas login`
 
 ## Build a production app
 
@@ -139,19 +87,7 @@ You need a production .aab (Android App Bundle) to submit. Google Play requires 
 
 Terminal
 
--
-
-eas
-
-build
-
---platform
-
-android
-
---profile
-
-production
+`-` `eas build --platform android --profile production`
 
 Alternatively, build on your own computer with `eas build --platform android --profile production --local` or with Android Studio.
 
@@ -170,15 +106,7 @@ Once the build is ready, submit it to the Google Play Store:
 
 Terminal
 
--
-
-eas
-
-submit
-
---platform
-
-android
+`-` `eas submit --platform android`
 
 The command will walk you through selecting a build and uploading it. Configure the submission process by adding a submission profile in eas.json. See the [eas.json reference](/eas/json#android-specific-options-1) for every available option.
 
@@ -188,15 +116,7 @@ Pass `--auto-submit` to `eas build` to hand the finished build off to EAS Submit
 
 Terminal
 
--
-
-eas
-
-build
-
---platform
-
-android --auto-submit
+`-` `eas build --platform android --auto-submit`
 
 See [Automate submissions](/build/automate-submissions) for details.
 
@@ -226,11 +146,7 @@ This builds an Android app on every push to `main` and submits it to Google Play
 
 Terminal
 
--
-
-eas
-
-workflow:run submit-android.yml
+`-` `eas workflow:run submit-android.yml`
 
 See the [workflow examples guide](/eas/workflows/examples/introduction) for more patterns.
 
@@ -240,18 +156,6 @@ You can run `eas submit` from any CI/CD service, such as GitHub Actions, GitLab 
 
 Terminal
 
--
-
-eas
-
-submit
-
---platform
-
-android
-
---profile
-
-production
+`-` `eas submit --platform android --profile production`
 
 This requires a [personal access token](/accounts/programmatic-access#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.

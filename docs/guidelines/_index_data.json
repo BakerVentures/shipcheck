@@ -1,0 +1,32 @@
+[
+  [
+    "5-1-1-v-account-deletion",
+    "Guideline 5.1.1(v): account deletion",
+    "Apple's exact wording for guideline 5.1.1(v) account deletion, what counts as compliant, and the fix for React Native and Expo apps."
+  ],
+  [
+    "3-1-2-subscription-disclosure",
+    "Guideline 3.1.2(c): what your paywall has to show before the buy button",
+    "What Apple's guideline 3.1.2(c) requires on a paywall screen before purchase, quoted directly, plus the exact fix for React Native paywalls."
+  ],
+  [
+    "4-8-sign-in-with-apple",
+    "Guideline 4.8: do you actually need Sign in with Apple?",
+    "Apple's exact requirement for guideline 4.8 login services, the real exemptions, and the fix for Google/Facebook login in React Native apps."
+  ],
+  [
+    "itms-91053-privacy-manifest",
+    "ITMS-91053: privacy manifest doesn't declare required-reason API",
+    "What ITMS-91053 means, why it's the most common Expo App Store upload rejection, and the exact reason code to add to fix it."
+  ],
+  [
+    "2-3-1-placeholder-metadata",
+    "Guideline 2.3.1: placeholder text and misleading metadata",
+    "Apple's exact wording on guideline 2.3.1 accurate metadata, what counts as placeholder content, and how to check your listing before submitting."
+  ],
+  [
+    "google-play-target-api-level",
+    "Google Play's target API level requirement, as of 2026-09-04",
+    "Google Play's current target API level requirement for new apps and updates, quoted directly, with the deadline and the fix for React Native / Expo."
+  ]
+]

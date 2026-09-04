@@ -1,4 +1,4 @@
-<!-- source=prepare-and-roll-out-a-release clause=step-1-create-a-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-03T19:54:34+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=step-1-create-a-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-04T07:14:09+00:00 -->
 
 ## Step 1: Create a release
 
@@ -18,28 +18,11 @@ To create a release, keep the following requirements in mind:
 To start your release, follow these steps:
 
 1. Sign in to Play Console, select your app, and go to the track where you want to start your release:
-  Open testing
-  (
-  Test and release > Testing > Open testing
-  )
-  Closed testing
-  (
-  Test and release > Testing > Closed testing
-  )
-  Note:
-  To create a release on an existing closed testing track, click
-  Manage track
-  . To create a new track, click
-  Create track
-  .
-  Internal testing
-  (
-  Test and release > Testing > Internal testing
-  )
-  Production
-  (
-  Test and release > Production
-  )
+  [**Open testing**](https://play.google.com/console/developers/app/tracks/open-testing)(**Test and release > Testing > Open testing**)
+  [**Closed testing**](https://play.google.com/console/developers/app/closed-testing)(**Test and release > Testing > Closed testing**)
+  **Note:** To create a release on an existing closed testing track, click **Manage track**. To create a new track, click **Create track**.
+  [**Internal testing**](https://play.google.com/console/developers/app/tracks/internal-testing)(**Test and release > Testing > Internal testing**)
+  [**Production**](https://play.google.com/console/developers/app/tracks/production) (**Test and release > Production**)
 2. Near the top right of the page, click **Create new release**.
 
 To edit an existing release, go to the corresponding release page and click **Edit release**.

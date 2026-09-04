@@ -1,18 +1,10 @@
-<!-- source=permissions-policy clause=full-screen-intent-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-03T19:54:39+00:00 -->
+<!-- source=permissions-policy clause=full-screen-intent-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T07:14:14+00:00 -->
 
 ## Full-Screen Intent Permission
 
 **Policy Summary**
 
-On Android 14+, the
-
-USE_FULL_SCREEN_INTENT
-
-permission is auto-granted
-
-only
-
-for apps whose core function is setting alarms or handling calls. For any other use case, you must obtain explicit user consent and clearly explain your need. This policy prevents the misuse of full-screen intents for non-critical purposes and requires that your use does not interfere with or disrupt the user's device, other apps, or overall usability. Please review the full policy to ensure compliance.
+On Android 14+, the ``USE_FULL_SCREEN_INTENT`` permission is auto-granted *only* for apps whose core function is setting alarms or handling calls. For any other use case, you must obtain explicit user consent and clearly explain your need. This policy prevents the misuse of full-screen intents for non-critical purposes and requires that your use does not interfere with or disrupt the user's device, other apps, or overall usability. Please review the full policy to ensure compliance.
 
 **Full Policy**
 

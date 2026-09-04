@@ -3,18 +3,18 @@ shipcheck_source_id: expo-apple-privacy
 title: "Expo: Apple privacy manifests"
 url: https://docs.expo.dev/guides/apple-privacy/
 final_url: https://docs.expo.dev/guides/apple-privacy/
-fetched_at: 2026-09-03T19:55:49+00:00
-sha256: 6871f238e30847117e3e482a4265f114e539a0fc45a040510480f1a0537fb93b
+fetched_at: 2026-09-04T07:14:07+00:00
+sha256: b38f66fcab445b40096c19b65b7bfa61bddf3a8752f868cb00cef488a604fd47
 vendor: apple
 ---
 
 # Privacy manifests
 
-Edit page
+[Edit page](https://github.com/expo/expo/edit/main/docs/pages/guides/apple-privacy.mdx)
 
 Learn about configuring iOS privacy manifests for your mobile app.
 
-Edit page
+[Edit page](https://github.com/expo/expo/edit/main/docs/pages/guides/apple-privacy.mdx)
 
 ---
 

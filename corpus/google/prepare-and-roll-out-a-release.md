@@ -3,8 +3,8 @@ shipcheck_source_id: prepare-and-roll-out-a-release
 title: "Prepare and roll out a release"
 url: https://support.google.com/googleplay/android-developer/answer/9859348
 final_url: https://support.google.com/googleplay/android-developer/answer/9859348?hl=en
-fetched_at: 2026-09-03T19:54:34+00:00
-sha256: bd3ec44d79ed0fb869814a9244924f736ebc07eb6a94e3760c85a5133864e3f5
+fetched_at: 2026-09-04T07:14:09+00:00
+sha256: 3e0303cf06a9d2731f1e1775e0de18b3d80614fad58bc386aac1c674ff48908f
 vendor: google
 note: "Listed in the brief as 'Developer Program Policies' but this ID is actually release rollout. Kept for testing-track rules; policy text is under policy-center-hub."
 ---
@@ -31,28 +31,11 @@ To create a release, keep the following requirements in mind:
 To start your release, follow these steps:
 
 1. Sign in to Play Console, select your app, and go to the track where you want to start your release:
-  Open testing
-  (
-  Test and release > Testing > Open testing
-  )
-  Closed testing
-  (
-  Test and release > Testing > Closed testing
-  )
-  Note:
-  To create a release on an existing closed testing track, click
-  Manage track
-  . To create a new track, click
-  Create track
-  .
-  Internal testing
-  (
-  Test and release > Testing > Internal testing
-  )
-  Production
-  (
-  Test and release > Production
-  )
+  [**Open testing**](https://play.google.com/console/developers/app/tracks/open-testing)(**Test and release > Testing > Open testing**)
+  [**Closed testing**](https://play.google.com/console/developers/app/closed-testing)(**Test and release > Testing > Closed testing**)
+  **Note:** To create a release on an existing closed testing track, click **Manage track**. To create a new track, click **Create track**.
+  [**Internal testing**](https://play.google.com/console/developers/app/tracks/internal-testing)(**Test and release > Testing > Internal testing**)
+  [**Production**](https://play.google.com/console/developers/app/tracks/production) (**Test and release > Production**)
 2. Near the top right of the page, click **Create new release**.
 
 To edit an existing release, go to the corresponding release page and click **Edit release**.
@@ -64,21 +47,12 @@ To edit an existing release, go to the corresponding release page and click **Ed
 To prepare your release, follow these steps:
 
 1. Follow the on-screen instructions to prepare your release:
-  If this is your first release for this app, follow the instructions to
-  configure Play App Signing
-  .
+  If this is your first release for this app, follow the instructions to [configure Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756).
   Add your app bundles. Legacy apps (created before August 2021) can add app bundles or APKs for app updates.
-  Optional:
-  If you are creating a release for the first time, you can change your app signing key. In the 'App integrity' section, click
-  Change app signing key
-  . Before changing your key, understand that:
+  **Optional:** If you are creating a release for the first time, you can change your app signing key. In the 'App integrity' section, click **Change app signing key**. Before changing your key, understand that:
   - Internal and closed track users who already installed your app will no longer receive updates. These users must uninstall and reinstall the app to receive updates.
   - You cannot use previously uploaded app versions. You must re-upload app versions.
-  Optional:
-  To add the Play Games Sidekick to your app bundle, click
-  Add Play Games Sidekick
-  to new app bundles you upload
-  .
+  **Optional:** To add the Play Games Sidekick to your app bundle, click **Add Play Games Sidekick** to new app bundles you upload**.**
   - To upload an app bundle for your game, click **Upload**.
   - To use a previously uploaded app version, click **Add from library**.
   Name your release.
@@ -87,9 +61,7 @@ To prepare your release, follow these steps:
 2. To save changes to your release, click **Save as draft**.
 3. When you finish preparing your release, click **Next**.
 
-Note:
-
-Once you publish an app to an open track, its signing key is fixed.
+**Note:** Once you publish an app to an open track, its signing key is fixed.
 
 #### Configure release options
 
@@ -108,9 +80,7 @@ Upload new app bundles or add them from your library. Click **More** to perform 
 - Upload an expansion file (.obb)
 - Remove an app bundle
 
-Note:
-
-Legacy apps (created before August 2021) can use app bundles or APKs in releases.
+**Note:** Legacy apps (created before August 2021) can use app bundles or APKs in releases.
 
 To learn more about ReTrace mapping files and native debug symbols, see [Deobfuscate or symbolicate crash stack traces](https://support.google.com/googleplay/android-developer/answer/9848633).
 
@@ -158,9 +128,7 @@ The release notes description can take up multiple lines.
 
 </en-US>
 
-Note:
-
-You can enter release notes using up to 500 Unicode characters per language.
+**Note:** You can enter release notes using up to 500 Unicode characters per language.
 
 #### **Copy from previous release**
 
@@ -178,15 +146,9 @@ To roll out your app, follow these steps:
 4. If you see 'Errors summary' at the top of the page, click **Show more** to review details and resolve any problems.
 5. If updating an existing app, select a rollout percentage.
   Rollout percentage options are unavailable for a first release.
-  For details on targeting staged rollouts to specific countries or regions, see
-  Release app updates with staged rollouts
-  .
+  For details on targeting staged rollouts to specific countries or regions, see [Release app updates with staged rollouts](https://support.google.com/googleplay/android-developer/answer/6346149#staged_country).
 6. Click **Start rollout**.
-  If rolling out a first production release, clicking
-  Start rollout to production
-  publishes your app to all Google Play users in your selected
-  countries or regions
-  .
+  If rolling out a first production release, clicking **Start rollout to production** publishes your app to all Google Play users in your selected [countries or regions](https://support.google.com/googleplay/android-developer/answer/7550024).
 
 ## Step 4: Review release details
 
@@ -212,11 +174,9 @@ To discard a release during setup, use the procedure corresponding to your relea
 - **Draft:** Click **Discard draft release** near the top right of the page. This action removes changes made in the release.
 - **Ready to send for review:** Click **Discard release** on the release summary. Your release is removed from the [**Publishing overview**](https://play.google.com/console/developers/app/publishing) page and excluded from review submissions.
 - **In review** or **Ready to publish:** Remove changes from the **Publishing overview** page first. Once removed, click **Discard release** on the release summary.
-- **Rejected:** Click **Discard release**on the rejected release summary.
+- **Rejected:** Click **Discard release** on the rejected release summary.
 
-Note:
-
-You can only discard the latest release on a track, including draft releases and recently rejected releases.
+**Note:** You can only discard the latest release on a track, including draft releases and recently rejected releases.
 
 ## Track releases on the Latest releases and bundles page
 

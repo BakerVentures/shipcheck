@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=personal-and-sensitive-user-data url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-03T19:54:35+00:00 -->
+<!-- source=user-data-policy clause=personal-and-sensitive-user-data url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-04T07:14:10+00:00 -->
 
 ## Personal and Sensitive User Data
 
@@ -11,17 +11,13 @@ Google's User Data policy requires you to be transparent about how your app hand
 Personal and sensitive user data includes, but isn't limited to, personally identifiable information, financial and payment information, authentication information, phonebook, contacts, [device location](https://developer.android.com/training/location), SMS and call-related data, [health data](https://support.google.com/googleplay/android-developer/answer/12261419#health_apps), [Health Connect](https://support.google.com/googleplay/android-developer/answer/9888170#ahp) data, inventory of other apps on the device, microphone, camera, and other sensitive device or usage data. If your app handles personal and sensitive user data, then you must:
 
 - Limit the access, collection, use and sharing of personal and sensitive user data acquired through the app to app and service functionality and policy-conforming purposes reasonably expected by the user:
-  Apps that extend usage of personal and sensitive user data for serving advertising must comply with Google Play’s
-  Ads policy
-  .
+  Apps that extend usage of personal and sensitive user data for serving advertising must comply with Google Play’s [Ads policy](https://support.google.com/googleplay/android-developer/answer/9857753#location-data).
 
 - You may also transfer data as necessary to [service providers](https://support.google.com/googleplay/android-developer/answer/10787469#service-provider&zippy=%2Csharing%2Cdata-sharing) or for legal reasons such as to comply with a valid governmental request, applicable law, or as part of a merger or acquisition with legally adequate notice to users.
 - Handle all personal and sensitive user data securely, including transmitting it using modern cryptography (for example, over HTTPS).
 - Use a runtime permissions request whenever available, prior to accessing data gated by [Android permissions](https://developer.android.com/guide/topics/permissions/overview).
 - Not sell personal and sensitive user data.
-  "Sale" means the exchange or transfer of personal and sensitive user data to a
-  third party
-  for monetary consideration.
+  "Sale" means the exchange or transfer of personal and sensitive user data to a [third party](https://support.google.com/googleplay/android-developer/answer/10787469#first-and-third&zippy=%2Csharing%2Cdata-sharing) for monetary consideration.
   - User-initiated transfer of personal and sensitive user data (for example, when the user is using a feature of the app to transfer a file to a third party, or when the user chooses to use a dedicated purpose research study app), is not regarded as sale.
 
 **Key Considerations**

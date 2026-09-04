@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=providing-support url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-03T19:54:29+00:00 -->
+<!-- source=subscriptions clause=providing-support url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-04T07:14:04+00:00 -->
 
 ### Providing support
 

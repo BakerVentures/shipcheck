@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=run-closed-tests url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-03T19:54:38+00:00 -->
+<!-- source=testing-requirements clause=run-closed-tests url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-04T07:14:13+00:00 -->
 
 ## Run closed tests
 

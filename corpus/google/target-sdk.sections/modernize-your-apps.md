@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=modernize-your-apps url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-03T19:54:43+00:00 -->
+<!-- source=target-sdk clause=modernize-your-apps url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T07:14:18+00:00 -->
 
 ## Modernize your apps
 
@@ -16,20 +16,12 @@ platform features to modernize your apps and delight your users.
   Support larger aspect ratios (more than 16:9) to take advantage of
   recent advances in hardware. Ensure that your app resizes to fill the
   available screen space. Only declare a maximum aspect ratio as a last
-  resort. For more information about maximum aspect ratios, see
-  Declare
-  Restricted Screen Support
-  .
-  Add
-  multi-window support
-  to help your app increase productivity,
-  and to manage
-  multiple displays
-  .
+  resort. For more information about maximum aspect ratios, see [Declare
+  Restricted Screen Support](/guide/practices/screens-distribution#MaxAspectRatio).
+  Add [multi-window support](/guide/topics/ui/multi-window) to help your app increase productivity,
+  and to manage [multiple displays](/about/versions/oreo/android-8.0#mds).
   If a great minimized app experience would improve the user experience,
-  add support for
-  Picture-in-Picture
-  .
+  add support for [Picture-in-Picture](/guide/topics/ui/picture-in-picture).
   - Optimize for devices with display cutout.
   - Don't assume status bar height. Instead, use [`WindowInsets`](/reference/kotlin/android/view/WindowInsets)
   - Don't assume that the app has the entire window. Instead, confirm

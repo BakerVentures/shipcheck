@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=republic-of-korea-regional-ratings url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-03T19:54:31+00:00 -->
+<!-- source=age-ratings clause=republic-of-korea-regional-ratings url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T07:14:06+00:00 -->
 
 ### Republic of Korea regional ratings
 
@@ -14,12 +14,6 @@ Possible values for Korea regional ratings are:
 
 * The GRAC may issue a KR-15 regional rating with an updated pictogram, or text that indicates KR-19 regional age rating for some apps.
 
-**Note:**You’ll receive a message from App Review if the [Korean Games Rating and Administration Committee(GRAC)](https://www.grac.or.kr/english/) issues an official rating for your app that is different from your app’s age rating. If you receive this notice, follow the instructions in the [override age rating for Korea](/help/app-store-connect/manage-app-information/set-an-app-age-rating/#override-region-specific-ratings) section and re-submit your app for review.
+**Note:** You’ll receive a message from App Review if the [Korean Games Rating and Administration Committee(GRAC)](https://www.grac.or.kr/english/) issues an official rating for your app that is different from your app’s age rating. If you receive this notice, follow the instructions in the [override age rating for Korea](/help/app-store-connect/manage-app-information/set-an-app-age-rating/#override-region-specific-ratings) section and re-submit your app for review.
 
-Related
-
-Set an app age rating
-
-App information
-
-Platform version information
+**Related** [Set an app age rating](/help/app-store-connect/manage-app-information/set-an-app-age-rating) [App information](/help/app-store-connect/reference/app-information/app-information) [Platform version information](/help/app-store-connect/reference/app-information/platform-version-information)

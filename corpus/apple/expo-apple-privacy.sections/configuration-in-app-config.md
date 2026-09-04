@@ -1,4 +1,4 @@
-<!-- source=expo-apple-privacy clause=configuration-in-app-config url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-apple-privacy clause=configuration-in-app-config url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-09-04T07:14:07+00:00 -->
 
 ## Configuration in app config
 

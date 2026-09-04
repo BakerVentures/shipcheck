@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=offer-codesnow-available-on-macos url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-03T19:54:29+00:00 -->
+<!-- source=subscriptions clause=offer-codesnow-available-on-macos url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-04T07:14:04+00:00 -->
 
 ### Offer codesNow available on macOS
 
@@ -28,6 +28,4 @@ Depending on your subscription setup, existing subscribers may be able to redeem
 
 Be sure to provide a relevant experience based on someone’s subscription status. For example, you might provide onboarding that highlights the benefits of your subscription for new subscribers. If your app includes account creation or requires agreement to additional terms, make this process as smooth as possible for customers who redeemed a code and are new to your app.
 
-#### Subscription offer codes essentials
-
-#### Get started with custom offer codes
+[Subscription offer codes essentials](/videos/play/tech-talks/10868/) [Get started with custom offer codes](/videos/play/tech-talks/110150/)

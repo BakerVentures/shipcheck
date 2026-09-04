@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=configure-a-submission-profile url=https://docs.expo.dev/submit/ios/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-submit-ios clause=configure-a-submission-profile url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T07:14:08+00:00 -->
 
 ### Configure a submission profile
 
@@ -10,9 +10,7 @@ eas.json
 { "submit": { "production": { "ios": { "ascAppId": "your-app-store-connect-app-id" } } } }
 ```
 
-How to find
-
-ascAppId
+How to find `ascAppId`
 
 1. Sign in to [App Store Connect](https://appstoreconnect.apple.com/) and select your team.
 2. Navigate to [Apps](https://appstoreconnect.apple.com/apps).

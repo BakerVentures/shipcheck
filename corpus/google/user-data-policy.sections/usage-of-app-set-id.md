@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=usage-of-app-set-id url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-03T19:54:35+00:00 -->
+<!-- source=user-data-policy clause=usage-of-app-set-id url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-04T07:14:10+00:00 -->
 
 ## Usage of App Set ID
 
@@ -11,7 +11,7 @@ The App Set ID is intended to support essential non-ads use cases such as analyt
 Android will introduce a new ID to support essential use cases such as analytics and fraud prevention. Terms for the use of this ID are below.
 
 - **Usage**: App set ID must not be used for ads personalization and ads measurement.
-- **Association with personally-identifiable information or other identifiers:**App set ID may not be connected to any Android identifiers (for example, AAID) or any personal and sensitive data for advertising purposes.
+- **Association with personally-identifiable information or other identifiers:** App set ID may not be connected to any Android identifiers (for example, AAID) or any personal and sensitive data for advertising purposes.
 - **Transparency and consent:** The collection and use of the app set ID and commitment to these terms must be disclosed to users in a legally adequate privacy notification, including your privacy policy. You must obtain users' legally valid consent where required. To learn more about our privacy standards, please review our [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?visit_id=637570411965975172-4240498562&rd=1) policy.
 
 **Key Considerations**

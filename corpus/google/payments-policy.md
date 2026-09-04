@@ -3,8 +3,8 @@ shipcheck_source_id: payments-policy
 title: "Payments policy / Play Billing"
 url: https://support.google.com/googleplay/android-developer/answer/9858738
 final_url: https://support.google.com/googleplay/android-developer/answer/9858738?hl=en
-fetched_at: 2026-09-03T19:54:37+00:00
-sha256: ca3c4ade10980ca02ab8184e09714f1bf34157eca3c0de749e2d7f5fdde03e5c
+fetched_at: 2026-09-04T07:14:12+00:00
+sha256: b4d7efe8d7fd015e0583a175a68cd65a1ee2801076360330ae6713dea780a1df
 vendor: google
 ---
 
@@ -20,17 +20,9 @@ vendor: google
   - for the purchase of physical services (such as transportation services, cleaning services, airfare, gym memberships, food delivery, tickets for live events); or
   - a remittance in respect of a credit card bill or utility bill (such as cable and telecommunications services);
   payments include peer-to-peer payments, online auctions, and tax exempt donations;
-  payment is for content or services that facilitate online gambling, as described in the
-  Gambling Apps
-  section of the
-  Real-Money Gambling, Games, and Contests policy
-  ;
-  payment is in respect of any product category deemed unacceptable under Google’s
-  Payments Center Content Policies
-  .
-  Note: In some markets, we offer Google Pay for apps selling physical goods and/or services. For more information, please visit our
-  Google Pay developer
-  page.
+  payment is for content or services that facilitate online gambling, as described in the [Gambling Apps](https://support.google.com/googleplay/android-developer/answer/9877032#gambling-app) section of the [Real-Money Gambling, Games, and Contests policy](https://support.google.com/googleplay/android-developer/answer/9877032);
+  payment is in respect of any product category deemed unacceptable under Google’s [Payments Center Content Policies](https://support.google.com/payments/merchant/answer/75724?visit_id=1-636308113142509927-1253831182&payments_to_biz=&rd=1).
+  Note: In some markets, we offer Google Pay for apps selling physical goods and/or services. For more information, please visit our [Google Pay developer](https://developers.google.com/pay/) page.
 
 1. Other than the conditions described in Section 3, Section 8, and Section 9, apps may not lead users to a payment method other than Google Play's billing system. This prohibition includes, but is not limited to, leading users to other payment methods via:
   An app’s listing in Google Play;
@@ -46,15 +38,9 @@ vendor: google
 
 1. Developers serving users in [eligible countries/regions](https://support.google.com/googleplay/android-developer/answer/13821247) may offer users an alternative billing system within the app if they enroll in the [applicable program](https://support.google.com/googleplay/android-developer/topic/16471708) and agree to the additional terms and program requirements.
 
-1. Developers may lead users in eligible countries/regions outside the app [subject to program requirements](https://support.google.com/googleplay/android-developer/topic/16470499)**,**provided they enroll in the applicable program and agree to the additional terms and [program requirements](https://support.google.com/googleplay/android-developer/topic/16470499).
+1. Developers may lead users in eligible countries/regions outside the app [subject to program requirements](https://support.google.com/googleplay/android-developer/topic/16470499)**,** provided they enroll in the applicable program and agree to the additional terms and [program requirements](https://support.google.com/googleplay/android-developer/topic/16470499).
 
-Note:
-
-To view timelines and frequently asked questions regarding this policy, please visit our
-
-Help Center
-
-.
+**Note:** To view timelines and frequently asked questions regarding this policy, please visit our [Help Center](https://support.google.com/googleplay/android-developer/answer/10281818).
 
 ## Was this helpful?
 

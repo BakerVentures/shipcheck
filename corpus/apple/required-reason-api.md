@@ -3,7 +3,7 @@ shipcheck_source_id: required-reason-api
 title: "Describing use of required reason API"
 url: https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api
 final_url: https://developer.apple.com/tutorials/data/documentation/bundleresources/describing-use-of-required-reason-api.json
-fetched_at: 2026-09-03T19:54:28+00:00
+fetched_at: 2026-09-04T07:14:02+00:00
 sha256: cde18246923f3ea0fd62f73f4cd3451d7be75e12c2e11cb27e69c1bb0e37e2bb
 vendor: apple
 substituted_from: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api

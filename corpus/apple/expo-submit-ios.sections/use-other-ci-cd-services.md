@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/ios/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-submit-ios clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T07:14:08+00:00 -->
 
 ## Use other CI/CD services
 
@@ -6,18 +6,6 @@ You can run `eas submit` from any CI/CD service, such as GitHub Actions, GitLab 
 
 Terminal
 
--
-
-eas
-
-submit
-
---platform
-
-ios
-
---profile
-
-production
+`-` `eas submit --platform ios --profile production`
 
 This requires a [personal access token](/accounts/programmatic-access#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.

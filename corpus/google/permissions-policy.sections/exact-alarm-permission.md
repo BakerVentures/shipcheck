@@ -1,20 +1,10 @@
-<!-- source=permissions-policy clause=exact-alarm-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-03T19:54:39+00:00 -->
+<!-- source=permissions-policy clause=exact-alarm-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T07:14:14+00:00 -->
 
 ## Exact Alarm Permission
 
 **Policy Summary**
 
-USE_EXACT_ALARM
-
-permission on Android 13+ is a highly restricted permission used only for apps whose core, user-facing functionality genuinely requires precise timing, like dedicated alarm, timer, or calendar applications with event notifications. If your app does
-
-not
-
-have this specific core need, consider using
-
-SCHEDULE_EXACT_ALARM
-
-permission instead. It provides the same functionality but access must be granted by the user. This policy prevents misuse that impacts system resources. Please review the full policy to ensure compliance.
+`USE_EXACT_ALARM` permission on Android 13+ is a highly restricted permission used only for apps whose core, user-facing functionality genuinely requires precise timing, like dedicated alarm, timer, or calendar applications with event notifications. If your app does *not* have this specific core need, consider using ``SCHEDULE_EXACT_ALARM`` permission instead. It provides the same functionality but access must be granted by the user. This policy prevents misuse that impacts system resources. Please review the full policy to ensure compliance.
 
 **Full Policy**
 
@@ -31,11 +21,7 @@ Your app must use the ``USE_EXACT_ALARM`` functionality only when your app’s c
 
 If you have a use case for exact alarm functionality that’s not covered above, you should evaluate if using ``SCHEDULE_EXACT_ALARM`` as an alternative is an option.
 
-For more information on exact alarm functionality, please see this
-
-developer guidance
-
-.
+For more information on exact alarm functionality, please see this [developer guidance](https://developer.android.com/about/versions/13/features#use-exact-alarm-permission).
 
 **Key Considerations**
 

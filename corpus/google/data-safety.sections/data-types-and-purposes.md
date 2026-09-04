@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=data-types-and-purposes url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-03T19:55:34+00:00 -->
+<!-- source=data-safety clause=data-types-and-purposes url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T07:14:10+00:00 -->
 
 ### **Data types and purposes**
 
@@ -10,7 +10,7 @@ Developers will be asked to provide collection, sharing, and other practices for
 
 | **Category** | **Data type** | **Description** |
 | --- | --- | --- |
-| Location | Approximate location | User or device physical location to an area greater than or equal to 3 square kilometers, such as the city a user is in, or location provided by Android’s `ACCESS_COARSE_LOCATION` permission. **Note:**Approximate location that is inferred, such as via IP address or Access Point Name, must be disclosed here. |
+| Location | Approximate location | User or device physical location to an area greater than or equal to 3 square kilometers, such as the city a user is in, or location provided by Android’s `ACCESS_COARSE_LOCATION` permission. **Note:** Approximate location that is inferred, such as via IP address or Access Point Name, must be disclosed here. |
 | Precise location | User or device physical location within an area less than 3 square kilometers, such as location provided by Android’s `ACCESS_FINE_LOCATION` permission. **Note:** Precise location that is inferred, such as via IP address or Access Point Name, must be disclosed here. |  |
 | Personal info | Name | How a user refers to themselves, such as their first or last name, or nickname. |
 | Email address | A user’s email address. |  |

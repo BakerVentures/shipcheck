@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=win-back-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-03T19:54:29+00:00 -->
+<!-- source=subscriptions clause=win-back-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-04T07:14:04+00:00 -->
 
 ### Win-back offers
 
@@ -26,4 +26,4 @@ If you’d like to display your offer on the App Store, you’ll need an approve
 
 By default, [streamlined purchasing](/help/app-store-connect/manage-subscriptions/manage-streamlined-purchasing) is turned on for your app or game, which lets people complete a purchase from outside your app. You can turn this off in App Store Connect if you wish.
 
-#### Implement App Store Offers
+[Implement App Store Offers](/videos/play/wwdc2024/10110/)

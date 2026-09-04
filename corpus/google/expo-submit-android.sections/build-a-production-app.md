@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=build-a-production-app url=https://docs.expo.dev/submit/android/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-submit-android clause=build-a-production-app url=https://docs.expo.dev/submit/android/ fetched=2026-09-04T07:14:19+00:00 -->
 
 ## Build a production app
 
@@ -6,19 +6,7 @@ You need a production .aab (Android App Bundle) to submit. Google Play requires 
 
 Terminal
 
--
-
-eas
-
-build
-
---platform
-
-android
-
---profile
-
-production
+`-` `eas build --platform android --profile production`
 
 Alternatively, build on your own computer with `eas build --platform android --profile production --local` or with Android Studio.
 

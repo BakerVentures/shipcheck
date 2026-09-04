@@ -3,7 +3,7 @@ shipcheck_source_id: subscriptions-policy
 title: "Play subscriptions policy"
 url: https://support.google.com/googleplay/android-developer/answer/10281818
 final_url: https://support.google.com/googleplay/android-developer/answer/10281818?hl=en
-fetched_at: 2026-09-03T19:54:36+00:00
+fetched_at: 2026-09-04T07:14:11+00:00
 sha256: a70dbe0e4e43072578984fd4b8b9e0f862123b4fe2c75bd0af0f491111c43722
 vendor: google
 ---

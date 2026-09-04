@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=body-sensor-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-03T19:54:39+00:00 -->
+<!-- source=permissions-policy clause=body-sensor-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T07:14:14+00:00 -->
 
 ## Body Sensor Permissions
 
@@ -10,7 +10,7 @@ Starting with Android 16, apps must migrate from the general `android.permission
 
 **Full Policy**
 
-Access to data from sensors that measure physical parameters of the body (such as heart rate, SpO₂, and skin temperature) is considered personal and sensitive user data**.**Apps requesting access are subject to the requirements outlined in the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?#personal-sensitive) and the [Health apps policy](https://support.google.com/googleplay/android-developer/answer/12261419?hl=en#:~:text=laws%20and%20regulations.-,Health%20Apps,-If%20your%20app). This applies to requests for `android.permission.BODY_SENSORS` and `android.permission.BODY_SENSORS_BACKGROUND` permissions across all form factors including phones, tablets, and Wear OS devices.
+Access to data from sensors that measure physical parameters of the body (such as heart rate, SpO₂, and skin temperature) is considered personal and sensitive user data**.** Apps requesting access are subject to the requirements outlined in the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?#personal-sensitive) and the [Health apps policy](https://support.google.com/googleplay/android-developer/answer/12261419?hl=en#:~:text=laws%20and%20regulations.-,Health%20Apps,-If%20your%20app). This applies to requests for `android.permission.BODY_SENSORS` and `android.permission.BODY_SENSORS_BACKGROUND` permissions across all form factors including phones, tablets, and Wear OS devices.
 
 Starting in Android 16, the broad `BODY_SENSORS` permission is being transitioned in favor of granular, more privacy preserving `android.permissions.health.`* permissions for specific data types (for example, `android.permission.health.READ_HEART_RATE`, `android.permission.health.READ_OXYGEN_SATURATION`, `android.permission.health.READ_SKIN_TEMPERATURE`).
 

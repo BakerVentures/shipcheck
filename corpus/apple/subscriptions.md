@@ -3,8 +3,8 @@ shipcheck_source_id: subscriptions
 title: "Auto-renewable subscriptions"
 url: https://developer.apple.com/app-store/subscriptions/
 final_url: https://developer.apple.com/app-store/subscriptions/
-fetched_at: 2026-09-03T19:54:29+00:00
-sha256: 3d6d363a26653025b2be7f4b615e976bd3eafdc945a60d1f4b32e2e54ab644d5
+fetched_at: 2026-09-04T07:14:04+00:00
+sha256: b7204c7d2a8411357da2695abedb14a3e2c37cbe91420c32dc2382c62526a86e
 vendor: apple
 ---
 
@@ -188,9 +188,7 @@ You can create introductory offers, offer codes, promotional offers, and win-bac
 | **Win-back offers** |  |  |  |
 | **Offer codes** |  |  |  |
 
-#### Optimize subscriptions for success: acquisition
-
-#### Improve your subscriber retention with App Store features
+[Optimize subscriptions for success: acquisition](/videos/play/tech-talks/110151/) [Improve your subscriber retention with App Store features](/videos/play/tech-talks/111386/)
 
 ### Configuring subscription offers
 
@@ -234,9 +232,7 @@ Depending on your subscription setup, existing subscribers may be able to redeem
 
 Be sure to provide a relevant experience based on someone’s subscription status. For example, you might provide onboarding that highlights the benefits of your subscription for new subscribers. If your app includes account creation or requires agreement to additional terms, make this process as smooth as possible for customers who redeemed a code and are new to your app.
 
-#### Subscription offer codes essentials
-
-#### Get started with custom offer codes
+[Subscription offer codes essentials](/videos/play/tech-talks/10868/) [Get started with custom offer codes](/videos/play/tech-talks/110150/)
 
 ### Promotional offers
 
@@ -274,7 +270,7 @@ If you’d like to display your offer on the App Store, you’ll need an approve
 
 By default, [streamlined purchasing](/help/app-store-connect/manage-subscriptions/manage-streamlined-purchasing) is turned on for your app or game, which lets people complete a purchase from outside your app. You can turn this off in App Store Connect if you wish.
 
-#### Implement App Store Offers
+[Implement App Store Offers](/videos/play/wwdc2024/10110/)
 
 ## Keeping subscribers
 

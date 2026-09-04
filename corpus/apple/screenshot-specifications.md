@@ -3,14 +3,14 @@ shipcheck_source_id: screenshot-specifications
 title: "Screenshot specifications"
 url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
-fetched_at: 2026-09-03T19:55:48+00:00
-sha256: 7db7f399e70b3496b2299af1944447f0bd139465203c20e5aed165230d4075d7
+fetched_at: 2026-09-04T07:14:05+00:00
+sha256: 9329cca4ab348aae1b4c6547398e4d6f1ce6e74f5d4c077cf098b1b7906a5357
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications
 note: "Moved under /reference/app-information/."
 ---
 
-### App Store Connect Help
+[App Store Connect Help](/help/app-store-connect/)
 
 [App Store Connect](/help/app-store-connect/) Reference [App information](/help/app-store-connect/reference/app-information/) Screenshot specifications
 
@@ -20,7 +20,7 @@ Reference
 
 You can upload one to 10 screenshots in `.jpeg`, `.jpg`, and `.png` formats, with the following specifications.
 
-**Note:**Images can’t include alpha channels or transparencies.
+**Note:** Images can’t include alpha channels or transparencies.
 
 ## iPhone
 

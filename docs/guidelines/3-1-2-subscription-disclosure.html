@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guideline 3.1.2: Subscription Disclosure on Your Paywall (2026)</title>
+<meta name="description" content="What Apple&#x27;s guideline 3.1.2(c) requires on a paywall screen before purchase, quoted directly, plus the exact fix for React Native paywalls.">
+<link rel="canonical" href="https://bakerventures.github.io/shipcheck/guidelines/3-1-2-subscription-disclosure.html">
+<meta property="og:title" content="Guideline 3.1.2: Subscription Disclosure on Your Paywall (2026)">
+<meta property="og:description" content="What Apple&#x27;s guideline 3.1.2(c) requires on a paywall screen before purchase, quoted directly, plus the exact fix for React Native paywalls.">
+<meta property="og:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:var(--red)}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+.eyebrow{font:600 13px "IBM Plex Mono",monospace;color:var(--red);letter-spacing:.04em;margin:40px 0 8px}
+h1{font-size:clamp(26px,4.5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:0 0 18px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px}
+.quote{background:var(--code);color:var(--codeink);border-radius:8px;padding:22px 24px;font:14px/1.7 "IBM Plex Mono",ui-monospace,monospace;margin:0 0 28px}
+.quote .clause{color:#8FA3B5;display:block;margin-bottom:10px;font-weight:500}
+.quote a{color:#F2C14E}
+.quote ul{margin:8px 0 0;padding-left:20px}
+h2{font-size:20px;letter-spacing:-.01em;font-weight:600;margin:36px 0 12px}
+p{margin:0 0 14px;max-width:640px}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 8px}
+code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font:13px "IBM Plex Mono",monospace}
+.fixbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 20px}
+.fixbox .label{font:600 12px "IBM Plex Mono",monospace;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.cta{background:var(--ink);color:#fff;border-radius:10px;padding:26px 28px;margin:44px 0 20px}
+.cta h2{color:#fff;margin-top:0}
+.cta p{color:#B9C2CC}
+.cta code{background:#0F151B;border-color:#2B3642;color:#DCE3EA}
+.source{color:var(--muted);font-size:13px;margin-top:8px}
+footer{color:var(--muted);font-size:13px;padding:24px 0 0;border-top:1px solid var(--line);margin-top:40px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="../">shipcheck</a>
+  <nav><a href="../#checks">What it checks</a><a href="../#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<div class="eyebrow">APP STORE GUIDELINE 3.1.2</div>
+<h1>Guideline 3.1.2(c): what your paywall has to show before the buy button</h1>
+<p class="lede">&quot;Add subscription terms&quot; is the reviewer&#x27;s note. Here&#x27;s exactly what that means, quoted from the guideline itself.</p>
+
+<div class="quote">
+  <span class="clause">3.1.2(c) Subscription Information — App Store Review Guidelines</span>
+  <p><strong>3.1.2(c) Subscription Information:</strong> Before asking a customer to subscribe, you should clearly describe what the user will get for the price. How many issues per month? How much cloud storage? What kind of access to your service? Ensure you clearly communicate the requirements described in <a href="https://developer.apple.com/support/terms/apple-developer-program-license-agreement/#S2">Schedule 2 of the Apple Developer Program License Agreement</a>.</p>
+</div>
+
+<h2>What has to be on screen, not behind a link</h2>
+<p>Price, billing period, and what auto-renewal means -- visible before the purchase button is tapped, not on a separate terms page the user has to navigate to. In practice, App Review wants to see something close to: the plan name, the price and period (&quot;$4.99/month&quot; or &quot;$39.99/year&quot;), a plain sentence that it renews automatically until cancelled, and working links to your Terms of Use and Privacy Policy on the same screen.</p>
+<h2>The most common way RN/Expo apps get this wrong</h2>
+<p>A paywall built from a design mock rather than from the guideline text: a price, a &quot;Start Free Trial&quot; button, and nothing else. RevenueCat&#x27;s own prebuilt paywall templates include the disclosure by default; a hand-rolled paywall component usually doesn&#x27;t, because nothing in the UI design process flags it as required. It&#x27;s a compliance requirement, not a design preference, and reviewers check for it specifically.</p>
+
+<h2>The fix</h2>
+<div class="fixbox"><span class="label">Put this directly on the paywall screen, above or right below the CTA</span><p>Pro Monthly — $4.99/month. Renews automatically until cancelled. Cancel anytime in Settings. Then Terms of Use and Privacy Policy as tappable links on the same screen, and a visible Restore Purchases control (guideline 3.1.1, checked separately, but almost always missing alongside 3.1.2).</p></div>
+
+<div class="cta">
+  <h2>ShipCheck catches this before you submit</h2>
+  <p>A Claude Code plugin for React Native and Expo. Reads your project and store listing, checks them against the live App Store Review Guidelines and Google Play policies -- the same corpus quoted on this page -- and tells you the clause, the reviewer's likely wording, and the fix.</p>
+  <code>/plugin marketplace add BakerVentures/shipcheck</code>
+  <p class="source">Free scan on every app. <a href="../#pricing" style="color:#F2C14E">See pricing &rarr;</a></p>
+</div>
+
+<footer>
+  Guideline text quoted from App Store Review Guidelines, 3.1.2(c), fetched 2026-09-04 and cached with a SHA-256 in
+  <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a> --
+  the same corpus <a href="https://github.com/BakerVentures/shipcheck">ShipCheck</a> cites in a real scan, not separately maintained copy.
+  Not affiliated with Apple Inc. or Google LLC. This page is not a guarantee of approval.
+</footer>
+</div>
+</body>
+</html>

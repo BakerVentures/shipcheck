@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ITMS-91053: Privacy Manifest Missing Required-Reason API Declaration (2026)</title>
+<meta name="description" content="What ITMS-91053 means, why it&#x27;s the most common Expo App Store upload rejection, and the exact reason code to add to fix it.">
+<link rel="canonical" href="https://bakerventures.github.io/shipcheck/guidelines/itms-91053-privacy-manifest.html">
+<meta property="og:title" content="ITMS-91053: Privacy Manifest Missing Required-Reason API Declaration (2026)">
+<meta property="og:description" content="What ITMS-91053 means, why it&#x27;s the most common Expo App Store upload rejection, and the exact reason code to add to fix it.">
+<meta property="og:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:var(--red)}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+.eyebrow{font:600 13px "IBM Plex Mono",monospace;color:var(--red);letter-spacing:.04em;margin:40px 0 8px}
+h1{font-size:clamp(26px,4.5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:0 0 18px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px}
+.quote{background:var(--code);color:var(--codeink);border-radius:8px;padding:22px 24px;font:14px/1.7 "IBM Plex Mono",ui-monospace,monospace;margin:0 0 28px}
+.quote .clause{color:#8FA3B5;display:block;margin-bottom:10px;font-weight:500}
+.quote a{color:#F2C14E}
+.quote ul{margin:8px 0 0;padding-left:20px}
+h2{font-size:20px;letter-spacing:-.01em;font-weight:600;margin:36px 0 12px}
+p{margin:0 0 14px;max-width:640px}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 8px}
+code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font:13px "IBM Plex Mono",monospace}
+.fixbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 20px}
+.fixbox .label{font:600 12px "IBM Plex Mono",monospace;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.cta{background:var(--ink);color:#fff;border-radius:10px;padding:26px 28px;margin:44px 0 20px}
+.cta h2{color:#fff;margin-top:0}
+.cta p{color:#B9C2CC}
+.cta code{background:#0F151B;border-color:#2B3642;color:#DCE3EA}
+.source{color:var(--muted);font-size:13px;margin-top:8px}
+footer{color:var(--muted);font-size:13px;padding:24px 0 0;border-top:1px solid var(--line);margin-top:40px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="../">shipcheck</a>
+  <nav><a href="../#checks">What it checks</a><a href="../#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<div class="eyebrow">ITMS-91053 · REQUIRED-REASON API</div>
+<h1>ITMS-91053: privacy manifest doesn&#x27;t declare required-reason API</h1>
+<p class="lede">This one blocks the upload itself, before a human reviewer ever sees the app -- and it&#x27;s the single most common upload-time rejection in Expo projects.</p>
+
+<div class="quote">
+  <span class="clause">Apple Developer Documentation — Describing use of required reason API</span>
+  <p>Some APIs that your app uses to deliver its core functionality — in code you write or included in a third-party SDK — have the potential of being misused to access device signals to try to identify the device or user, also known as fingerprinting. Regardless of whether a user gives your app permission to track, fingerprinting is not allowed. Describe the reasons your app or third-party SDK on iOS, iPadOS, tvOS, visionOS, or watchOS uses these APIs, and check that your app or third-party SDK only uses the APIs for the expected reasons.</p>
+<p>&gt; <strong>Important:</strong> If you upload an app to App Store Connect that uses required reason API without describing the reason in its privacy manifest file, Apple sends you an email reminding you to add the reason to the app’s privacy manifest. Starting May 1, 2024, apps that don’t describe their use of required reason API in their privacy manifest file aren’t accepted by App Store Connect.</p>
+<p>For each category of required reason API that your app or third-party SDK uses, add a dictionary to the <a href="https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes">NSPrivacyAccessedAPITypes</a> array in your app or third-party SDK’s privacy manifest file that reports the reasons your app uses the API category. If you use the API in your app’s code, then you need to report the API in your app’s privacy manifest file. If you use the API in your third-party SDK’s code, then you need to report the API in your third-party SDK’s privacy manifest file. Your third-party SDK can’t rely on the privacy manifest files for apps that link the third-party SDK, or those of other third-party SDKs the app links, to report your third-party SDK’s use of required reasons API.</p>
+<p>For each executable or dynamic library in an app that uses a required reason API, the bundle that includes the executable or dynamic library needs to include a privacy manifest file that reports the API. For the expected location of frameworks and dynamic libraries, see <a href="https://developer.apple.com/documentation/bundleresources/placing-content-in-a-bundle">Placing content in a bundle</a>.</p>
+<p>&gt; <strong>Important:</strong> Your app or third-party SDK must declare one or more approved reasons that accurately reflect your use of each of these APIs and the data derived from their use. You may use these APIs and the data derived from their use for the declared reasons only. These declared reasons must be consistent with your app’s functionality as presented to users, and you may not use the APIs or derived data for tracking.</p>
+<p>Each dictionary in the `NSPrivacyAccessedAPITypes` array needs to contain these keys and values:</p>
+<ul><li><strong>[NSPrivacyAccessedAPIType](https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitype)</strong> — A string that identifies the category of required reason APIs your app uses. The value you provide must be one of the values listed in the sections below.</li></ul>
+<ul><li><strong>[NSPrivacyAccessedAPITypeReasons](https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons)</strong> — An array of strings that identifies the reasons your app uses the APIs. The values you provide must be the values associated with the accessed API type in the sections below.</li></ul>
+<p>The categories of required reason APIs, which APIs are in each category, and the reasons you can include in a privacy manifest are described in the documentation for the dictionary keys.</p>
+<p>&gt; <strong>Note:</strong> Apple continually reviews the list of required reason APIs and reasons for usage, and will update this article from time to time. If your app uses required reason API to provide benefits to the people using the app, for a reason that isn’t listed here, <a href="https://developer.apple.com/contact/request/privacy-manifest-reason/">submit a request for a new approved reason</a>.</p>
+<p>For more information on creating a privacy manifest file, see <a href="https://developer.apple.com/documentation/bundleresources/privacy-manifest-files#Create-a-privacy-manifest">Create a privacy manifest</a>.</p>
+</div>
+
+<h2>Why Expo apps trip this without writing any native code</h2>
+<p>`expo-file-system`, `expo-device`, `expo-constants`, and `@react-native-async-storage/async-storage` are near-universal in Expo apps, and each touches an API in Apple&#x27;s required-reason list -- reading file timestamps, disk space, system boot time, or UserDefaults. Since 1 May 2024, App Store Connect rejects the upload outright if your app&#x27;s own `PrivacyInfo.xcprivacy` doesn&#x27;t declare the categories your code (or a linked SDK&#x27;s code) actually uses.</p>
+<h2>The rule that trips people up: SDKs declare their own use</h2>
+<p>A package that ships its own `PrivacyInfo.xcprivacy` -- most current versions of `expo-device`, `expo-file-system`, and `@react-native-async-storage/async-storage` do -- has already declared its own API use. Your app&#x27;s manifest doesn&#x27;t need to repeat it. What&#x27;s actually missing is usually required-reason API touched by your app&#x27;s own code, or by a dependency that hasn&#x27;t shipped a manifest yet.</p>
+
+<h2>The fix</h2>
+<div class="fixbox"><span class="label">Add the entry to your app&#x27;s PrivacyInfo.xcprivacy</span><p>In app.json: `expo.ios.privacyManifests` (Expo SDK 50+), or directly in `ios/&lt;App&gt;/PrivacyInfo.xcprivacy` for a bare project. Each entry needs `NSPrivacyAccessedAPIType` set to the category (e.g. `NSPrivacyAccessedAPICategoryFileTimestamp`) and an approved reason code in `NSPrivacyAccessedAPITypeReasons` -- for file timestamps, that&#x27;s usually `C617.1`. The full, current code list is in Apple&#x27;s own required-reason API documentation, since Apple revises it.</p></div>
+
+<div class="cta">
+  <h2>ShipCheck catches this before you submit</h2>
+  <p>A Claude Code plugin for React Native and Expo. Reads your project and store listing, checks them against the live App Store Review Guidelines and Google Play policies -- the same corpus quoted on this page -- and tells you the clause, the reviewer's likely wording, and the fix.</p>
+  <code>/plugin marketplace add BakerVentures/shipcheck</code>
+  <p class="source">Free scan on every app. <a href="../#pricing" style="color:#F2C14E">See pricing &rarr;</a></p>
+</div>
+
+<footer>
+  Guideline text quoted from Apple Developer Documentation, required-reason API, fetched 2026-09-04 and cached with a SHA-256 in
+  <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a> --
+  the same corpus <a href="https://github.com/BakerVentures/shipcheck">ShipCheck</a> cites in a real scan, not separately maintained copy.
+  Not affiliated with Apple Inc. or Google LLC. This page is not a guarantee of approval.
+</footer>
+</div>
+</body>
+</html>

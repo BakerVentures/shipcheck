@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/android/ fetched=2026-09-03T19:55:49+00:00 -->
+<!-- source=expo-submit-android clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/android/ fetched=2026-09-04T07:14:19+00:00 -->
 
 ## Automate with EAS Workflows
 
@@ -26,10 +26,6 @@ This builds an Android app on every push to `main` and submits it to Google Play
 
 Terminal
 
--
-
-eas
-
-workflow:run submit-android.yml
+`-` `eas workflow:run submit-android.yml`
 
 See the [workflow examples guide](/eas/workflows/examples/introduction) for more patterns.

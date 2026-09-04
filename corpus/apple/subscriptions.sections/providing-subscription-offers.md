@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=providing-subscription-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-03T19:54:29+00:00 -->
+<!-- source=subscriptions clause=providing-subscription-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-04T07:14:04+00:00 -->
 
 ## Providing subscription offers
 
@@ -13,6 +13,4 @@ You can create introductory offers, offer codes, promotional offers, and win-bac
 | **Win-back offers** |  |  |  |
 | **Offer codes** |  |  |  |
 
-#### Optimize subscriptions for success: acquisition
-
-#### Improve your subscriber retention with App Store features
+[Optimize subscriptions for success: acquisition](/videos/play/tech-talks/110151/) [Improve your subscriber retention with App Store features](/videos/play/tech-talks/111386/)

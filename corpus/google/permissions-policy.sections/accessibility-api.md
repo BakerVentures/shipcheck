@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=accessibility-api url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-03T19:54:39+00:00 -->
+<!-- source=permissions-policy clause=accessibility-api url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T07:14:14+00:00 -->
 
 ## Accessibility API
 
@@ -23,9 +23,9 @@ The use of the Accessibility API must be documented in the Google Play listing.
 
 #### Guidelines for **IsAccessibilityTool**
 
-Apps with a core functionality intended to directly support people with disabilities are eligible to use the **IsAccessibilityTool**to appropriately publicly designate themselves as an accessibility app.
+Apps with a core functionality intended to directly support people with disabilities are eligible to use the **IsAccessibilityTool** to appropriately publicly designate themselves as an accessibility app.
 
-Apps not eligible for **IsAccessibilityTool**may not use the flag and must meet prominent disclosure and consent requirements as outlined in the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en&ref_topic=9877467) policy as the accessibility related functionality is not obvious to the user.
+Apps not eligible for **IsAccessibilityTool** may not use the flag and must meet prominent disclosure and consent requirements as outlined in the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en&ref_topic=9877467) policy as the accessibility related functionality is not obvious to the user.
 
 Apps must use more narrowly scoped [APIs and permissions](https://developer.android.com/privacy/best-practices#permissions) in lieu of the Accessibility API when possible to achieve the desired functionality.
 

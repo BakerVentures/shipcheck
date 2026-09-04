@@ -1,16 +1,10 @@
-<!-- source=permissions-policy clause=request-install-packages-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-03T19:54:39+00:00 -->
+<!-- source=permissions-policy clause=request-install-packages-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T07:14:14+00:00 -->
 
 ## Request Install Packages Permission
 
 **Policy Summary**
 
-REQUEST_INSTALL_PACKAGES
-
-permission allows apps to request the installation of other app packages. This permission is restricted to the app's core functionality, specifically when the primary purpose directly involves sending, receiving, or enabling user-initiated installation of app packages. Using this permission to update your app, change its functionality or bundle other APKs for silent or unauthorized installation (except enterprise management) is prohibited. All installations must be a direct, active choice by the user. Apps targeting Android 8+ must hold this permission in order to use
-
-Intent.ACTION_INSTALL_PACKAGE
-
-. Please review the full policy to ensure compliance.
+`REQUEST_INSTALL_PACKAGES` permission allows apps to request the installation of other app packages. This permission is restricted to the app's core functionality, specifically when the primary purpose directly involves sending, receiving, or enabling user-initiated installation of app packages. Using this permission to update your app, change its functionality or bundle other APKs for silent or unauthorized installation (except enterprise management) is prohibited. All installations must be a direct, active choice by the user. Apps targeting Android 8+ must hold this permission in order to use `Intent.ACTION_INSTALL_PACKAGE`. Please review the full policy to ensure compliance.
 
 **Full Policy**
 
@@ -31,15 +25,7 @@ Permitted functionalities include:
 
 Core functionality is defined as the main purpose of the app. The core functionality, as well as any core features that comprise this core functionality, must all be prominently documented and promoted in the app's description.
 
-The
-
-REQUEST_INSTALL_PACKAGES
-
-permission may not be used to perform self updates, modifications, or the bundling of other APKs in the asset file unless for device management purposes. All updates or installing of packages must abide by Google Play’s
-
-Device and Network Abuse policy
-
-and must be initiated and driven by the user.
+The ``REQUEST_INSTALL_PACKAGES`` permission may not be used to perform self updates, modifications, or the bundling of other APKs in the asset file unless for device management purposes. All updates or installing of packages must abide by Google Play’s [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/9888379?hl=en&ref_topic=9877467) and must be initiated and driven by the user.
 
 **Key Considerations**
 

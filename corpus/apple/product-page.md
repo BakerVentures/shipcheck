@@ -3,8 +3,8 @@ shipcheck_source_id: product-page
 title: "App Store product page"
 url: https://developer.apple.com/app-store/product-page/
 final_url: https://developer.apple.com/app-store/product-page/
-fetched_at: 2026-09-03T19:54:30+00:00
-sha256: 0446b47370c4550c7692365bf262510fefcee47b0773ec7c084dfc120b05b049
+fetched_at: 2026-09-04T07:14:05+00:00
+sha256: 2bb1db1cfc0c841c9f05328d73c207f2ac9f0b029c2023ebae391a7e481b7e3e
 vendor: apple
 ---
 
@@ -162,10 +162,10 @@ Create additional versions of your app’s product page to highlight specific fe
 
 Find out how to prepare your product page metadata.
 
-App Store for Apple Watch
+[App Store for Apple Watch](/watchos/submit/)
 
-App Store for Apple TV
+[App Store for Apple TV](/tvos/submit/)
 
-App Store for iMessage
+[App Store for iMessage](/imessage/)
 
-App Store for visionOS
+[App Store for visionOS](/visionos/submit/)

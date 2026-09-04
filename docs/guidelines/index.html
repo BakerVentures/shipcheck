@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Store & Play Guideline Explainers — ShipCheck</title>
+<meta name="description" content="Plain-English explainers for the App Store and Google Play guidelines ShipCheck checks, each quoting the policy text verbatim from the same corpus ShipCheck cites in a real scan.">
+<link rel="canonical" href="https://bakerventures.github.io/shipcheck/guidelines/">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--panel:#FFFFFF}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:var(--red)}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+h1{font-size:clamp(26px,4.5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:40px 0 12px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 36px;max-width:620px}
+.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.list li{border-bottom:1px solid var(--line);padding:20px 0}
+.list a{display:block;text-decoration:none;color:var(--ink);font-weight:600;font-size:17px;margin-bottom:6px}
+.list a:hover{color:var(--red)}
+.list p{margin:0;color:var(--muted);font-size:15px;max-width:600px}
+footer{color:var(--muted);font-size:13px;padding:24px 0 0;border-top:1px solid var(--line);margin-top:20px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="../">shipcheck</a>
+  <nav><a href="../#checks">What it checks</a><a href="../#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<h1>Guideline explainers</h1>
+<p class="lede">Plain-English breakdowns of the App Store and Google Play rules ShipCheck checks -- each one quotes the policy text verbatim from the corpus ShipCheck actually fetches, not separately maintained copy.</p>
+
+<ul class="list">
+  <li><a href="5-1-1-v-account-deletion.html">Guideline 5.1.1(v): account deletion</a><p>Apple&#x27;s exact wording for guideline 5.1.1(v) account deletion, what counts as compliant, and the fix for React Native and Expo apps.</p></li>
+  <li><a href="3-1-2-subscription-disclosure.html">Guideline 3.1.2(c): what your paywall has to show before the buy button</a><p>What Apple&#x27;s guideline 3.1.2(c) requires on a paywall screen before purchase, quoted directly, plus the exact fix for React Native paywalls.</p></li>
+  <li><a href="4-8-sign-in-with-apple.html">Guideline 4.8: do you actually need Sign in with Apple?</a><p>Apple&#x27;s exact requirement for guideline 4.8 login services, the real exemptions, and the fix for Google/Facebook login in React Native apps.</p></li>
+  <li><a href="itms-91053-privacy-manifest.html">ITMS-91053: privacy manifest doesn&#x27;t declare required-reason API</a><p>What ITMS-91053 means, why it&#x27;s the most common Expo App Store upload rejection, and the exact reason code to add to fix it.</p></li>
+  <li><a href="2-3-1-placeholder-metadata.html">Guideline 2.3.1: placeholder text and misleading metadata</a><p>Apple&#x27;s exact wording on guideline 2.3.1 accurate metadata, what counts as placeholder content, and how to check your listing before submitting.</p></li>
+  <li><a href="google-play-target-api-level.html">Google Play&#x27;s target API level requirement, as of 2026-09-04</a><p>Google Play&#x27;s current target API level requirement for new apps and updates, quoted directly, with the deadline and the fix for React Native / Expo.</p></li>
+</ul>
+
+<footer>
+  Quoted text is fetched and cached with a SHA-256 in <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a>.
+  Not affiliated with Apple Inc. or Google LLC.
+</footer>
+</div>
+</body>
+</html>

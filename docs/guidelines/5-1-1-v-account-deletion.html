@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guideline 5.1.1(v): Account Deletion — What Apple Actually Requires (2026)</title>
+<meta name="description" content="Apple&#x27;s exact wording for guideline 5.1.1(v) account deletion, what counts as compliant, and the fix for React Native and Expo apps.">
+<link rel="canonical" href="https://bakerventures.github.io/shipcheck/guidelines/5-1-1-v-account-deletion.html">
+<meta property="og:title" content="Guideline 5.1.1(v): Account Deletion — What Apple Actually Requires (2026)">
+<meta property="og:description" content="Apple&#x27;s exact wording for guideline 5.1.1(v) account deletion, what counts as compliant, and the fix for React Native and Expo apps.">
+<meta property="og:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:var(--red)}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+.eyebrow{font:600 13px "IBM Plex Mono",monospace;color:var(--red);letter-spacing:.04em;margin:40px 0 8px}
+h1{font-size:clamp(26px,4.5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:0 0 18px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px}
+.quote{background:var(--code);color:var(--codeink);border-radius:8px;padding:22px 24px;font:14px/1.7 "IBM Plex Mono",ui-monospace,monospace;margin:0 0 28px}
+.quote .clause{color:#8FA3B5;display:block;margin-bottom:10px;font-weight:500}
+.quote a{color:#F2C14E}
+.quote ul{margin:8px 0 0;padding-left:20px}
+h2{font-size:20px;letter-spacing:-.01em;font-weight:600;margin:36px 0 12px}
+p{margin:0 0 14px;max-width:640px}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 8px}
+code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font:13px "IBM Plex Mono",monospace}
+.fixbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 20px}
+.fixbox .label{font:600 12px "IBM Plex Mono",monospace;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.cta{background:var(--ink);color:#fff;border-radius:10px;padding:26px 28px;margin:44px 0 20px}
+.cta h2{color:#fff;margin-top:0}
+.cta p{color:#B9C2CC}
+.cta code{background:#0F151B;border-color:#2B3642;color:#DCE3EA}
+.source{color:var(--muted);font-size:13px;margin-top:8px}
+footer{color:var(--muted);font-size:13px;padding:24px 0 0;border-top:1px solid var(--line);margin-top:40px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="../">shipcheck</a>
+  <nav><a href="../#checks">What it checks</a><a href="../#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<div class="eyebrow">APP STORE GUIDELINE 5.1.1(v)</div>
+<h1>Guideline 5.1.1(v): account deletion</h1>
+<p class="lede">If your app supports creating an account, App Review checks that users can delete it from inside the app -- not just sign out, not just deactivate.</p>
+
+<div class="quote">
+  <span class="clause">5.1.1(v) Account Sign-In — App Store Review Guidelines</span>
+  <p><strong>(v) Account Sign-In:</strong> If your app doesn’t include significant account-based features, let people use it without a login. If your app supports account creation, you must also <a href="https://developer.apple.com/support/offering-account-deletion-in-your-app/">offer account deletion within the app</a>. Apps may not require users to enter personal information to function, except when directly relevant to the core functionality of the app or required by law. If your core app functionality is not related to a specific social network (e.g. Facebook, WeChat, Weibo, X, etc.), you must provide access without a login or via another mechanism. Pulling basic profile information, sharing to the social network, or inviting friends to use the app are not considered core app functionality. The app must also include a mechanism to revoke social network credentials and disable data access between the app and social network from within the app. An app may not store credentials or tokens to social networks off of the device and may only use such credentials or tokens to directly connect to the social network from the app itself while the app is in use.</p>
+</div>
+
+<h2>What counts as compliant, per Apple&#x27;s own account-deletion guidance</h2>
+<p>Account deletion is a significant decision for the user, and the process for initiating and confirming deletion should be straightforward and transparent:</p>
+<ul><li>Make the account deletion option easy to find in your app. Typically, it’s included in the app’s account settings.</li><li>Offer to delete the entire account record, along with associated personal data. You may include additional options, but only offering to temporarily deactivate or disable an account is insufficient.</li><li>If people need to visit a website to finish deleting their account, include a link directly to the page on your website where they can complete the process.</li><li>Keep users informed. If the deletion request will take additional time to complete, let them know. If your app supports in-app purchases, help people understand how billing and cancellations will be handled. For additional guidance, read the <a href="https://developer.apple.com/design/human-interface-guidelines/ios/user-interaction/accounts/">Human Interface Guidelines</a>.</li></ul>
+<p>Note: Follow applicable legal requirements for storing and retaining user account information and for handling account deletion. This includes complying with local laws where your apps are available. If you have questions regarding your legal obligations, check with your legal counsel.</p>
+<h2>Why React Native and Expo apps miss this specifically</h2>
+<p>Auth is usually wired through Supabase, Firebase Auth, or Clerk, and the SDK ships a `signOut()` method that&#x27;s easy to mistake for account deletion in a quick implementation. `signOut()` clears the local session; the account record and its data are untouched on the server. A reviewer testing this will sign back in with the same credentials and find the account still exists -- that&#x27;s the rejection, every time.</p>
+<p>If your app also offers a subscription, the deletion flow needs to say what happens to billing: Apple&#x27;s own account-deletion guidance calls this out directly, and `5.1.1(v)`&#x27;s neighboring `3.1.2` covers the subscription-disclosure side of the same screen.</p>
+
+<h2>The fix</h2>
+<div class="fixbox"><span class="label">iOS + Android (Supabase example)</span><p>Add a server-side delete path that removes the auth user and owned rows -- most auth providers&#x27; client SDKs deliberately can&#x27;t delete a user themselves (that needs a service-role key), so this has to be a server function, not a client call. Then wire a &quot;Delete Account&quot; control in Settings that calls it, shows a confirmation naming what gets deleted, and if the app has a subscription, tells the user how billing is affected before they confirm.</p></div><div class="fixbox"><span class="label">Google Play needs one more thing Apple doesn&#x27;t</span><p>Play requires the in-app path *and* a web-accessible account-deletion URL, submitted separately in Play Console. An iOS-first team that ships the in-app flow and stops there passes Apple and fails the Play Data safety review.</p></div>
+
+<div class="cta">
+  <h2>ShipCheck catches this before you submit</h2>
+  <p>A Claude Code plugin for React Native and Expo. Reads your project and store listing, checks them against the live App Store Review Guidelines and Google Play policies -- the same corpus quoted on this page -- and tells you the clause, the reviewer's likely wording, and the fix.</p>
+  <code>/plugin marketplace add BakerVentures/shipcheck</code>
+  <p class="source">Free scan on every app. <a href="../#pricing" style="color:#F2C14E">See pricing &rarr;</a></p>
+</div>
+
+<footer>
+  Guideline text quoted from App Store Review Guidelines, 5.1.1(v), fetched 2026-09-04 and cached with a SHA-256 in
+  <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a> --
+  the same corpus <a href="https://github.com/BakerVentures/shipcheck">ShipCheck</a> cites in a real scan, not separately maintained copy.
+  Not affiliated with Apple Inc. or Google LLC. This page is not a guarantee of approval.
+</footer>
+</div>
+</body>
+</html>

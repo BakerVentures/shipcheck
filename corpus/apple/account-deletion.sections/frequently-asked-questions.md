@@ -1,4 +1,4 @@
-<!-- source=account-deletion clause=frequently-asked-questions url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-09-03T19:54:32+00:00 -->
+<!-- source=account-deletion clause=frequently-asked-questions url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-09-04T07:14:07+00:00 -->
 
 ## Frequently asked questions
 

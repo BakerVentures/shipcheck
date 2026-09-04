@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=cryptographic-keys url=https://developer.android.com/studio/publish/preparing fetched=2026-09-03T19:54:40+00:00 -->
+<!-- source=prepare-for-release clause=cryptographic-keys url=https://developer.android.com/studio/publish/preparing fetched=2026-09-04T07:14:15+00:00 -->
 
 ### Cryptographic keys
 

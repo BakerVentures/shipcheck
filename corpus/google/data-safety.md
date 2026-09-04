@@ -3,8 +3,8 @@ shipcheck_source_id: data-safety
 title: "Provide information for Google Play's Data safety section"
 url: https://support.google.com/googleplay/android-developer/answer/10787469
 final_url: https://support.google.com/googleplay/android-developer/answer/10787469?hl=en
-fetched_at: 2026-09-03T19:55:34+00:00
-sha256: 1406d17c06d3b3c3252a27df3ec8ba828730bbad10786d9d45e28c448d44e355
+fetched_at: 2026-09-04T07:14:10+00:00
+sha256: 9fd30df4b657f4e092565f9503f3de66654b39c84e6e110dbbf254c7f787f47f
 vendor: google
 ---
 
@@ -66,7 +66,7 @@ Watch the Data safety form walkthrough video
 
 This video takes you through all the resources and steps required to complete the Data safety form.
 
-Google Play PolicyBytes - Data safety form walkthrough
+[Google Play PolicyBytes - Data safety form walkthrough](//www.youtube.com/watch?v=4rfF3y4xchU)
 
 ## What developers need to disclose in the Data safety form
 
@@ -80,13 +80,13 @@ Data collection
 
 "Collect" means transmitting data from your app off a user’s device. Please note the following guidelines:
 
-- **Libraries and SDKs:**This includes user data transmitted off device from your app by libraries and/or SDKs used in your app, irrespective of whether data is transmitted to you or a third-party server.
+- **Libraries and SDKs:** This includes user data transmitted off device from your app by libraries and/or SDKs used in your app, irrespective of whether data is transmitted to you or a third-party server.
 - **Webview:** It also includes user data collected from a webview which has been opened from your app, if your app is in control of the code/behavior delivered through that webview.
   You do not need to declare data collection from a webview in which users are navigating the open web.
-- **Ephemeral processing:**User data transmitted off device that is processed ephemerally needs to be included in your form response, but if it meets the standard below, it will **not** be disclosed in your app’s Data safety section on Google Play.
+- **Ephemeral processing:** User data transmitted off device that is processed ephemerally needs to be included in your form response, but if it meets the standard below, it will **not** be disclosed in your app’s Data safety section on Google Play.
   Processing data "ephemerally" means accessing and using it while the data is only stored in memory and retained for no longer than necessary to service the specific request in real-time.
   For example, a weather app that transmits user location off the device to fetch the current weather at the user's location but only uses location data in memory and does not store that data once the request has been fulfilled, can treat its transient use of location as ephemeral. However, using data to build advertising profiles or other user profiles cannot be treated as ephemeral and must be declared as collection or sharing for the relevant purposes.
-- **Pseudonymous data:**User data collected pseudonymously must be disclosed. For example, data that can reasonably be re-associated with a user must be disclosed.
+- **Pseudonymous data:** User data collected pseudonymously must be disclosed. For example, data that can reasonably be re-associated with a user must be disclosed.
 
 #### Not in scope for data collection
 
@@ -100,19 +100,18 @@ Data sharing
 
 "Sharing" refers to transferring user data collected from your app to a third party. This includes user data transferred:
 
-- **Off-device, such as**s**erver to server transfers.**For example, if you transfer user data collected from your app from your server to a third-party server.
-- **On-device transfer to another app.**Transferring user data from your app to another app directly on the device. In this case, you must disclose data sharing in your Data safety section declarations even if your app does not transmit the data off the user’s device.
-- **From your app libraries and SDKs.**Transferring data collected from your app off a user’s device directly to a third party via libraries and/or SDKs included in your app.
-- **From webview which has been opened through your app.**Transferring user data to a third party via a webview which has been opened from your app, if your app is in control of code/behavior delivered through that webview.
+- **Off-device, such as** s**erver to server transfers.** For example, if you transfer user data collected from your app from your server to a third-party server.
+- **On-device transfer to another app.** Transferring user data from your app to another app directly on the device. In this case, you must disclose data sharing in your Data safety section declarations even if your app does not transmit the data off the user’s device.
+- **From your app libraries and SDKs.** Transferring data collected from your app off a user’s device directly to a third party via libraries and/or SDKs included in your app.
+- **From webview which has been opened through your app.** Transferring user data to a third party via a webview which has been opened from your app, if your app is in control of code/behavior delivered through that webview.
   You do not need to declare data sharing from a webview in which users are navigating the open web.
 
 The following types of data transfers do not need to be disclosed as "sharing":
 
-- **Service providers.**Transferring user data to a "service provider" that processes it on behalf of the developer.
-  "Service provider"
-  means an entity that processes user data on behalf of the developer and based on the developer’s instructions.
-- **Legal purposes.**Transferring user data for specific legal purposes, such as in response to a legal obligation or government requests.
-- **User-initiated action or prominent disclosure and user consent.**Transferring user data to a third party based on a specific user-initiated action, where the user reasonably expects the data to be shared, or based on a prominent in-app disclosure and consent that meets the requirements described in our [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+- **Service providers.** Transferring user data to a "service provider" that processes it on behalf of the developer.
+  **"Service provider"** means an entity that processes user data on behalf of the developer and based on the developer’s instructions.
+- **Legal purposes.** Transferring user data for specific legal purposes, such as in response to a legal obligation or government requests.
+- **User-initiated action or prominent disclosure and user consent.** Transferring user data to a third party based on a specific user-initiated action, where the user reasonably expects the data to be shared, or based on a prominent in-app disclosure and consent that meets the requirements described in our [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
 - **Anonymous data.** Transferring user data that has been fully anonymized so that it can no longer be associated with an individual user.
 
 **First and third parties.**
@@ -170,7 +169,7 @@ Developers will be asked to provide collection, sharing, and other practices for
 
 | **Category** | **Data type** | **Description** |
 | --- | --- | --- |
-| Location | Approximate location | User or device physical location to an area greater than or equal to 3 square kilometers, such as the city a user is in, or location provided by Android’s `ACCESS_COARSE_LOCATION` permission. **Note:**Approximate location that is inferred, such as via IP address or Access Point Name, must be disclosed here. |
+| Location | Approximate location | User or device physical location to an area greater than or equal to 3 square kilometers, such as the city a user is in, or location provided by Android’s `ACCESS_COARSE_LOCATION` permission. **Note:** Approximate location that is inferred, such as via IP address or Access Point Name, must be disclosed here. |
 | Precise location | User or device physical location within an area less than 3 square kilometers, such as location provided by Android’s `ACCESS_FINE_LOCATION` permission. **Note:** Precise location that is inferred, such as via IP address or Access Point Name, must be disclosed here. |  |
 | Personal info | Name | How a user refers to themselves, such as their first or last name, or nickname. |
 | Email address | A user’s email address. |  |
@@ -249,10 +248,9 @@ When you're ready to start, here's how you complete and submit your Data safety 
 6. Select **Next** to move on to the next section.
 7. In the "Data types" section, select all of the user data types collected or shared by your app. When you're finished, select **Next** to move on to the next section. You must [complete this section in accordance with the data collection and sharing guidance above.
 8. In the "Data usage and handling" section, answer questions about how the data is used and handled for each user data type your app collects or shares. Next to each user data type, select **Start** to answer the questions. When you're finished, select **Next** to move on to the next section.
-  Note:
-  You can change the user data types that are selected by going back to the previous section and changing your selections.
+  **Note:** You can change the user data types that are selected by going back to the previous section and changing your selections.
 9. After answering all questions, the "Store listing preview" section previews the information that will be shown to users on Google Play based on the form answers you've provided. Review this information.
-10. If you're ready to submit your completed form, select **Submit**. If you want to go back and change something, you can select **Back**to amend your answers. If you're not sure about something, you can select **Save as draft** and return to the form later. If you select **Discard changes**, you'll need to start the form again.
+10. If you're ready to submit your completed form, select **Submit**. If you want to go back and change something, you can select **Back** to amend your answers. If you're not sure about something, you can select **Save as draft** and return to the form later. If you select **Discard changes**, you'll need to start the form again.
 
 ### Import or export your form responses
 
@@ -338,9 +336,9 @@ Optional format for SDKs
 | --- |
 | SDK / SDK feature that may collect or share data |
 | Data type SDK accesses and collects **Note:** Consider providing accurate technical information that will help your customers to determine which of the Play Data safety section definitions of data types applies to the data your SDK collects. In some cases, you may be comfortable using a Data safety section definition (e.g., “approximate location”) because the applicable data type is clear and does not depend on extraneous factors. In other cases, the data type definition may depend on how the given data is used after it is collected, or on the developer’s particular interpretation of Play Data safety section definitions. For example, IP addresses may be used alternatively to infer location, or to extract identifiers, or for a variety of other purposes depending on the nature of the SDK, its implementation by any given app, and other factors. **Note:** Developers do not have to declare data access as collection if it occurs solely on the user’s device as long as the data is never transmitted off the user’s device. |
-| For each data type listed: Describe required (or automatic) data access versus optional access. “Optional” includes the ability for a user to opt into or opt out of data collection. Does SDK transmit this data off the device? Describe purposes of collection and subsequent sharing and use. **Note:** In many cases, purposes of collection and sharing may depend on the particular use or implementation of your SDK by a given developer. Consider providing any relevant technical information here that will be helpful to your customers as they determine the applicable purposes to be declared in their apps’ Safety section. For example, if your SDK has optional modules, you should provide this information on a per-module basis. Does SDK transfer data to other third parties, including other apps on the user’s device? Describe the purposes for this sharing. **Note:**Developers do not have to disclose as sharing some transfers of data in their apps’ Data safety section in some circumstances, for example, where data is transferred to a service provider processing data on their behalf, or if data is transferred for specific legal purposes, and in some other cases. See the [Play Console Help article](https://support.google.com/googleplay/android-developer/answer/10787469) for more details. Consider providing any relevant technical information here that will be helpful to your customers as they evaluate whether a sharing exception applies. |
+| For each data type listed: Describe required (or automatic) data access versus optional access. “Optional” includes the ability for a user to opt into or opt out of data collection. Does SDK transmit this data off the device? Describe purposes of collection and subsequent sharing and use. **Note:** In many cases, purposes of collection and sharing may depend on the particular use or implementation of your SDK by a given developer. Consider providing any relevant technical information here that will be helpful to your customers as they determine the applicable purposes to be declared in their apps’ Safety section. For example, if your SDK has optional modules, you should provide this information on a per-module basis. Does SDK transfer data to other third parties, including other apps on the user’s device? Describe the purposes for this sharing. **Note:** Developers do not have to disclose as sharing some transfers of data in their apps’ Data safety section in some circumstances, for example, where data is transferred to a service provider processing data on their behalf, or if data is transferred for specific legal purposes, and in some other cases. See the [Play Console Help article](https://support.google.com/googleplay/android-developer/answer/10787469) for more details. Consider providing any relevant technical information here that will be helpful to your customers as they evaluate whether a sharing exception applies. |
 | App level notes [complete section for any data collected or shared] |
-| Does your SDK encrypt data in transit? **Note:**If the answer is different for the different sets of data that the SDK collects, consider explaining how encryption in transit is applied to each relevant dataset. In Play’s Data safety section, developers can only declare encryption in transit if it applies to all user data that their app (including all its SDKs and libraries) collects and transmits off the user's device. Can the app developer and/or users request to delete user data collected? |
+| Does your SDK encrypt data in transit? **Note:** If the answer is different for the different sets of data that the SDK collects, consider explaining how encryption in transit is applied to each relevant dataset. In Play’s Data safety section, developers can only declare encryption in transit if it applies to all user data that their app (including all its SDKs and libraries) collects and transmits off the user's device. Can the app developer and/or users request to delete user data collected? |
 
 ## Frequently asked questions
 

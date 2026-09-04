@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=bug-fix-submissions url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-03T19:54:27+00:00 -->
+<!-- source=app-review-overview clause=bug-fix-submissions url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T07:14:02+00:00 -->
 
 ### Bug fix submissions
 

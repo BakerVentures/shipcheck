@@ -1,25 +1,16 @@
-<!-- source=prepare-and-roll-out-a-release clause=step-2-prepare-your-app-s-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-03T19:54:34+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=step-2-prepare-your-app-s-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-04T07:14:09+00:00 -->
 
 ## Step 2: Prepare your app's release
 
 To prepare your release, follow these steps:
 
 1. Follow the on-screen instructions to prepare your release:
-  If this is your first release for this app, follow the instructions to
-  configure Play App Signing
-  .
+  If this is your first release for this app, follow the instructions to [configure Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756).
   Add your app bundles. Legacy apps (created before August 2021) can add app bundles or APKs for app updates.
-  Optional:
-  If you are creating a release for the first time, you can change your app signing key. In the 'App integrity' section, click
-  Change app signing key
-  . Before changing your key, understand that:
+  **Optional:** If you are creating a release for the first time, you can change your app signing key. In the 'App integrity' section, click **Change app signing key**. Before changing your key, understand that:
   - Internal and closed track users who already installed your app will no longer receive updates. These users must uninstall and reinstall the app to receive updates.
   - You cannot use previously uploaded app versions. You must re-upload app versions.
-  Optional:
-  To add the Play Games Sidekick to your app bundle, click
-  Add Play Games Sidekick
-  to new app bundles you upload
-  .
+  **Optional:** To add the Play Games Sidekick to your app bundle, click **Add Play Games Sidekick** to new app bundles you upload**.**
   - To upload an app bundle for your game, click **Upload**.
   - To use a previously uploaded app version, click **Add from library**.
   Name your release.
@@ -28,9 +19,7 @@ To prepare your release, follow these steps:
 2. To save changes to your release, click **Save as draft**.
 3. When you finish preparing your release, click **Next**.
 
-Note:
-
-Once you publish an app to an open track, its signing key is fixed.
+**Note:** Once you publish an app to an open track, its signing key is fixed.
 
 #### Configure release options
 
@@ -49,9 +38,7 @@ Upload new app bundles or add them from your library. Click **More** to perform 
 - Upload an expansion file (.obb)
 - Remove an app bundle
 
-Note:
-
-Legacy apps (created before August 2021) can use app bundles or APKs in releases.
+**Note:** Legacy apps (created before August 2021) can use app bundles or APKs in releases.
 
 To learn more about ReTrace mapping files and native debug symbols, see [Deobfuscate or symbolicate crash stack traces](https://support.google.com/googleplay/android-developer/answer/9848633).
 
@@ -99,9 +86,7 @@ The release notes description can take up multiple lines.
 
 </en-US>
 
-Note:
-
-You can enter release notes using up to 500 Unicode characters per language.
+**Note:** You can enter release notes using up to 500 Unicode characters per language.
 
 #### **Copy from previous release**
 

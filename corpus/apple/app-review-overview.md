@@ -3,7 +3,7 @@ shipcheck_source_id: app-review-overview
 title: "App Review (overview and common rejections)"
 url: https://developer.apple.com/distribute/app-review/
 final_url: https://developer.apple.com/distribute/app-review/
-fetched_at: 2026-09-03T19:54:27+00:00
+fetched_at: 2026-09-04T07:14:02+00:00
 sha256: 26692832f43c5832d7a5560a5bed49213954292a857fec2cf3dbf092c8aa3f98
 vendor: apple
 substituted_from: https://developer.apple.com/app-store/review/

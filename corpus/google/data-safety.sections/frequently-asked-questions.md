@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=frequently-asked-questions url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-03T19:55:34+00:00 -->
+<!-- source=data-safety clause=frequently-asked-questions url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T07:14:10+00:00 -->
 
 ## Frequently asked questions
 

@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=sms-and-call-log-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-03T19:54:39+00:00 -->
+<!-- source=permissions-policy clause=sms-and-call-log-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T07:14:14+00:00 -->
 
 ## SMS and Call Log Permissions
 
