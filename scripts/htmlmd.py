@@ -156,8 +156,18 @@ def _inline(node):
             parts.append("\n")
         elif t == "img":
             alt = c.attrs.get("alt", "").strip()
-            if alt:
-                parts.append(f"![{alt}]")
+            src = c.attrs.get("src", "").strip()
+            if alt and src:
+                # ![alt](src) -- emitting alt with no (src), as this used to,
+                # is not valid markdown syntax; it printed literally as
+                # "![alt text]" wherever a citation quoted it verbatim.
+                parts.append(f"![{alt}]({src})")
+            elif alt:
+                # No usable src (decorative icon, sprite, etc.) but the alt
+                # text itself may still carry real information (a HIG
+                # illustration's description) -- keep it as plain text
+                # rather than emit invalid, unresolvable image syntax.
+                parts.append(alt)
         else:
             parts.append(_inline(c))
     return "".join(parts)

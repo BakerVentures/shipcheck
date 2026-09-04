@@ -3,7 +3,7 @@ shipcheck_source_id: expo-apple-privacy
 title: "Expo: Apple privacy manifests"
 url: https://docs.expo.dev/guides/apple-privacy/
 final_url: https://docs.expo.dev/guides/apple-privacy/
-fetched_at: 2026-09-04T15:48:29+00:00
+fetched_at: 2026-09-04T16:10:03+00:00
 sha256: b38f66fcab445b40096c19b65b7bfa61bddf3a8752f868cb00cef488a604fd47
 vendor: apple
 ---

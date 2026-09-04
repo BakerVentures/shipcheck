@@ -1,4 +1,4 @@
-<!-- source=product-page clause=ratings-and-reviews url=https://developer.apple.com/app-store/product-page/ fetched=2026-09-04T15:48:27+00:00 -->
+<!-- source=product-page clause=ratings-and-reviews url=https://developer.apple.com/app-store/product-page/ fetched=2026-09-04T16:10:01+00:00 -->
 
 ## Ratings and reviews
 

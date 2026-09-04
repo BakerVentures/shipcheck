@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-from-android-8-api-26-to-android-9-api-28 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T15:48:40+00:00 -->
+<!-- source=target-sdk clause=migrate-from-android-8-api-26-to-android-9-api-28 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T16:10:14+00:00 -->
 
 ### Migrate from Android 8 (API 26) to Android 9 (API 28)
 

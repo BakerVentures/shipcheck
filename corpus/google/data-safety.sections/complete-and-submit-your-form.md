@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=complete-and-submit-your-form url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T15:48:31+00:00 -->
+<!-- source=data-safety clause=complete-and-submit-your-form url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T16:10:05+00:00 -->
 
 ### Complete and submit your form
 

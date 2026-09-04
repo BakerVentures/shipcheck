@@ -3,7 +3,7 @@ shipcheck_source_id: data-safety
 title: "Provide information for Google Play's Data safety section"
 url: https://support.google.com/googleplay/android-developer/answer/10787469
 final_url: https://support.google.com/googleplay/android-developer/answer/10787469?hl=en
-fetched_at: 2026-09-04T15:48:31+00:00
+fetched_at: 2026-09-04T16:10:05+00:00
 sha256: 9fd30df4b657f4e092565f9503f3de66654b39c84e6e110dbbf254c7f787f47f
 vendor: google
 ---

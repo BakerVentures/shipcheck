@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T15:48:30+00:00 -->
+<!-- source=expo-submit-ios clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T16:10:04+00:00 -->
 
 ## Use other CI/CD services
 

@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "shipcheck",
   "displayName": "ShipCheck",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "App Store / Google Play rejection-risk checker for React Native and Expo apps. Scans your project and store metadata, cites the exact guideline clause, and gives you the fix.",
   "author": {
     "name": "Ryan Baker"

@@ -1,10 +1,10 @@
-<!-- source=hig-sign-in-with-apple clause=creating-a-custom-sign-in-with-apple-button url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-09-04T15:48:26+00:00 -->
+<!-- source=hig-sign-in-with-apple clause=creating-a-custom-sign-in-with-apple-button url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-09-04T16:10:01+00:00 -->
 
 ### Creating a custom Sign in with Apple button
 
 If your interface requires it, you can create a custom Sign in with Apple button for iOS, macOS, or the web. For example, you may want to align logos across multiple sign-in buttons, use buttons that display only a logo, or adjust the button’s font, bezel, or background appearance to coordinate with your UI.
 
-![An illustration that includes two side-by-side partial iPhones showing sign-in screens. The screen on the left includes four stacked buttons: Sign in with Apple, Sign in with X, Sign in with Y, and Sign in with Z. The Sign in with Apple button includes an Apple logo before its title. The Sign in with X button includes a filled circle before its title. The Sign in with Y button includes a filled square before its title. The Sign in with Z button includes a filled triangle before its title. The screen on the right includes a heading that reads 'Sign in with', which appears above a row of four square buttons containing glyphs. The first square button contains the Apple logo. The second square button contains a filled circle. The third square button contains a filled square. The fourth square button contains a filled triangle. The circle, square, and triangle shapes represent a variety of logos.]
+![An illustration that includes two side-by-side partial iPhones showing sign-in screens. The screen on the left includes four stacked buttons: Sign in with Apple, Sign in with X, Sign in with Y, and Sign in with Z. The Sign in with Apple button includes an Apple logo before its title. The Sign in with X button includes a filled circle before its title. The Sign in with Y button includes a filled square before its title. The Sign in with Z button includes a filled triangle before its title. The screen on the right includes a heading that reads 'Sign in with', which appears above a row of four square buttons containing glyphs. The first square button contains the Apple logo. The second square button contains a filled circle. The third square button contains a filled square. The fourth square button contains a filled triangle. The circle, square, and triangle shapes represent a variety of logos.](https://developer.apple.com/images/com.apple.HIG/custom-sign-in-screens@2x.png)
 
 Always make sure that people can instantly identify your custom button as a Sign in with Apple button. If your custom button differs too much from the standard one, people may not feel comfortable using it to set up an account or sign in. App Review evaluates all custom Sign in with Apple buttons.
 
@@ -39,9 +39,9 @@ To coordinate with your app design, you can change:
 
 **Prefer the system font for the title — that is, Sign in with Apple, Sign up with Apple, or Continue with Apple.** Regardless of the font you choose, the title and button height of your custom button need to use the same proportions that the system uses. Using the system font for example, the title’s font size would be 43% of the button’s height — in other words, the button’s height would be 233% of the title’s font size, rounded to the nearest integer. Here are two examples that show these proportions using different sizes of the system font.
 
-![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 44 points and a font size of 19 points.]
+![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 44 points and a font size of 19 points.](https://developer.apple.com/images/com.apple.HIG/left-aligned-correct-proportions-2@2x.png)
 
-![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 56 points and a font size of 24 points.]
+![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 56 points and a font size of 24 points.](https://developer.apple.com/images/com.apple.HIG/left-aligned-correct-proportions-1@2x.png)
 
 **In general, preserve the capitalization style of the title.** By default, all variants of the button title capitalize the first word — that is, *Sign* or *Continue* — and *Apple*; all other letters are lowercase. Avoid changing this style unless your interface uses only uppercase.
 

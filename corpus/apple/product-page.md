@@ -3,7 +3,7 @@ shipcheck_source_id: product-page
 title: "App Store product page"
 url: https://developer.apple.com/app-store/product-page/
 final_url: https://developer.apple.com/app-store/product-page/
-fetched_at: 2026-09-04T15:48:27+00:00
+fetched_at: 2026-09-04T16:10:01+00:00
 sha256: 2bb1db1cfc0c841c9f05328d73c207f2ac9f0b029c2023ebae391a7e481b7e3e
 vendor: apple
 ---

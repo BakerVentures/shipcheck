@@ -1,4 +1,4 @@
-<!-- source=hig-sign-in-with-apple clause=offering-sign-in-with-apple url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-09-04T15:48:26+00:00 -->
+<!-- source=hig-sign-in-with-apple clause=offering-sign-in-with-apple url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-09-04T16:10:01+00:00 -->
 
 ## Offering Sign in with Apple
 
@@ -17,7 +17,7 @@ Follow these guidelines to offer Sign in with Apple when it’s most convenient 
 
 **In a commerce app, wait until after people make a purchase before asking them to create an account.** If you support a guest checkout system, give people a quick way to create an account after the transaction completes. For example, if you support Apple Pay, let people create an account on the order confirmation page. In cases where people have already provided their name and email address during the Apple Pay transaction, you don’t need to ask for this information.
 
-![An illustration representing an order confirmation screen on iPhone. The screen includes buttons titled 'Create Account' and 'Sign up with Apple'.]
+![An illustration representing an order confirmation screen on iPhone. The screen includes buttons titled 'Create Account' and 'Sign up with Apple'.](https://developer.apple.com/images/com.apple.HIG/create-account-after-purchase@2x.png)
 
 **As soon as Sign in with Apple completes, welcome people to their new account.** Help people use their new account right away; don’t delay the experience by asking for information that isn’t required.
 

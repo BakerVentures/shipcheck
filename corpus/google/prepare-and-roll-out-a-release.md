@@ -3,7 +3,7 @@ shipcheck_source_id: prepare-and-roll-out-a-release
 title: "Prepare and roll out a release"
 url: https://support.google.com/googleplay/android-developer/answer/9859348
 final_url: https://support.google.com/googleplay/android-developer/answer/9859348?hl=en
-fetched_at: 2026-09-04T15:48:31+00:00
+fetched_at: 2026-09-04T16:10:05+00:00
 sha256: 3e0303cf06a9d2731f1e1775e0de18b3d80614fad58bc386aac1c674ff48908f
 vendor: google
 note: "Listed in the brief as 'Developer Program Policies' but this ID is actually release rollout. Kept for testing-track rules; policy text is under policy-center-hub."

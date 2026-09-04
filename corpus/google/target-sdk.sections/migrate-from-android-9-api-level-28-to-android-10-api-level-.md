@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-from-android-9-api-level-28-to-android-10-api-level- url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T15:48:40+00:00 -->
+<!-- source=target-sdk clause=migrate-from-android-9-api-level-28-to-android-10-api-level- url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T16:10:14+00:00 -->
 
 ### Migrate from Android 9 (API level 28) to Android 10 (API level 29)
 

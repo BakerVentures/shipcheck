@@ -1,4 +1,4 @@
-<!-- source=hig-in-app-purchase clause=making-signup-effortless url=https://developer.apple.com/design/human-interface-guidelines/in-app-purchase fetched=2026-09-04T15:48:26+00:00 -->
+<!-- source=hig-in-app-purchase clause=making-signup-effortless url=https://developer.apple.com/design/human-interface-guidelines/in-app-purchase fetched=2026-09-04T16:10:00+00:00 -->
 
 ### Making signup effortless
 
@@ -18,10 +18,10 @@ A simple and informative sign-up experience makes it easy for people to act on t
 
 For example, the Forest Explorer sign-up screen displays billing totals for monthly, biannual, and annual subscriptions in the most prominent positions. In subordinate positions, it shows breakdowns of the biannual and annual prices, so that people can compare the values and make an informed choice. The sign-up screen also contains a button that existing subscribers can use to restore their purchases.
 
-![A screenshot of the Forest Explorer app running on iPhone. The screenshot displays a forested area as the first of three images in the top half of the screen. Below the image are three buttons with subscription options: Intrepid Pro, which costs $14.99 per month; Intrepid Pro with Ads, which costs $9.99 per month; and Redeem Code.]
+![A screenshot of the Forest Explorer app running on iPhone. The screenshot displays a forested area as the first of three images in the top half of the screen. Below the image are three buttons with subscription options: Intrepid Pro, which costs $14.99 per month; Intrepid Pro with Ads, which costs $9.99 per month; and Redeem Code.](https://developer.apple.com/images/com.apple.HIG/iphone-upgrade@2x.png)
 
 **Clearly describe how a free trial works.** It’s particularly important to make sure people know that when the free trial is over, a payment will be automatically initiated for the next subscription period. For example, the Ocean Journal sign-up screen explicitly states both the duration of the free trial and the amount that’s billed when it ends.
 
-![A screenshot of the Ocean Journal app running on Apple Watch, and displaying a modal view that describes a benefit of subscribing. Below the description area is a Subscribe Now button with subscription terms below it.]
+![A screenshot of the Ocean Journal app running on Apple Watch, and displaying a modal view that describes a benefit of subscribing. Below the description area is a Subscribe Now button with subscription terms below it.](https://developer.apple.com/images/com.apple.HIG/watch-onboarding@2x.png)
 
 **Include a sign-up opportunity in your app’s settings.** App and account settings are common places for people to look for a way to subscribe.

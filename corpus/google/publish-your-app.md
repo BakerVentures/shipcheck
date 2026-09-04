@@ -3,8 +3,8 @@ shipcheck_source_id: publish-your-app
 title: "Publish your app"
 url: https://developer.android.com/studio/publish
 final_url: https://developer.android.com/studio/publish?hl=en
-fetched_at: 2026-09-04T15:48:39+00:00
-sha256: de5a6026fcb7c09c5b469e9a0c97d429100e3fa02af8be09df0926e638be839f
+fetched_at: 2026-09-04T16:10:12+00:00
+sha256: 59b621c426d825878b752d4e2a8490ee210df3df4ac40092188b2de76a2f1700
 vendor: google
 ---
 
@@ -86,7 +86,7 @@ locations other than a trusted, first-party app store, such as Google Play.
 Android blocks such installs until the user opts into allowing the
 installation of apps from other sources. The opt-in process depends on the
 version of Android running on the user's device: ![Screenshot showing the settings screen for accepting install of
-unknown apps from different sources.] **Figure 1.** The **Install unknown apps** system settings screen,
+unknown apps from different sources.](/static/images/publishing/publishing_unknown_apps_sm.png) **Figure 1.** The **Install unknown apps** system settings screen,
 where users grant permission for a particular source to install unknown
 apps.
 On devices running Android 8.0 (API level 26) and higher, users must
@@ -104,7 +104,7 @@ call `[canRequestPackageInstalls()](/reference/android/content/pm/PackageManager
 permission to install unknown apps. If this method returns `false`,
 the source should prompt the user to re-enable the **Allow app installs**
 setting for that source. Unknown sources ![Screenshot showing the setting for accepting download and install of
-apps from unknown sources.] **Figure 2.** The **Unknown sources** setting
+apps from unknown sources.](/static/images/publishing/publishing_unknown_sources_sm.png) **Figure 2.** The **Unknown sources** setting
 determines whether users can install apps that aren't downloaded
 from Google Play.
 To permit the installation of apps from non-first-party

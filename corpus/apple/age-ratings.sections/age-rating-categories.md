@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=age-rating-categories url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T15:48:28+00:00 -->
+<!-- source=age-ratings clause=age-rating-categories url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T16:10:02+00:00 -->
 
 ## Age rating categories
 

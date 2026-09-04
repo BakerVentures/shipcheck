@@ -1,4 +1,4 @@
-<!-- source=account-deletion clause=account-deletion-guidance url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-09-04T15:48:29+00:00 -->
+<!-- source=account-deletion clause=account-deletion-guidance url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-09-04T16:10:03+00:00 -->
 
 ## Account deletion guidance
 

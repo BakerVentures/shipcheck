@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=build-and-submit-in-one-step url=https://docs.expo.dev/submit/android/ fetched=2026-09-04T15:48:40+00:00 -->
+<!-- source=expo-submit-android clause=build-and-submit-in-one-step url=https://docs.expo.dev/submit/android/ fetched=2026-09-04T16:10:14+00:00 -->
 
 ### Build and submit in one step
 

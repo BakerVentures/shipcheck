@@ -3,8 +3,8 @@ shipcheck_source_id: hig-sign-in-with-apple
 title: "HIG: Sign in with Apple"
 url: https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple
 final_url: https://developer.apple.com/tutorials/data/design/human-interface-guidelines/sign-in-with-apple.json
-fetched_at: 2026-09-04T15:48:26+00:00
-sha256: dd7d0be894b3d51375dd25547a1d0f706f4d5b6c9cbe28dc59f885afaa5af424
+fetched_at: 2026-09-04T16:10:01+00:00
+sha256: ad0ade9cc5dc33202f5c7b4e6ac61f1b3e44ba185f5872bfc4a6796f88addbde
 vendor: apple
 ---
 
@@ -12,7 +12,7 @@ vendor: apple
 
 Sign in with Apple provides a fast, private way to sign into apps and websites, giving people a consistent experience they can trust and the convenience of not having to remember multiple accounts and passwords.
 
-![A sketch of the Apple logo, suggesting Sign in with Apple. The image is overlaid with rectangular and circular grid lines and is tinted blue to subtly reflect the blue in the original six-color Apple logo.]
+![A sketch of the Apple logo, suggesting Sign in with Apple. The image is overlaid with rectangular and circular grid lines and is tinted blue to subtly reflect the blue in the original six-color Apple logo.](https://developer.apple.com/images/com.apple.HIG/technologies-SIWA-intro@2x.png)
 
 Supporting Sign in with Apple lets people use the Apple Account they already have to sign in or sign up, and skip filling out forms, verifying email addresses, and choosing passwords. In cases where you choose to ask for a name and email address, people have the option to share a unique, random email address that automatically relays messages to their personal email address. For developer guidance, see [Authentication Services](https://developer.apple.com/documentation/authenticationservices).
 
@@ -37,7 +37,7 @@ Follow these guidelines to offer Sign in with Apple when it’s most convenient 
 
 **In a commerce app, wait until after people make a purchase before asking them to create an account.** If you support a guest checkout system, give people a quick way to create an account after the transaction completes. For example, if you support Apple Pay, let people create an account on the order confirmation page. In cases where people have already provided their name and email address during the Apple Pay transaction, you don’t need to ask for this information.
 
-![An illustration representing an order confirmation screen on iPhone. The screen includes buttons titled 'Create Account' and 'Sign up with Apple'.]
+![An illustration representing an order confirmation screen on iPhone. The screen includes buttons titled 'Create Account' and 'Sign up with Apple'.](https://developer.apple.com/images/com.apple.HIG/create-account-after-purchase@2x.png)
 
 **As soon as Sign in with Apple completes, welcome people to their new account.** Help people use their new account right away; don’t delay the experience by asking for information that isn’t required.
 
@@ -85,7 +85,7 @@ The following button titles are available for iOS, macOS, tvOS, and the web:
 
 For watchOS, the system provides one title:  Sign in.
 
-![An illustration of a button for watchOS, that includes the Apple logo and text that reads 'Sign in'.]
+![An illustration of a button for watchOS, that includes the Apple logo and text that reads 'Sign in'.](https://developer.apple.com/images/com.apple.HIG/apple-account-watch-44mm-no-background@2x.png)
 
 Depending on the platform, the system provides up to three options for the appearance of the Sign in with Apple button: white, white with an outline, and black. Choose the appearance that works best with the background on which the button displays.
 
@@ -103,7 +103,7 @@ The black style is available on all platforms and the web. Use this style on whi
 
 Unlike the black Sign in with Apple button for other platforms, the watchOS button uses a fill color that’s not fully black. To contrast with the pure black background of Apple Watch, the watchOS button uses the system-defined dark gray appearance.
 
-![An illustration of a dark shaded button for watchOS on a black background, that includes the Apple logo and text that reads 'Sign in'.]
+![An illustration of a dark shaded button for watchOS on a black background, that includes the Apple logo and text that reads 'Sign in'.](https://developer.apple.com/images/com.apple.HIG/apple-account-watch-44mm@2x.png)
 
 #### Button size and corner radius
 
@@ -119,7 +119,7 @@ Unlike the black Sign in with Apple button for other platforms, the watchOS butt
 
 If your interface requires it, you can create a custom Sign in with Apple button for iOS, macOS, or the web. For example, you may want to align logos across multiple sign-in buttons, use buttons that display only a logo, or adjust the button’s font, bezel, or background appearance to coordinate with your UI.
 
-![An illustration that includes two side-by-side partial iPhones showing sign-in screens. The screen on the left includes four stacked buttons: Sign in with Apple, Sign in with X, Sign in with Y, and Sign in with Z. The Sign in with Apple button includes an Apple logo before its title. The Sign in with X button includes a filled circle before its title. The Sign in with Y button includes a filled square before its title. The Sign in with Z button includes a filled triangle before its title. The screen on the right includes a heading that reads 'Sign in with', which appears above a row of four square buttons containing glyphs. The first square button contains the Apple logo. The second square button contains a filled circle. The third square button contains a filled square. The fourth square button contains a filled triangle. The circle, square, and triangle shapes represent a variety of logos.]
+![An illustration that includes two side-by-side partial iPhones showing sign-in screens. The screen on the left includes four stacked buttons: Sign in with Apple, Sign in with X, Sign in with Y, and Sign in with Z. The Sign in with Apple button includes an Apple logo before its title. The Sign in with X button includes a filled circle before its title. The Sign in with Y button includes a filled square before its title. The Sign in with Z button includes a filled triangle before its title. The screen on the right includes a heading that reads 'Sign in with', which appears above a row of four square buttons containing glyphs. The first square button contains the Apple logo. The second square button contains a filled circle. The third square button contains a filled square. The fourth square button contains a filled triangle. The circle, square, and triangle shapes represent a variety of logos.](https://developer.apple.com/images/com.apple.HIG/custom-sign-in-screens@2x.png)
 
 Always make sure that people can instantly identify your custom button as a Sign in with Apple button. If your custom button differs too much from the standard one, people may not feel comfortable using it to set up an account or sign in. App Review evaluates all custom Sign in with Apple buttons.
 
@@ -154,9 +154,9 @@ To coordinate with your app design, you can change:
 
 **Prefer the system font for the title — that is, Sign in with Apple, Sign up with Apple, or Continue with Apple.** Regardless of the font you choose, the title and button height of your custom button need to use the same proportions that the system uses. Using the system font for example, the title’s font size would be 43% of the button’s height — in other words, the button’s height would be 233% of the title’s font size, rounded to the nearest integer. Here are two examples that show these proportions using different sizes of the system font.
 
-![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 44 points and a font size of 19 points.]
+![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 44 points and a font size of 19 points.](https://developer.apple.com/images/com.apple.HIG/left-aligned-correct-proportions-2@2x.png)
 
-![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 56 points and a font size of 24 points.]
+![An illustration of a Sign in with Apple button, with callouts that indicate a button height of 56 points and a font size of 24 points.](https://developer.apple.com/images/com.apple.HIG/left-aligned-correct-proportions-1@2x.png)
 
 **In general, preserve the capitalization style of the title.** By default, all variants of the button title capitalize the first word — that is, *Sign* or *Continue* — and *Apple*; all other letters are lowercase. Avoid changing this style unless your interface uses only uppercase.
 

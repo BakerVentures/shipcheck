@@ -47,8 +47,17 @@ def inline(items, doc):
         elif t == "image":
             ref = _refs(doc).get(it.get("identifier", ""), {})
             alt = ref.get("alt") or ""
-            if alt:
-                out.append("![%s]" % alt)
+            # image refs carry no top-level "url" (unlike a "reference" link)
+            # -- the real URL is the first entry of "variants" (1x/2x/3x).
+            # Emitting alt with no (url), as this used to, is not valid
+            # markdown and printed literally as "![alt text]" wherever a
+            # citation quoted the surrounding paragraph verbatim.
+            variants = ref.get("variants") or []
+            src = _url_for(variants[0]) if variants else ""
+            if alt and src:
+                out.append("![%s](%s)" % (alt, src))
+            elif alt:
+                out.append(alt)
         elif t == "inlineHead":
             out.append("**%s**" % inline(it.get("inlineContent"), doc))
         elif "inlineContent" in it:

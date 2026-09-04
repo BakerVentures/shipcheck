@@ -1,4 +1,4 @@
-<!-- source=hig-in-app-purchase clause=resources url=https://developer.apple.com/design/human-interface-guidelines/in-app-purchase fetched=2026-09-04T15:48:26+00:00 -->
+<!-- source=hig-in-app-purchase clause=resources url=https://developer.apple.com/design/human-interface-guidelines/in-app-purchase fetched=2026-09-04T16:10:00+00:00 -->
 
 ## Resources
 

@@ -1,4 +1,4 @@
-<!-- source=hig-sign-in-with-apple clause=using-the-system-provided-buttons url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-09-04T15:48:26+00:00 -->
+<!-- source=hig-sign-in-with-apple clause=using-the-system-provided-buttons url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-09-04T16:10:01+00:00 -->
 
 ### Using the system-provided buttons
 
@@ -18,7 +18,7 @@ The following button titles are available for iOS, macOS, tvOS, and the web:
 
 For watchOS, the system provides one title:  Sign in.
 
-![An illustration of a button for watchOS, that includes the Apple logo and text that reads 'Sign in'.]
+![An illustration of a button for watchOS, that includes the Apple logo and text that reads 'Sign in'.](https://developer.apple.com/images/com.apple.HIG/apple-account-watch-44mm-no-background@2x.png)
 
 Depending on the platform, the system provides up to three options for the appearance of the Sign in with Apple button: white, white with an outline, and black. Choose the appearance that works best with the background on which the button displays.
 
@@ -36,7 +36,7 @@ The black style is available on all platforms and the web. Use this style on whi
 
 Unlike the black Sign in with Apple button for other platforms, the watchOS button uses a fill color that’s not fully black. To contrast with the pure black background of Apple Watch, the watchOS button uses the system-defined dark gray appearance.
 
-![An illustration of a dark shaded button for watchOS on a black background, that includes the Apple logo and text that reads 'Sign in'.]
+![An illustration of a dark shaded button for watchOS on a black background, that includes the Apple logo and text that reads 'Sign in'.](https://developer.apple.com/images/com.apple.HIG/apple-account-watch-44mm@2x.png)
 
 #### Button size and corner radius
 

@@ -3,7 +3,7 @@ shipcheck_source_id: user-data-policy
 title: "User Data policy"
 url: https://support.google.com/googleplay/android-developer/answer/10144311
 final_url: https://support.google.com/googleplay/android-developer/answer/10144311?hl=en
-fetched_at: 2026-09-04T15:48:32+00:00
+fetched_at: 2026-09-04T16:10:06+00:00
 sha256: ae93407ede6628ce2ad566605cfa496c763f9621fc747c169d6fe8cbecd68dc7
 vendor: google
 substituted_from: https://support.google.com/googleplay/android-developer/answer/16810878

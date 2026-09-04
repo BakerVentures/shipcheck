@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=review-and-update-your-manifest-and-gradle-build-settings url=https://developer.android.com/studio/publish/preparing fetched=2026-09-04T15:48:37+00:00 -->
+<!-- source=prepare-for-release clause=review-and-update-your-manifest-and-gradle-build-settings url=https://developer.android.com/studio/publish/preparing fetched=2026-09-04T16:10:11+00:00 -->
 
 ### Review and update your manifest and Gradle build settings
 

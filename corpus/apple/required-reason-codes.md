@@ -3,7 +3,7 @@ shipcheck_source_id: required-reason-codes
 title: "NSPrivacyAccessedAPITypeReasons (approved reason codes)"
 url: https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons
 final_url: https://developer.apple.com/tutorials/data/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons.json
-fetched_at: 2026-09-04T15:48:24+00:00
+fetched_at: 2026-09-04T16:09:59+00:00
 sha256: 42fb691d1c118f98ad593779a52ff01ea918bc80ab5fb9361998f2d1deb6bfd5
 vendor: apple
 note: "Carries the actual approved reason codes (C617.1, CA92.1, E174.1, 35F9.1, 3EC4.1 ...). Without this the checker cannot tell a developer which value to put in NSPrivacyAccessedAPITypeReasons."

@@ -1,4 +1,4 @@
-<!-- source=app-privacy-details clause=additional-guidance url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-09-04T15:48:25+00:00 -->
+<!-- source=app-privacy-details clause=additional-guidance url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-09-04T16:10:00+00:00 -->
 
 ## Additional guidance
 

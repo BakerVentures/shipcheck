@@ -1,4 +1,4 @@
-<!-- source=describing-data-use clause=overview url=https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests fetched=2026-09-04T15:48:25+00:00 -->
+<!-- source=describing-data-use clause=overview url=https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests fetched=2026-09-04T16:09:59+00:00 -->
 
 ## Overview
 

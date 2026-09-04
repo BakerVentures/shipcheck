@@ -3,8 +3,8 @@ shipcheck_source_id: asrg
 title: "App Store Review Guidelines"
 url: https://developer.apple.com/app-store/review/guidelines/
 final_url: https://developer.apple.com/app-store/review/guidelines/
-fetched_at: 2026-09-04T15:48:23+00:00
-sha256: a7f27b7ee115345ecc84bbf58de92d6d3ce8fa314afed7c68808a9d71a15824a
+fetched_at: 2026-09-04T16:09:58+00:00
+sha256: 0bf0e968db7daf0bd037e17abf641701a3a6f9aa8c687c942445d6635855f943
 vendor: apple
 note: "Primary citation source. Chunked by clause number (1.1, 2.3.1, 3.1.2...)."
 ---
@@ -68,7 +68,7 @@ Make sure you:
 - [Add to Apple Wallet Guidelines](/wallet/add-to-apple-wallet-guidelines/)
 - [Guidelines for Using Apple Trademarks and Copyrights](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html)
 
-Guidelines that include ![ASR & NR] apply to [Notarization for iOS and iPadOS apps](/support/dma-and-apps-in-the-eu/#notarization-for-ios-apps).
+Guidelines that include ![ASR & NR](/app-store/review/images/key-icon.svg) apply to [Notarization for iOS and iPadOS apps](/support/dma-and-apps-in-the-eu/#notarization-for-ios-apps).
 
 ### 1. Safety
 

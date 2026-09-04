@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=avoiding-common-issues url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T15:48:23+00:00 -->
+<!-- source=app-review-overview clause=avoiding-common-issues url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T16:09:58+00:00 -->
 
 ## Avoiding common issues
 
