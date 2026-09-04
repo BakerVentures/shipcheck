@@ -3,12 +3,12 @@ shipcheck_source_id: target-sdk
 title: "Meet Google Play's target API level requirement (Android Developers)"
 url: https://developer.android.com/google/play/requirements/target-sdk
 final_url: https://developer.android.com/google/play/requirements/target-sdk?hl=en
-fetched_at: 2026-09-04T07:14:18+00:00
-sha256: 1b5371c60b3b4adade2652f0990613ee91967206b670d072e004b69d598a0a84
+fetched_at: 2026-09-04T15:48:40+00:00
+sha256: 43f23a03589b43e2f7490f4a1e01456c5606d2e401fcd2fe0dcc48bc90c22329
 vendor: google
 ---
 
-# Meet Google Play's target API level requirement  Stay organized with collections   Save and categorize content based on your preferences.
+# Meet Google Play's target API level requirement
 
 When you upload an APK, it must meet Google Play's [target API level
 requirements](https://support.google.com/googleplay/android-developer/answer/11926878).

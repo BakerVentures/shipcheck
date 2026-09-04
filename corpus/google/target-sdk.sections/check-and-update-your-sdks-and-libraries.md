@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=check-and-update-your-sdks-and-libraries url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T07:14:18+00:00 -->
+<!-- source=target-sdk clause=check-and-update-your-sdks-and-libraries url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T15:48:40+00:00 -->
 
 ## Check and update your SDKs and libraries
 

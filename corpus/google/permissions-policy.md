@@ -3,7 +3,7 @@ shipcheck_source_id: permissions-policy
 title: "Permissions and APIs that Access Sensitive Information"
 url: https://support.google.com/googleplay/android-developer/answer/16558241
 final_url: https://support.google.com/googleplay/android-developer/answer/16558241?hl=en
-fetched_at: 2026-09-04T07:14:14+00:00
+fetched_at: 2026-09-04T15:48:35+00:00
 sha256: cc08f03dc0508b369521ba0756ea140efa858173deb5a2d1063693577c3d65ab
 vendor: google
 substituted_from: https://support.google.com/googleplay/android-developer/answer/9888170

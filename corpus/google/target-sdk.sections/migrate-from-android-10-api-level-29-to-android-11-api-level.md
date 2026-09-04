@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-from-android-10-api-level-29-to-android-11-api-level url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T07:14:18+00:00 -->
+<!-- source=target-sdk clause=migrate-from-android-10-api-level-29-to-android-11-api-level url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T15:48:40+00:00 -->
 
 ### Migrate from Android 10 (API level 29) to Android 11 (API level 30)
 

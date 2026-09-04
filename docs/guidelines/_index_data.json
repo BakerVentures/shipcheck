@@ -28,5 +28,15 @@
     "google-play-target-api-level",
     "Google Play's target API level requirement, as of 2026-09-04",
     "Google Play's current target API level requirement for new apps and updates, quoted directly, with the deadline and the fix for React Native / Expo."
+  ],
+  [
+    "2-1-demo-account",
+    "Guideline 2.1: the demo account rejection",
+    "Apple's exact wording for guideline 2.1 app completeness, why a working demo account is not optional if your app has a login, and the fix."
+  ],
+  [
+    "att-app-tracking-transparency",
+    "App Tracking Transparency: what the prompt actually requires",
+    "Apple's exact requirement for the AppTrackingTransparency framework, what triggers it, and the fix for React Native and Expo apps that track users."
   ]
 ]

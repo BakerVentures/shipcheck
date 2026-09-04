@@ -34,7 +34,7 @@ def read(rel):
     return body
 
 
-_MD_TOKEN_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*")
+_MD_TOKEN_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*")
 
 
 def _inline_md(text):
@@ -56,11 +56,16 @@ def _inline_md(text):
                 "https://developer.apple.com" + href if href.startswith("/") else href
             out.append('<a href="%s">%s</a>' % (html.escape(href, quote=True),
                                                   html.escape(label)))
-        else:
+        elif m.group(3) is not None:
             out.append("<strong>%s</strong>" % html.escape(m.group(3)))
+        else:
+            out.append("<em>%s</em>" % html.escape(m.group(4)))
         last = m.end()
     out.append(html.escape(text[last:]))
     return "".join(out)
+
+
+_ATX_HEADING_RE = re.compile(r"^#{1,6}\s+(.*)$")
 
 
 def para_html(text):
@@ -69,8 +74,16 @@ def para_html(text):
     out = []
     for b in blocks:
         lines = b.splitlines()
-        if all(re.match(r"^[-*]\s+", l) or not l.strip() for l in lines) and \
-           any(re.match(r"^[-*]\s+", l) for l in lines):
+        heading = _ATX_HEADING_RE.match(b) if len(lines) == 1 else None
+        if heading:
+            # chunk_named() keeps a source page's own "### Heading" markdown
+            # line at the top of a .sections chunk -- quoting that chunk
+            # verbatim (as several of these pages do) printed the literal
+            # "###" characters instead of a heading, since this function had
+            # no ATX-heading case at all.
+            out.append("<p><strong>%s</strong></p>" % _inline_md(heading.group(1)))
+        elif all(re.match(r"^[-*]\s+", l) or not l.strip() for l in lines) and \
+             any(re.match(r"^[-*]\s+", l) for l in lines):
             items = [re.sub(r"^[-*]\s+", "", l) for l in lines if l.strip()]
             out.append("<ul>" + "".join(
                 "<li>%s</li>" % _inline_md(i) for i in items) + "</ul>")
@@ -413,6 +426,88 @@ PAGES.append(dict(
          "Set `targetSdkVersion` to the current floor for new apps shown in the table above. "
          "If you're on a managed Expo workflow, do this through `expo-build-properties` in "
          "app.json instead, and rebuild."),
+    ],
+))
+
+PAGES.append(dict(
+    slug="2-1-demo-account",
+    eyebrow="APP STORE GUIDELINE 2.1",
+    title="Guideline 2.1: The Demo Account Rejection (2026)",
+    description="Apple's exact wording for guideline 2.1 app completeness, why a working demo account is not optional if your app has a login, and the fix.",
+    h1="Guideline 2.1: the demo account rejection",
+    lede="If your app has a login and the reviewer can't get past it, App Review rejects the "
+         "whole submission without ever seeing what you built.",
+    clause_label="2.1 App Completeness — App Store Review Guidelines",
+    quote=read("apple/asrg.sections/2.1.md"),
+    source_label="App Store Review Guidelines, 2.1",
+    sections=[
+        ("Why this is the single most common React Native/Expo rejection",
+         "It has nothing to do with your code. It's a metadata field left blank. App Review "
+         "runs on a schedule you don't control, and the credentials you type into App Store "
+         "Connect's Review Notes have to work *at that moment* -- a demo account whose backend "
+         "seed data expired, whose password rotated, or whose account got deleted in a cleanup "
+         "script fails the same way a missing account does: the reviewer hits a login wall and "
+         "rejects on sight, because 2.1 says explicitly that the back-end service has to be on."),
+        ("The two ways to satisfy this, and when each applies",
+         "A working demo account is the default path -- App Store Connect's Review Notes field "
+         "is where the username and password go, and Apple checks it before opening the app. "
+         "The guideline also allows a built-in demo mode in place of an account, but only \"with "
+         "prior approval by Apple\" -- that's not a fallback you can decide to use unilaterally "
+         "in Review Notes; it requires actually requesting it, and the demo mode still has to "
+         "exhibit the app's full functionality, not a stripped-down preview."),
+    ],
+    fixes=[
+        ("Before every submission, not just the first one",
+         "Verify the demo account can log in right now, today -- not that it worked when you "
+         "created it. Seed data expires, test accounts get swept by cleanup jobs, and passwords "
+         "get rotated by security policy; any of those turns a previously-approved app into a "
+         "2.1 rejection on the next update with zero code changes."),
+        ("Put it where Apple actually looks",
+         "The credentials belong in App Store Connect's Review Notes for that specific build, "
+         "not just in your own `shipcheck.metadata.md` or internal docs. ShipCheck checks that "
+         "you've *recorded* a demo account so nothing ships without one, but only App Store "
+         "Connect's own Review Notes field is what the reviewer sees."),
+    ],
+))
+PAGES.append(dict(
+    slug="att-app-tracking-transparency",
+    eyebrow="APPLE PRIVACY REQUIREMENT",
+    title="App Tracking Transparency (ATT): What the Prompt Actually Requires (2026)",
+    description="Apple's exact requirement for the AppTrackingTransparency framework, what triggers it, and the fix for React Native and Expo apps that track users.",
+    h1="App Tracking Transparency: what the prompt actually requires",
+    lede="If your app reads the advertising identifier or otherwise tracks users across apps "
+         "and websites, the ATT prompt is not optional, and the timing and wording both matter "
+         "to App Review.",
+    clause_label="Using the AppTrackingTransparency framework — Apple Developer",
+    quote=read("apple/user-privacy-and-data-use.sections/using-the-apptrackingtransparency-framework.md")
+          .split("\n\n", 1)[1],
+    source_label="User Privacy and Data Use, AppTrackingTransparency framework",
+    sections=[
+        ("What actually requires the prompt",
+         "Reading IDFA (the advertising identifier) or otherwise tracking a user across apps "
+         "and websites owned by other companies needs ATT permission first -- without it, IDFA "
+         "reads back as all zeros. The one narrow exception the guidance calls out is IDFV (ID "
+         "for Vendors), which can be used for cross-app analytics *within your own company's* "
+         "apps without triggering the framework -- but IDFV may not be combined with other data "
+         "to track a user across apps and websites owned by other companies, so mixing it into "
+         "a third-party ad SDK's payload can still cross the line."),
+        ("Where React Native and Expo apps get this wrong",
+         "Ad SDKs (AdMob, Meta Audience Network, AppLovin, and similar) read the advertising "
+         "identifier as soon as they initialize, which in a default Expo or RN setup is often "
+         "before your app has shown the ATT prompt at all -- that's a guideline violation "
+         "regardless of what the prompt eventually says. `NSUserTrackingUsageDescription` also "
+         "has to be a real, specific purpose string; Expo's default placeholder text for this "
+         "key is exactly the kind of generic string App Review rejects on sight, the same "
+         "pattern that shows up across Expo's other default usage-description strings."),
+    ],
+    fixes=[
+        ("Expo / React Native",
+         "Add `expo-tracking-transparency`, call `requestTrackingPermissionsAsync()` and wait "
+         "for the result *before* initializing any ad or analytics SDK that reads IDFA -- not "
+         "in parallel, not after. Set a specific `NSUserTrackingUsageDescription` in "
+         "`app.json` under `ios.infoPlist`, naming what the tracking is actually for (e.g. "
+         "\"Used to show you more relevant ads based on your activity in other apps\"), not a "
+         "generic placeholder."),
     ],
 ))
 

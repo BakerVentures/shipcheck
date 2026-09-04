@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=global-age-ratings url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T07:14:06+00:00 -->
+<!-- source=age-ratings clause=global-age-ratings url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T15:48:28+00:00 -->
 
 ## Global age ratings
 

@@ -3,12 +3,12 @@ shipcheck_source_id: publish-your-app
 title: "Publish your app"
 url: https://developer.android.com/studio/publish
 final_url: https://developer.android.com/studio/publish?hl=en
-fetched_at: 2026-09-04T07:14:16+00:00
-sha256: 59e200baaa7dc1e8eb8246978d3e3dcc53d4000f41747a066777df5a906db529
+fetched_at: 2026-09-04T15:48:39+00:00
+sha256: de5a6026fcb7c09c5b469e9a0c97d429100e3fa02af8be09df0926e638be839f
 vendor: google
 ---
 
-# Publish your app  Stay organized with collections   Save and categorize content based on your preferences.
+# Publish your app
 
 Publishing is the general process that makes your Android app available to users. When you
 publish an Android app, you do the following:

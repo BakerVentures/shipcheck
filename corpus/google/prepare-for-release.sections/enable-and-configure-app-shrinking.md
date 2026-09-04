@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=enable-and-configure-app-shrinking url=https://developer.android.com/studio/publish/preparing fetched=2026-09-04T07:14:15+00:00 -->
+<!-- source=prepare-for-release clause=enable-and-configure-app-shrinking url=https://developer.android.com/studio/publish/preparing fetched=2026-09-04T15:48:37+00:00 -->
 
 ### Enable and configure app shrinking
 

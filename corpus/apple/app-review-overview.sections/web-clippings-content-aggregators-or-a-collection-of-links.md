@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=web-clippings-content-aggregators-or-a-collection-of-links url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T07:14:02+00:00 -->
+<!-- source=app-review-overview clause=web-clippings-content-aggregators-or-a-collection-of-links url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T15:48:23+00:00 -->
 
 ### Web clippings, content aggregators, or a collection of links
 

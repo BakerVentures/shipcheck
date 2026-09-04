@@ -1,4 +1,4 @@
-<!-- source=policy-center-hub clause=how-google-play-works-for-developers url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-09-04T07:14:09+00:00 -->
+<!-- source=policy-center-hub clause=how-google-play-works-for-developers url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-09-04T15:48:30+00:00 -->
 
 ## How Google Play Works for Developers
 

@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=timeline-information-changes url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T07:14:10+00:00 -->
+<!-- source=data-safety clause=timeline-information-changes url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T15:48:31+00:00 -->
 
 ### Timeline information changes
 

@@ -1,4 +1,4 @@
-<!-- source=set-age-rating clause=set-an-app-age-rating url=https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating fetched=2026-09-04T07:14:06+00:00 -->
+<!-- source=set-age-rating clause=set-an-app-age-rating url=https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating fetched=2026-09-04T15:48:28+00:00 -->
 
 ### Set an app age rating
 

@@ -1,4 +1,4 @@
-<!-- source=screenshot-specifications clause=apple-vision-pro url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-09-04T07:14:05+00:00 -->
+<!-- source=screenshot-specifications clause=apple-vision-pro url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-09-04T15:48:27+00:00 -->
 
 ### Apple Vision Pro
 

@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=offer-codesnow-available-on-macos url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-04T07:14:04+00:00 -->
+<!-- source=subscriptions clause=offer-codesnow-available-on-macos url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-04T15:48:26+00:00 -->
 
 ### Offer codesNow available on macOS
 

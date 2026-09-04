@@ -3,7 +3,7 @@ shipcheck_source_id: policy-center-hub
 title: "Play Console Help: Policy Center hub"
 url: https://support.google.com/googleplay/android-developer/topic/9858052
 final_url: https://support.google.com/googleplay/android-developer/topic/9858052?hl=en
-fetched_at: 2026-09-04T07:14:09+00:00
+fetched_at: 2026-09-04T15:48:30+00:00
 sha256: ef43cccb5485b4cdea40a0d69d91e8a18be890cc9397ac359513a3671fbf295e
 vendor: google
 note: "Added in Phase 0: navigable, server-rendered index of the Developer Program Policies."

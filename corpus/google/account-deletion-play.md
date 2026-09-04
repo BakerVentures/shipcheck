@@ -3,7 +3,7 @@ shipcheck_source_id: account-deletion-play
 title: "App account deletion requirements"
 url: https://support.google.com/googleplay/android-developer/answer/13327111
 final_url: https://support.google.com/googleplay/android-developer/answer/13327111?hl=en
-fetched_at: 2026-09-04T07:14:12+00:00
+fetched_at: 2026-09-04T15:48:34+00:00
 sha256: 6b2c2c7bca8eaaebd394db6c2bbbe9e251c0c029a039ee6b4dbc9122f15b1666
 vendor: google
 ---

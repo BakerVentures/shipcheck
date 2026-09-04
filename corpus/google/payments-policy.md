@@ -3,7 +3,7 @@ shipcheck_source_id: payments-policy
 title: "Payments policy / Play Billing"
 url: https://support.google.com/googleplay/android-developer/answer/9858738
 final_url: https://support.google.com/googleplay/android-developer/answer/9858738?hl=en
-fetched_at: 2026-09-04T07:14:12+00:00
+fetched_at: 2026-09-04T15:48:34+00:00
 sha256: b4d7efe8d7fd015e0583a175a68cd65a1ee2801076360330ae6713dea780a1df
 vendor: google
 ---

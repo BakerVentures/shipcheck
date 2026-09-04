@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=android-xr-app-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-04T07:14:11+00:00 -->
+<!-- source=target-api-level clause=android-xr-app-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-04T15:48:33+00:00 -->
 
 ### Android XR app requirements
 

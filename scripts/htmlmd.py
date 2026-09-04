@@ -15,7 +15,7 @@ DROP_ATTR_RE = re.compile(
     r"(^|[-_ ])(nav|menu|footer|header|breadcrumb|sidebar|cookie|banner|promo|"
     r"related|feedback|social|share|search|skip|localnav|globalnav|ac-gn|"
     r"chapter-nav|pagination|newsletter|subscribe-|footnote-back|modal|dialog|"
-    r"overlay|offscreen|visuallyhidden|sr-only)($|[-_ ])",
+    r"overlay|offscreen|visuallyhidden|sr-only|tooltip)($|[-_ ])",
     re.I)
 
 
@@ -208,10 +208,17 @@ def _blocks(node, depth=0):
                    "sub", "sup", "u", "small", "abbr", "cite", "q")
 
     def _is_inline(child):
+        # A junk inline element (e.g. a decorative tooltip-icon <span>) must
+        # still count as inline here even though it renders to nothing --
+        # otherwise it acts as a wall in the middle of a run of real inline
+        # siblings ("<strong>1.4.2</strong><span class=tooltip-icon>...</span>
+        # Drug dosage calculators...") and splits one sentence into two
+        # paragraphs, the same bug this run-grouping exists to prevent.
+        # _inline() already drops junk children when it renders the run, so
+        # letting it through here costs nothing.
         if isinstance(child, str):
             return True
-        return isinstance(child, Node) and child.tag in INLINE_TAGS \
-            and not _is_junk(child)
+        return isinstance(child, Node) and child.tag in INLINE_TAGS
 
     out = []
     children = list(node.children)

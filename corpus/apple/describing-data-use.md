@@ -3,7 +3,7 @@ shipcheck_source_id: describing-data-use
 title: "Describing data use in privacy manifests"
 url: https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests
 final_url: https://developer.apple.com/tutorials/data/documentation/bundleresources/describing-data-use-in-privacy-manifests.json
-fetched_at: 2026-09-04T07:14:03+00:00
+fetched_at: 2026-09-04T15:48:25+00:00
 sha256: 0d100d5ed30f2c3343f01d47445e477dc2b9258a1795d2328e816ffb5f53ef4b
 vendor: apple
 note: "NSPrivacyCollectedDataTypes vocabulary, which must line up with the App Privacy nutrition labels."

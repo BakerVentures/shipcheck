@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=unclear-data-access-requests url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T07:14:02+00:00 -->
+<!-- source=app-review-overview clause=unclear-data-access-requests url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T15:48:23+00:00 -->
 
 ### Unclear data access requests
 

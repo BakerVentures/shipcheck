@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=build-and-submit-in-one-step url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T07:14:08+00:00 -->
+<!-- source=expo-submit-ios clause=build-and-submit-in-one-step url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T15:48:30+00:00 -->
 
 ### Build and submit in one step
 

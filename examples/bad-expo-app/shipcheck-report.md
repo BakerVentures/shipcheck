@@ -1,6 +1,6 @@
 # ShipCheck report
 
-**Bad App** · v1.0.0 · generated 2026-09-04 01:14
+**Bad App** · v1.0.0 · generated 2026-09-04 09:56
 
 ## Rejection risk: 100 / 100
 
@@ -372,12 +372,13 @@ Remove `developmentClient` from the production profile. A dev-client build shows
 
 **Guideline 5.1.1** · confidence: high · iOS · blocks review · deterministic
 
-> **5.1.1![ASR & NR] Data Collection and Storage**
+> **5.1.1 Data Collection and Storage**
 > 
 > - **(i) Privacy Policies:** All apps must include a link to their privacy policy in the App Store Connect metadata field and within the app in an easily accessible manner. The privacy policy must clearly and explicitly:
 >   Identify what data, if any, the app/service collects, how it collects that data, and all uses of that data.
 >   Confirm that any third party with whom an app shares user data (in compliance with these Guidelines)—such as analytics tools, advertising networks and third-party SDKs, as well as any parent, subsidiary or other related entities that will have access to user data—will provide the same or equal protection of user data as stated in the app’s privacy policy and required by these Guidelines.
->   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the […]
+>   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the user’s data.
+> - […]
 > 
 > — [5.1.1](https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage)
 
@@ -396,12 +397,13 @@ Without the key iOS terminates the app the moment the permission is requested, w
 
 **Guideline 5.1.1** · confidence: high · iOS · blocks review · deterministic
 
-> **5.1.1![ASR & NR] Data Collection and Storage**
+> **5.1.1 Data Collection and Storage**
 > 
 > - **(i) Privacy Policies:** All apps must include a link to their privacy policy in the App Store Connect metadata field and within the app in an easily accessible manner. The privacy policy must clearly and explicitly:
 >   Identify what data, if any, the app/service collects, how it collects that data, and all uses of that data.
 >   Confirm that any third party with whom an app shares user data (in compliance with these Guidelines)—such as analytics tools, advertising networks and third-party SDKs, as well as any parent, subsidiary or other related entities that will have access to user data—will provide the same or equal protection of user data as stated in the app’s privacy policy and required by these Guidelines.
->   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the […]
+>   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the user’s data.
+> - […]
 > 
 > — [5.1.1](https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage)
 
@@ -420,7 +422,7 @@ Without the key iOS terminates the app the moment the permission is requested, w
 
 **Guideline 4.8** · confidence: high · iOS · blocks review · deterministic
 
-> **4.8![ASR & NR] Login Services**
+> **4.8 Login Services**
 > 
 > Apps that use a third-party or social login service (such as Facebook Login, Google Sign-In, Log in with X, Sign In with LinkedIn, Login with Amazon, or WeChat Login) to set up or authenticate the user’s primary account with the app must also offer as an equivalent option another login service with the following features:
 > 
@@ -431,7 +433,7 @@ Without the key iOS terminates the app the moment the permission is requested, w
 > A user’s primary account is the account they establish with your app for the purposes of identifying themselves, signing in, and accessing your features and associated services.
 > 
 > Another login service is not required if:
-> Your app exclusively […]
+> Your app exclusively uses your […]
 > 
 > — [4.8](https://developer.apple.com/app-store/review/guidelines/#login-services)
 
@@ -450,8 +452,8 @@ Add `expo-apple-authentication`, render an `AppleAuthenticationButton` alongside
 
 > **2.1 App Completeness**
 > 
-> - **(a)**![ASR & NR] Submissions to App Review, including apps you make available for pre-order, should be final versions with all necessary metadata and fully functional URLs included; placeholder text, empty websites, and other temporary content should be scrubbed before submission. Make sure your app has been tested on-device for bugs and stability before you submit it, and include demo account info (and turn on your back-end service!) if your app includes a login. If you are unable to provide a demo account due to legal or security obligations, you may include a built-in demo mode in lieu of a demo account with prior approval by Apple. Ensure the demo mode exhibits your app’s full features and functionality. We will reject incomplete app bundles and binaries that crash or exhibit obvious technical problems.
-> - **(b)** If you offer in-app purchases in your […]
+> - **(a)** Submissions to App Review, including apps you make available for pre-order, should be final versions with all necessary metadata and fully functional URLs included; placeholder text, empty websites, and other temporary content should be scrubbed before submission. Make sure your app has been tested on-device for bugs and stability before you submit it, and include demo account info (and turn on your back-end service!) if your app includes a login. If you are unable to provide a demo account due to legal or security obligations, you may include a built-in demo mode in lieu of a demo account with prior approval by Apple. Ensure the demo mode exhibits your app’s full features and functionality. We will reject incomplete app bundles and binaries that crash or exhibit obvious technical problems.
+> - **(b)** If you offer in-app purchases in your app, make […]
 > 
 > — [2.1](https://developer.apple.com/app-store/review/guidelines/#app-completeness)
 
@@ -470,8 +472,8 @@ Put working credentials in App Review notes. A reviewer who hits a login wall wi
 
 > **2.3.1**
 > 
-> - **(a)**![ASR & NR] Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
-> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the […]
+> - **(a)** Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
+> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the App Store a […]
 > 
 > — [2.3.1](https://developer.apple.com/app-store/review/guidelines/#2.3.1)
 
@@ -490,8 +492,8 @@ Replace it with real copy. Placeholder or template text in the listing is a guar
 
 > **2.3.1**
 > 
-> - **(a)**![ASR & NR] Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
-> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the […]
+> - **(a)** Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
+> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the App Store a […]
 > 
 > — [2.3.1](https://developer.apple.com/app-store/review/guidelines/#2.3.1)
 
@@ -510,8 +512,8 @@ Replace it with real copy. Placeholder or template text in the listing is a guar
 
 > **2.3.1**
 > 
-> - **(a)**![ASR & NR] Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
-> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the […]
+> - **(a)** Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
+> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the App Store a […]
 > 
 > — [2.3.1](https://developer.apple.com/app-store/review/guidelines/#2.3.1)
 
@@ -530,8 +532,8 @@ Replace it with real copy. Placeholder or template text in the listing is a guar
 
 > **2.3.1**
 > 
-> - **(a)**![ASR & NR] Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
-> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the […]
+> - **(a)** Don’t include any hidden, dormant, or undocumented features in your app; your app’s functionality should be clear to end users and App Review. All new features, functionality, and product changes must be described with specificity in the Notes for Review section of App Store Connect (generic descriptions will be rejected) and accessible for review. Similarly, marketing your app in a misleading way, such as by promoting content or services that it does not actually offer (e.g. iOS-based virus and malware scanners) or promoting a false price, whether within or outside of the App Store, is grounds for removal of your app from the App Store or a block from installing via alternative distribution and termination of your developer account.
+> - **(b)** Egregious or repeated behavior is grounds for removal from the Apple Developer Program. We work hard to make the App Store a […]
 > 
 > — [2.3.1](https://developer.apple.com/app-store/review/guidelines/#2.3.1)
 
@@ -548,12 +550,13 @@ Replace it with real copy. Placeholder or template text in the listing is a guar
 
 **Guideline 5.1.1** · confidence: high · iOS · metadata only — no new build · deterministic
 
-> **5.1.1![ASR & NR] Data Collection and Storage**
+> **5.1.1 Data Collection and Storage**
 > 
 > - **(i) Privacy Policies:** All apps must include a link to their privacy policy in the App Store Connect metadata field and within the app in an easily accessible manner. The privacy policy must clearly and explicitly:
 >   Identify what data, if any, the app/service collects, how it collects that data, and all uses of that data.
 >   Confirm that any third party with whom an app shares user data (in compliance with these Guidelines)—such as analytics tools, advertising networks and third-party SDKs, as well as any parent, subsidiary or other related entities that will have access to user data—will provide the same or equal protection of user data as stated in the app’s privacy policy and required by these Guidelines.
->   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the […]
+>   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the user’s data.
+> - […]
 > 
 > — [5.1.1](https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage)
 
@@ -570,7 +573,7 @@ Fix or replace the URL. Reviewers open every link in the listing; a dead privacy
 
 **Guideline 2.3.8** · confidence: high · iOS · metadata only — no new build · deterministic
 
-> **2.3.8**![ASR & NR] Metadata should be appropriate for all audiences, so make sure your app and in-app purchase icons, screenshots, and previews adhere to a 4+ age rating even if your app is rated higher. For example, if your app is a game that includes violence, select images that don’t depict a gruesome death or a gun pointed at a specific character. Use of terms like “For Kids” and “For Children” in app metadata is reserved in the App Store for the Kids Category. Remember to ensure your metadata, including app name and icons (small, large, Apple Watch app, alternate icons, etc.), are similar to avoid creating confusion.
+> **2.3.8** Metadata should be appropriate for all audiences, so make sure your app and in-app purchase icons, screenshots, and previews adhere to a 4+ age rating even if your app is rated higher. For example, if your app is a game that includes violence, select images that don’t depict a gruesome death or a gun pointed at a specific character. Use of terms like “For Kids” and “For Children” in app metadata is reserved in the App Store for the Kids Category. Remember to ensure your metadata, including app name and icons (small, large, Apple Watch app, alternate icons, etc.), are similar to avoid creating confusion.
 > 
 > — [2.3.8](https://developer.apple.com/app-store/review/guidelines/#2.3.8)
 
@@ -737,7 +740,7 @@ Export a 1024x1024 PNG. App Store Connect rejects the upload outright at any oth
 
 **Guideline 2.3** · confidence: high · iOS · blocks upload · deterministic
 
-> **2.3![ASR & NR] Accurate Metadata**
+> **2.3 Accurate Metadata**
 > 
 > Customers should know what they’re getting when they download or buy your app, so make sure all your app metadata, including privacy information, your app description, screenshots, and previews accurately reflect the app’s core experience and remember to keep them up-to-date with new versions.
 > 
@@ -1172,12 +1175,13 @@ Move it to devDependencies. If it is bundled into the release binary the Expo de
 
 **Guideline 5.1.1** · confidence: medium · iOS · blocks review · deterministic
 
-> **5.1.1![ASR & NR] Data Collection and Storage**
+> **5.1.1 Data Collection and Storage**
 > 
 > - **(i) Privacy Policies:** All apps must include a link to their privacy policy in the App Store Connect metadata field and within the app in an easily accessible manner. The privacy policy must clearly and explicitly:
 >   Identify what data, if any, the app/service collects, how it collects that data, and all uses of that data.
 >   Confirm that any third party with whom an app shares user data (in compliance with these Guidelines)—such as analytics tools, advertising networks and third-party SDKs, as well as any parent, subsidiary or other related entities that will have access to user data—will provide the same or equal protection of user data as stated in the app’s privacy policy and required by these Guidelines.
->   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the […]
+>   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the user’s data.
+> - […]
 > 
 > — [5.1.1](https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage)
 
@@ -1194,12 +1198,13 @@ Rewrite it to name the specific feature and benefit, e.g. "Used to attach a phot
 
 **Guideline 5.1.1** · confidence: medium · iOS · blocks review · deterministic
 
-> **5.1.1![ASR & NR] Data Collection and Storage**
+> **5.1.1 Data Collection and Storage**
 > 
 > - **(i) Privacy Policies:** All apps must include a link to their privacy policy in the App Store Connect metadata field and within the app in an easily accessible manner. The privacy policy must clearly and explicitly:
 >   Identify what data, if any, the app/service collects, how it collects that data, and all uses of that data.
 >   Confirm that any third party with whom an app shares user data (in compliance with these Guidelines)—such as analytics tools, advertising networks and third-party SDKs, as well as any parent, subsidiary or other related entities that will have access to user data—will provide the same or equal protection of user data as stated in the app’s privacy policy and required by these Guidelines.
->   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the […]
+>   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the user’s data.
+> - […]
 > 
 > — [5.1.1](https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage)
 
@@ -1216,7 +1221,7 @@ Rewrite it to name the specific feature and benefit, e.g. "Used to attach a phot
 
 **Guideline 2.3.7** · confidence: high · iOS · metadata only — no new build · deterministic
 
-> **2.3.7**![ASR & NR] Choose a unique app name, assign keywords that accurately describe your app, and don’t try to pack any of your metadata with trademarked terms, popular app names, pricing information, or other irrelevant phrases just to game the system. App names must be limited to 30 characters. Metadata such as app names, subtitles, screenshots, and previews should not include prices, terms, or descriptions that are not specific to the metadata type. App subtitles are a great way to provide additional context for your app; they must follow our standard metadata rules and should not include inappropriate content, reference other apps, or make unverifiable product claims. Apple may modify inappropriate keywords at any time or take other appropriate steps to prevent abuse.
+> **2.3.7** Choose a unique app name, assign keywords that accurately describe your app, and don’t try to pack any of your metadata with trademarked terms, popular app names, pricing information, or other irrelevant phrases just to game the system. App names must be limited to 30 characters. Metadata such as app names, subtitles, screenshots, and previews should not include prices, terms, or descriptions that are not specific to the metadata type. App subtitles are a great way to provide additional context for your app; they must follow our standard metadata rules and should not include inappropriate content, reference other apps, or make unverifiable product claims. Apple may modify inappropriate keywords at any time or take other appropriate steps to prevent abuse.
 > 
 > — [2.3.7](https://developer.apple.com/app-store/review/guidelines/#2.3.7)
 
@@ -1233,12 +1238,13 @@ Use commas with no spaces — each space costs you a character of the 100-charac
 
 **Guideline 5.1.1** · confidence: medium · iOS · blocks review · deterministic
 
-> **5.1.1![ASR & NR] Data Collection and Storage**
+> **5.1.1 Data Collection and Storage**
 > 
 > - **(i) Privacy Policies:** All apps must include a link to their privacy policy in the App Store Connect metadata field and within the app in an easily accessible manner. The privacy policy must clearly and explicitly:
 >   Identify what data, if any, the app/service collects, how it collects that data, and all uses of that data.
 >   Confirm that any third party with whom an app shares user data (in compliance with these Guidelines)—such as analytics tools, advertising networks and third-party SDKs, as well as any parent, subsidiary or other related entities that will have access to user data—will provide the same or equal protection of user data as stated in the app’s privacy policy and required by these Guidelines.
->   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the […]
+>   Explain its data retention/deletion policies and describe how a user can revoke consent and/or request deletion of the user’s data.
+> - […]
 > 
 > — [5.1.1](https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage)
 
@@ -1263,4 +1269,4 @@ ShipCheck could not verify these. They are not passes:
 
 ---
 
-<sub>ShipCheck v0.2.2 · unlimited tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>
+<sub>ShipCheck v0.2.3 · unlimited tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>

@@ -1,4 +1,4 @@
-<!-- source=privacy-manifest-files clause=essentials url=https://developer.apple.com/documentation/bundleresources/privacy-manifest-files fetched=2026-09-04T07:14:02+00:00 -->
+<!-- source=privacy-manifest-files clause=essentials url=https://developer.apple.com/documentation/bundleresources/privacy-manifest-files fetched=2026-09-04T15:48:23+00:00 -->
 
 ## Essentials
 

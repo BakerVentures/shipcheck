@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=asking-permission-to-track url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-04T07:14:04+00:00 -->
+<!-- source=user-privacy-and-data-use clause=asking-permission-to-track url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-04T15:48:26+00:00 -->
 
 ## Asking permission to track
 

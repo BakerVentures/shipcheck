@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Tracking Transparency (ATT): What the Prompt Actually Requires (2026)</title>
+<meta name="description" content="Apple&#x27;s exact requirement for the AppTrackingTransparency framework, what triggers it, and the fix for React Native and Expo apps that track users.">
+<link rel="canonical" href="https://bakerventures.github.io/shipcheck/guidelines/att-app-tracking-transparency.html">
+<meta property="og:title" content="App Tracking Transparency (ATT): What the Prompt Actually Requires (2026)">
+<meta property="og:description" content="Apple&#x27;s exact requirement for the AppTrackingTransparency framework, what triggers it, and the fix for React Native and Expo apps that track users.">
+<meta property="og:image" content="https://bakerventures.github.io/shipcheck/assets/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--ink:#1B2430;--muted:#5A6573;--line:#CBD3DB;--red:#B8122A;--amber:#9A6200;--green:#1F6B45;--panel:#FFFFFF;--code:#141A21;--codeink:#DCE3EA}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0}
+a{color:var(--red)}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+header{padding:28px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+header .brand{font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink)}
+header nav a{margin-left:20px;color:var(--muted);text-decoration:none;font-size:14px}
+.eyebrow{font:600 13px "IBM Plex Mono",monospace;color:var(--red);letter-spacing:.04em;margin:40px 0 8px}
+h1{font-size:clamp(26px,4.5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:600;margin:0 0 18px}
+.lede{font-size:18px;color:var(--muted);margin:0 0 28px}
+.quote{background:var(--code);color:var(--codeink);border-radius:8px;padding:22px 24px;font:14px/1.7 "IBM Plex Mono",ui-monospace,monospace;margin:0 0 28px}
+.quote .clause{color:#8FA3B5;display:block;margin-bottom:10px;font-weight:500}
+.quote a{color:#F2C14E}
+.quote ul{margin:8px 0 0;padding-left:20px}
+h2{font-size:20px;letter-spacing:-.01em;font-weight:600;margin:36px 0 12px}
+p{margin:0 0 14px;max-width:640px}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin:0 0 8px}
+code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font:13px "IBM Plex Mono",monospace}
+.fixbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 20px}
+.fixbox .label{font:600 12px "IBM Plex Mono",monospace;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.cta{background:var(--ink);color:#fff;border-radius:10px;padding:26px 28px;margin:44px 0 20px}
+.cta h2{color:#fff;margin-top:0}
+.cta p{color:#B9C2CC}
+.cta code{background:#0F151B;border-color:#2B3642;color:#DCE3EA}
+.source{color:var(--muted);font-size:13px;margin-top:8px}
+footer{color:var(--muted);font-size:13px;padding:24px 0 0;border-top:1px solid var(--line);margin-top:40px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="../">shipcheck</a>
+  <nav><a href="../#checks">What it checks</a><a href="../#pricing">Pricing</a><a href="https://github.com/BakerVentures/shipcheck">GitHub</a></nav>
+</header>
+
+<div class="eyebrow">APPLE PRIVACY REQUIREMENT</div>
+<h1>App Tracking Transparency: what the prompt actually requires</h1>
+<p class="lede">If your app reads the advertising identifier or otherwise tracks users across apps and websites, the ATT prompt is not optional, and the timing and wording both matter to App Review.</p>
+
+<div class="quote">
+  <span class="clause">Using the AppTrackingTransparency framework — Apple Developer</span>
+  <p>To request permission to track the user and access the device’s advertising identifier, use the AppTrackingTransparency framework. You must also include a purpose string in the system prompt that explains why you’d like to track the user. Unless you receive permission from the user to enable tracking, the device’s advertising identifier value will be all zeros and you may not track them as described above.</p>
+<p>While you can display the AppTrackingTransparency prompt whenever you choose, the device’s advertising identifier value will only be returned once you present the prompt and the user grants permission. Use the purpose string to explain what this data will be used for to help the user understand what they’re opting in to share. If the user allows apps to request to track, but has turned tracking off for your app, you can ask the user to change their preference for your app by providing a <a href="https://developer.apple.com/documentation/uikit/uiapplication/1623042-opensettingsurlstring/">shortcut to Settings</a> where they can change the tracking permission.</p>
+<p>The <a href="https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor/">ID for Vendors (IDFV)</a>, may be used for analytics across apps from the same content provider. In this case, the use of the AppTrackingTransparency framework is not required. The IDFV may not be combined with other data to track a user across apps and websites owned by other companies. You remain fully responsible to ensure that your collection and use of the IDFV complies with applicable law.</p>
+<p>For more information, visit:</p>
+<ul><li><a href="https://developer.apple.com/documentation/apptrackingtransparency/">App Tracking Transparency</a></li><li><a href="https://developer.apple.com/design/human-interface-guidelines/privacy/">Human Interface Guidelines: Privacy</a></li><li><a href="https://developer.apple.com/documentation/adsupport/">AdSupport Framework</a></li></ul>
+</div>
+
+<h2>What actually requires the prompt</h2>
+<p>Reading IDFA (the advertising identifier) or otherwise tracking a user across apps and websites owned by other companies needs ATT permission first -- without it, IDFA reads back as all zeros. The one narrow exception the guidance calls out is IDFV (ID for Vendors), which can be used for cross-app analytics <em>within your own company&#x27;s</em> apps without triggering the framework -- but IDFV may not be combined with other data to track a user across apps and websites owned by other companies, so mixing it into a third-party ad SDK&#x27;s payload can still cross the line.</p>
+<h2>Where React Native and Expo apps get this wrong</h2>
+<p>Ad SDKs (AdMob, Meta Audience Network, AppLovin, and similar) read the advertising identifier as soon as they initialize, which in a default Expo or RN setup is often before your app has shown the ATT prompt at all -- that&#x27;s a guideline violation regardless of what the prompt eventually says. `NSUserTrackingUsageDescription` also has to be a real, specific purpose string; Expo&#x27;s default placeholder text for this key is exactly the kind of generic string App Review rejects on sight, the same pattern that shows up across Expo&#x27;s other default usage-description strings.</p>
+
+<h2>The fix</h2>
+<div class="fixbox"><span class="label">Expo / React Native</span><p>Add `expo-tracking-transparency`, call `requestTrackingPermissionsAsync()` and wait for the result <em>before</em> initializing any ad or analytics SDK that reads IDFA -- not in parallel, not after. Set a specific `NSUserTrackingUsageDescription` in `app.json` under `ios.infoPlist`, naming what the tracking is actually for (e.g. &quot;Used to show you more relevant ads based on your activity in other apps&quot;), not a generic placeholder.</p></div>
+
+<div class="cta">
+  <h2>ShipCheck catches this before you submit</h2>
+  <p>A Claude Code plugin for React Native and Expo. Reads your project and store listing, checks them against the live App Store Review Guidelines and Google Play policies -- the same corpus quoted on this page -- and tells you the clause, the reviewer's likely wording, and the fix.</p>
+  <code>/plugin marketplace add BakerVentures/shipcheck</code>
+  <p class="source">Free scan on every app. <a href="../#pricing" style="color:#F2C14E">See pricing &rarr;</a></p>
+</div>
+
+<footer>
+  Guideline text quoted from User Privacy and Data Use, AppTrackingTransparency framework, fetched 2026-09-04 and cached with a SHA-256 in
+  <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a> --
+  the same corpus <a href="https://github.com/BakerVentures/shipcheck">ShipCheck</a> cites in a real scan, not separately maintained copy.
+  Not affiliated with Apple Inc. or Google LLC. This page is not a guarantee of approval.
+</footer>
+</div>
+</body>
+</html>

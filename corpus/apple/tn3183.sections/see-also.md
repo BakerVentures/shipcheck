@@ -1,4 +1,4 @@
-<!-- source=tn3183 clause=see-also url=https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest fetched=2026-09-04T07:14:03+00:00 -->
+<!-- source=tn3183 clause=see-also url=https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest fetched=2026-09-04T15:48:24+00:00 -->
 
 ## See Also
 

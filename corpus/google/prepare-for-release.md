@@ -3,14 +3,14 @@ shipcheck_source_id: prepare-for-release
 title: "Prepare your app for release"
 url: https://developer.android.com/studio/publish/preparing
 final_url: https://developer.android.com/studio/publish/preparing?hl=en
-fetched_at: 2026-09-04T07:14:15+00:00
-sha256: 2803f8ef1fe886ad792d58b63871aefc722b844bf06a22310ddc9cf52f68293b
+fetched_at: 2026-09-04T15:48:37+00:00
+sha256: 65bc4db71169facae8bd877c697b5c8967837580b7ec83adc37c32319a2791ff
 vendor: google
 substituted_from: https://developer.android.com/distribute/best-practices/launch/launch-checklist
 note: "The launch-checklist page is retired; it 302s to a Play Console stub."
 ---
 
-# Prepare your app for release  Stay organized with collections   Save and categorize content based on your preferences.
+# Prepare your app for release
 
 To prepare your app for release, you need to configure, build, and test a
 release version of your app. The configuration tasks involve basic code
