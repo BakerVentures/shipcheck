@@ -973,6 +973,12 @@ class Scan:
                             "Updates are blocked until you raise it."),
                      platform="android",
                      corpus="google/target-api-level.md")
+        elif tgt is not None and floor:
+            self.passes.append(dict(
+                title="Target API level meets Play's floor",
+                clause="play:target-api-level",
+                note="android/build.gradle sets targetSdkVersion = %d, at or above "
+                     "the current floor of API %d." % (tgt, floor)))
         elif tgt is not None and not floor:
             self.gap("Play target API floor",
                      "Could not parse the current target-API requirement out of "
