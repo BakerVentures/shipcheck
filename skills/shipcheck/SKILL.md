@@ -37,9 +37,18 @@ Run it first. It resolves everything a script can decide, so you spend your
 reasoning on the parts that need judgment.
 
 ```bash
+CORPUS="${CLAUDE_PLUGIN_ROOT}/corpus"
+[ -d "${CLAUDE_PLUGIN_DATA}/corpus" ] && CORPUS="${CLAUDE_PLUGIN_DATA}/corpus"
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scan.py" \
-  --project . --platform both --out .shipcheck/scan.json
+  --project . --platform both --out .shipcheck/scan.json --corpus "$CORPUS"
 ```
+
+Always pass `--corpus` explicitly, resolved this way. `${CLAUDE_PLUGIN_DATA}` is
+markdown-level text substitution, not a real environment variable a Python
+subprocess can read on its own — the script has no way to find what
+`/shipcheck:refresh` wrote unless this step hands it the resolved path. Skipping
+this is a silently stale corpus, which is the one failure mode this tool exists
+to prevent.
 
 Read `.shipcheck/scan.json`. It has three keys:
 
@@ -166,9 +175,17 @@ and it resolves automatically.
 Then render:
 
 ```bash
+CORPUS="${CLAUDE_PLUGIN_ROOT}/corpus"
+[ -d "${CLAUDE_PLUGIN_DATA}/corpus" ] && CORPUS="${CLAUDE_PLUGIN_DATA}/corpus"
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/report.py" \
-  --findings .shipcheck/findings.json --out shipcheck-report.md
+  --findings .shipcheck/findings.json --out shipcheck-report.md --corpus "$CORPUS"
 ```
+
+This is the step that actually resolves every finding's `corpus` reference to
+clause text on disk — pass `--corpus` here the same way as Step 1, for the same
+reason. This is the more consequential of the two, since it is what determines
+whether a citation in the report reflects `/shipcheck:refresh`'s last fetch or a
+stale one bundled with whichever plugin version happens to be installed.
 
 `report.py` computes the score, ranks by rejection likelihood, and applies the
 licence tier. Do not compute the score yourself and do not hand-write the

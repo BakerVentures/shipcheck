@@ -25,11 +25,15 @@ import license as lic                                # noqa: E402
 
 
 def _default_corpus_dir():
-    """Prefer the corpus /shipcheck:refresh wrote, if there is one.
+    """Fall back to the bundled corpus shipped with this plugin version.
 
-    See the matching helper and comment in scan.py -- report.py is what
-    actually resolves a finding's `corpus` reference to clause text, so this
-    is the more consequential of the two places this mattered.
+    See the matching helper and comment in scan.py for why the os.environ
+    check below is dead code on the real plugin path -- ${CLAUDE_PLUGIN_DATA}
+    is markdown-level text substitution, not a real subprocess environment
+    variable. report.py is what actually resolves a finding's `corpus`
+    reference to clause text, so SKILL.md passing --corpus explicitly here
+    (using ITS OWN already-substituted ${CLAUDE_PLUGIN_DATA} text) is the
+    more consequential of the two fixes.
     """
     bundled = os.path.join(HERE, "..", "corpus")
     data_dir = os.environ.get("CLAUDE_PLUGIN_DATA", "").strip()

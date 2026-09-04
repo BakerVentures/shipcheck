@@ -27,15 +27,21 @@ DATA = os.path.join(HERE, "data")
 
 
 def _default_corpus_dir():
-    """Prefer the corpus /shipcheck:refresh wrote, if there is one.
+    """Fall back to the bundled corpus shipped with this plugin version.
 
-    That command writes to ${CLAUDE_PLUGIN_DATA}/corpus (the plugin's
-    writable, update-surviving data dir) because ${CLAUDE_PLUGIN_ROOT} is the
-    read-only installed plugin tree. Defaulting to CLAUDE_PLUGIN_ROOT/corpus
-    unconditionally -- the bundled snapshot from whenever this version of the
-    plugin was published -- meant a refresh was silently never read back by a
-    scan, the exact "silently stale corpus" failure this tool is built to
-    avoid causing.
+    NOTE: ${CLAUDE_PLUGIN_DATA} -- where /shipcheck:refresh writes a fresh
+    corpus, since ${CLAUDE_PLUGIN_ROOT} (this script's own location, which
+    "..", "corpus" is relative to) is the read-only installed plugin tree --
+    is markdown-level text substitution inside SKILL.md/commands/*.md, NOT a
+    real process environment variable. A subprocess this script runs in
+    never receives it via os.environ, confirmed by testing against a real
+    installed plugin (see CHANGELOG v0.2.8 vs v0.2.9). This function's own
+    os.environ check below is therefore dead code for the actual plugin path
+    -- it only matters if something manually exports that literal name
+    before invoking this script directly, which is not the normal case. The
+    real fix is SKILL.md passing --corpus explicitly, using its own
+    already-resolved ${CLAUDE_PLUGIN_DATA} text. Kept as a harmless secondary
+    fallback rather than removed outright.
     """
     bundled = os.path.abspath(os.path.join(HERE, "..", "corpus"))
     data_dir = os.environ.get("CLAUDE_PLUGIN_DATA", "").strip()
@@ -1255,13 +1261,23 @@ def head_ok(url, timeout=12):
 
 
 def main():
+    global CORPUS_DIR
     ap = argparse.ArgumentParser()
     ap.add_argument("--project", default=".")
     ap.add_argument("--platform", default="both", choices=["ios", "android", "both"])
     ap.add_argument("--offline", action="store_true",
                     help="skip outbound URL reachability checks")
     ap.add_argument("--out", default="")
+    ap.add_argument("--corpus", default="",
+                    help="corpus directory to read from (e.g. the one "
+                         "/shipcheck:refresh wrote to ${CLAUDE_PLUGIN_DATA}/corpus). "
+                         "${CLAUDE_PLUGIN_DATA} is markdown-level text substitution, "
+                         "not a real environment variable a subprocess can read, so "
+                         "the caller must pass the resolved path explicitly -- see "
+                         "SKILL.md.")
     args = ap.parse_args()
+    if args.corpus and os.path.isdir(args.corpus):
+        CORPUS_DIR = os.path.abspath(args.corpus)
     res = Scan(args.project, args.platform, args.offline).run()
     text = json.dumps(res, indent=2, ensure_ascii=False, default=str)
     if args.out:

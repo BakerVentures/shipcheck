@@ -1,6 +1,6 @@
 # ShipCheck report
 
-**Bad App** · v1.0.0 · generated 2026-09-04 11:46
+**Bad App** · v1.0.0 · generated 2026-09-04 12:08
 
 ## Rejection risk: 100 / 100
 
@@ -1269,4 +1269,4 @@ ShipCheck could not verify these. They are not passes:
 
 ---
 
-<sub>ShipCheck v0.2.8 · unlimited tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>
+<sub>ShipCheck v0.2.9 · unlimited tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>
