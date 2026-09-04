@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Clean App",
+    "slug": "clean-app",
+    "version": "1.0.0",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "com.bakerventures.cleanapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.bakerventures.cleanapp"
+    }
+  }
+}
