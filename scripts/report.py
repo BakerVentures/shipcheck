@@ -23,6 +23,22 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import license as lic                                # noqa: E402
 
+
+def _default_corpus_dir():
+    """Prefer the corpus /shipcheck:refresh wrote, if there is one.
+
+    See the matching helper and comment in scan.py -- report.py is what
+    actually resolves a finding's `corpus` reference to clause text, so this
+    is the more consequential of the two places this mattered.
+    """
+    bundled = os.path.join(HERE, "..", "corpus")
+    data_dir = os.environ.get("CLAUDE_PLUGIN_DATA", "").strip()
+    if data_dir:
+        refreshed = os.path.join(data_dir, "corpus")
+        if os.path.isdir(refreshed):
+            return refreshed
+    return bundled
+
 WEIGHT = {"critical": 22, "high": 12, "medium": 5, "low": 2, "info": 0}
 CONF = {"high": 1.0, "medium": 0.75, "low": 0.5}
 BADGE = {"critical": "🔴 CRITICAL", "high": "🟠 HIGH", "medium": "🟡 MEDIUM",
@@ -304,7 +320,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--findings", required=True)
     ap.add_argument("--out", default="shipcheck-report.md")
-    ap.add_argument("--corpus", default=os.path.join(HERE, "..", "corpus"))
+    ap.add_argument("--corpus", default=_default_corpus_dir())
     ap.add_argument("--force-tier", default="", choices=["", "free", "pro"])
     args = ap.parse_args()
 

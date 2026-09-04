@@ -26,7 +26,27 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
 
 
-CORPUS_DIR = os.path.abspath(os.path.join(HERE, "..", "corpus"))
+def _default_corpus_dir():
+    """Prefer the corpus /shipcheck:refresh wrote, if there is one.
+
+    That command writes to ${CLAUDE_PLUGIN_DATA}/corpus (the plugin's
+    writable, update-surviving data dir) because ${CLAUDE_PLUGIN_ROOT} is the
+    read-only installed plugin tree. Defaulting to CLAUDE_PLUGIN_ROOT/corpus
+    unconditionally -- the bundled snapshot from whenever this version of the
+    plugin was published -- meant a refresh was silently never read back by a
+    scan, the exact "silently stale corpus" failure this tool is built to
+    avoid causing.
+    """
+    bundled = os.path.abspath(os.path.join(HERE, "..", "corpus"))
+    data_dir = os.environ.get("CLAUDE_PLUGIN_DATA", "").strip()
+    if data_dir:
+        refreshed = os.path.join(data_dir, "corpus")
+        if os.path.isdir(refreshed):
+            return refreshed
+    return bundled
+
+
+CORPUS_DIR = _default_corpus_dir()
 
 
 def corpus_text(rel):
