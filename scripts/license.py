@@ -51,7 +51,11 @@ def read_key():
     try:
         with open(LICENSE_FILE, encoding="utf-8") as f:
             return f.read().strip()
-    except OSError:
+    except (OSError, UnicodeDecodeError):
+        # A garbled license file (partial write, binary garbage) must read as
+        # "no key", not crash. This whole module exists so a paying user is
+        # never blocked; an uncaught exception here is the one failure mode
+        # that actually blocks them.
         return ""
 
 
@@ -70,28 +74,38 @@ def _cache_get(ck):
     try:
         with open(CACHE_FILE, encoding="utf-8") as f:
             c = json.load(f)
-    except (OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(c, dict):
+        # Malformed cache structure (truncated write, disk issue, whatever)
+        # is a cache miss, not a crash -- falls through to a live check.
         return None
     e = c.get(ck)
-    if not e or time.time() - e.get("checked_at", 0) > CACHE_TTL:
+    if not isinstance(e, dict) or time.time() - e.get("checked_at", 0) > CACHE_TTL:
         return None
     return e
 
 
 def _cache_put(ck, entry):
+    # Caching is an optimization, not a correctness requirement. Any failure
+    # here -- corrupt file, disk full, wrong permissions, whatever -- must be
+    # swallowed rather than propagate, or a caching bug becomes the thing that
+    # blocks a paying user.
     try:
         os.makedirs(HOME, exist_ok=True)
         try:
             with open(CACHE_FILE, encoding="utf-8") as f:
                 c = json.load(f)
-        except (OSError, json.JSONDecodeError):
+            if not isinstance(c, dict):
+                c = {}
+        except (OSError, json.JSONDecodeError, UnicodeDecodeError):
             c = {}
         entry["checked_at"] = time.time()
         c[ck] = entry
         with open(CACHE_FILE, "w", encoding="utf-8") as f:
             json.dump(c, f)
         os.chmod(CACHE_FILE, 0o600)
-    except OSError:
+    except (OSError, TypeError, ValueError):
         pass
 
 
