@@ -176,7 +176,20 @@ def _table(node):
     return "\n".join(out)
 
 
+MAX_BLOCK_DEPTH = 150
+
+
 def _blocks(node, depth=0):
+    if depth > MAX_BLOCK_DEPTH:
+        # A real page has never come close to this; a pathologically nested
+        # one (or an adversarial one, since this parser also runs on
+        # whatever a GitHub Action's target repo happens to fetch) hits
+        # Python's default recursion limit here otherwise. Flatten instead
+        # of crashing that one source -- fetch_corpus.py's per-source
+        # try/except already bounds the blast radius to just this page, but
+        # there is no reason to make it rely on that as the only backstop.
+        s = _clean(node.text())
+        return [s] if s else []
     out = []
     for c in node.children:
         if isinstance(c, str):
@@ -236,7 +249,7 @@ def _blocks(node, depth=0):
             if s:
                 out.append(s)
         else:
-            out.extend(_blocks(c, depth))
+            out.extend(_blocks(c, depth + 1))
     return out
 
 

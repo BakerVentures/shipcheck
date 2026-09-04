@@ -58,8 +58,17 @@ def inline(items, doc):
     return "".join(out)
 
 
+MAX_BLOCK_DEPTH = 150
+
+
 def blocks(items, doc, depth=0):
     if not items:
+        return []
+    if depth > MAX_BLOCK_DEPTH:
+        # Same defensive cap as htmlmd._blocks -- this walks Apple's own
+        # DocC JSON, so pathological nesting is unlikely, but there is no
+        # reason to trust that indefinitely across whatever Apple's toolchain
+        # emits in the future.
         return []
     out = []
     for b in items:
@@ -75,7 +84,7 @@ def blocks(items, doc, depth=0):
             out.append("#" * lvl + " " + (b.get("text") or inline(b.get("inlineContent"), doc)))
         elif t == "aside":
             style = (b.get("style") or b.get("name") or "Note").title()
-            body = "\n".join(blocks(b.get("content"), doc, depth))
+            body = "\n".join(blocks(b.get("content"), doc, depth + 1))
             out.append("> **%s:** %s" % (style, body.replace("\n", "\n> ")))
         elif t == "codeListing":
             code = "\n".join(b.get("code") or [])
@@ -95,7 +104,7 @@ def blocks(items, doc, depth=0):
         elif t == "termList":
             for it in b.get("items") or []:
                 term = inline((it.get("term") or {}).get("inlineContent"), doc)
-                dfn = "\n".join(blocks((it.get("definition") or {}).get("content"), doc, depth))
+                dfn = "\n".join(blocks((it.get("definition") or {}).get("content"), doc, depth + 1))
                 out.append("- **%s** — %s" % (term, dfn.replace("\n", " ").strip()))
         elif t == "table":
             rows = b.get("rows") or []
@@ -104,7 +113,7 @@ def blocks(items, doc, depth=0):
             hdr = b.get("header")
             md = []
             for ri, row in enumerate(rows):
-                cells = ["".join(blocks(c, doc, depth)).replace("\n", " ").replace("|", "\\|")
+                cells = ["".join(blocks(c, doc, depth + 1)).replace("\n", " ").replace("|", "\\|")
                          if isinstance(c, list) else str(c) for c in row]
                 md.append("| " + " | ".join(cells) + " |")
                 if ri == 0 and hdr in ("row", "both", None):
@@ -113,7 +122,7 @@ def blocks(items, doc, depth=0):
         elif t == "dictionaryExample":
             out.append("```json\n%s\n```" % (b.get("example") or ""))
         elif "content" in b:
-            out += blocks(b.get("content"), doc, depth)
+            out += blocks(b.get("content"), doc, depth + 1)
     return out
 
 

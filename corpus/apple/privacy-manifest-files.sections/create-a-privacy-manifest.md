@@ -1,4 +1,4 @@
-<!-- source=privacy-manifest-files clause=create-a-privacy-manifest url=https://developer.apple.com/documentation/bundleresources/privacy-manifest-files fetched=2026-09-03T19:54:27+00:00 -->
+<!-- source=privacy-manifest-files clause=create-a-privacy-manifest url=https://developer.apple.com/documentation/bundleresources/privacy-manifest-files fetched=2026-09-04T01:32:38+00:00 -->
 
 ### Create a privacy manifest
 
