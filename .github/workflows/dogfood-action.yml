@@ -1,0 +1,36 @@
+# Exercises action.yml the same way a real user's README-copied workflow
+# would: `uses: BakerVentures/shipcheck@v1` against a real project. Runs
+# against the deliberately-broken fixture, so this is expected to fail the
+# fail-on:critical gate -- that failure IS the pass condition, asserted in
+# the last step. A silent green run here would mean the gate stopped working,
+# not that the fixture got clean.
+name: Dogfood the Action
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  self-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ShipCheck via the tagged action reference
+        id: shipcheck
+        continue-on-error: true
+        uses: BakerVentures/shipcheck@v1
+        with:
+          path: examples/bad-expo-app
+          platform: both
+          offline: "true"
+          fail-on: critical
+
+      - name: Assert the gate actually fired
+        run: |
+          if [ "${{ steps.shipcheck.outcome }}" != "failure" ]; then
+            echo "::error::Expected the action to fail on the seeded-violation fixture (fail-on: critical), but it reported '${{ steps.shipcheck.outcome }}'. Either the fixture stopped being broken or the gate silently stopped working -- both need investigating before this action ships to real users."
+            exit 1
+          fi
+          echo "Gate fired as expected: outcome=${{ steps.shipcheck.outcome }}, score=${{ steps.shipcheck.outputs.score }}, critical=${{ steps.shipcheck.outputs.critical }}"
