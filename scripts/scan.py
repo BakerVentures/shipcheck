@@ -106,6 +106,24 @@ class Scan:
 
     # ------------------------------------------------------------ utilities
     def p(self, *parts):
+        """Join onto the project root, clamped so a config-derived path (an
+        icon field, say) can never resolve outside it.
+
+        This matters because the GitHub Action runs on `pull_request`: an
+        external contributor's app.json can contain anything, and
+        "assets/../../../../../../etc/passwd" resolves and reads cleanly --
+        os.path.exists() honors embedded ".." through real directories
+        regardless of where the string started. A single choke point here
+        protects every caller (self.exists, self.read, and direct self.p()
+        callers like png_info) without auditing each config-derived field.
+        """
+        real_root = os.path.realpath(self.root)
+        candidate = os.path.realpath(os.path.join(self.root, *parts))
+        if candidate != real_root and not candidate.startswith(real_root + os.sep):
+            # Escapes the project. Return a path that cannot exist, so
+            # exists() is False and open() raises the OSError callers
+            # already handle -- no new exception shape for anyone to miss.
+            return os.path.join(real_root, ".shipcheck-blocked-path-escape")
         return os.path.join(self.root, *parts)
 
     def exists(self, *parts):
