@@ -38,5 +38,10 @@
     "att-app-tracking-transparency",
     "App Tracking Transparency: what the prompt actually requires",
     "Apple's exact requirement for the AppTrackingTransparency framework, what triggers it, and the fix for React Native and Expo apps that track users."
+  ],
+  [
+    "vs-free-claude-code-checkers",
+    "ShipCheck vs. Free Claude Code App Store Checkers (2026)",
+    "A measured, honest comparison of ShipCheck against greenlight and other free Claude Code plugins that check App Store rejection risk -- both run against the same seeded-violation fixture."
   ]
 ]
