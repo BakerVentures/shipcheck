@@ -48,3 +48,30 @@ that reads/writes an arbitrary project directory rather than only files inside
 
 Total spend chasing this case: ~$6.56 across 4 runs. The graders and prompt
 are left in place for whoever wants to retry under different conditions.
+
+## Real-world validation (outside the eval sandbox)
+
+Ran the actual installed plugin in a genuine headless Claude Code session
+(`claude -p "/shipcheck:scan"` with a scoped `--allowedTools`, not
+`claude plugin eval`) against a plain writable copy of this fixture outside
+the plugin's source tree -- no sandbox restrictions, because a real user's
+project is never inside the plugin's own directory.
+
+Result: 27 turns, $1.95, ~5 minutes. Completed cleanly, no permission
+fighting, no wasted reads. Produced 52 findings (34 deterministic + 18
+judgment), including two genuinely sharp catches neither I nor any prior pass
+this session had noticed: `app/index.tsx` imports `expo-tracking-transparency`
+which isn't in `package.json` (verified true -- Metro would fail to resolve
+it), and the paywall button passes an undefined `pkg` variable to
+`Purchases.purchasePackage()`. It correctly caught the 2.3.10
+metadata-references-another-platform violation this eval case was designed to
+test, with the right clause. Every citation checked was a real, verbatim
+corpus quote. The "Likely to pass" section showed sophisticated conditional
+reasoning (e.g. correctly exempting the Kids-category ad-SDK ban because the
+declared category is Health & Fitness, while separately flagging that the
+same SDK would be disqualifying if it were Kids) rather than generic
+boilerplate.
+
+This is the real signal the sandboxed eval case above couldn't produce. The
+report it generated replaced the earlier, partly hand-simulated one at
+`examples/bad-expo-app/shipcheck-report.md`.
