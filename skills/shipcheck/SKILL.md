@@ -15,21 +15,42 @@ You are running a pre-submission review of an app the way an App Review or Play
 policy reviewer would, and producing a report the developer can act on line by
 line.
 
-`${CLAUDE_PLUGIN_ROOT}` is the plugin root. Everything below is relative to it.
+`${CLAUDE_PLUGIN_ROOT}` is the plugin root. Everything below is relative to it,
+**except the corpus.** Run this once, before anything else, and remember the
+path it prints — every `$CORPUS` below means this value, substituted in by you,
+not a bare `corpus/...` relative to `${CLAUDE_PLUGIN_ROOT}`:
+
+```bash
+CORPUS="${CLAUDE_PLUGIN_ROOT}/corpus"
+[ -d "${CLAUDE_PLUGIN_DATA}/corpus" ] && CORPUS="${CLAUDE_PLUGIN_DATA}/corpus"
+echo "$CORPUS"
+```
+
+This matters because `/shipcheck:refresh` writes a freshly-fetched corpus to
+`${CLAUDE_PLUGIN_DATA}/corpus`, not `${CLAUDE_PLUGIN_ROOT}/corpus` (the
+read-only, bundled-with-this-version tree) — and `${CLAUDE_PLUGIN_DATA}` is
+markdown-level text substitution, not a real environment variable, so nothing
+downstream (a Python subprocess, a later Bash call, your own memory of "corpus/"
+three steps from now) can rediscover it on its own. Skipping this resolve step,
+or reading a bare `corpus/...` path anywhere below out of habit, means silently
+citing whatever policy text was bundled when this plugin version was published
+instead of what the user actually refreshed — the one failure mode this tool
+exists to prevent.
 
 ## The one rule that matters
 
 **Never state a guideline requirement from memory.** Every policy claim must come
-from `corpus/`, which was fetched from Apple and Google and carries a fetch date
+from `$CORPUS`, which was fetched from Apple and Google and carries a fetch date
 and hash. Apple and Google change these pages constantly; a confidently wrong
 clause number is worse than no report, because the developer will paste it into
 a Resolution Center reply.
 
-If you need a rule that is not in `corpus/`, say so in the report's *Not checked*
+If you need a rule that is not in `$CORPUS`, say so in the report's *Not checked*
 section instead of filling the gap from memory.
 
-`corpus/patterns/rn-expo-rejections.md` is the exception: it is hand-curated and
-tells you *what to look for*. Use it to direct the search, never as the citation.
+`$CORPUS/patterns/rn-expo-rejections.md` is the exception: it is hand-curated
+and tells you *what to look for*. Use it to direct the search, never as the
+citation.
 
 ## Step 1 — deterministic scan
 
@@ -43,12 +64,9 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scan.py" \
   --project . --platform both --out .shipcheck/scan.json --corpus "$CORPUS"
 ```
 
-Always pass `--corpus` explicitly, resolved this way. `${CLAUDE_PLUGIN_DATA}` is
-markdown-level text substitution, not a real environment variable a Python
-subprocess can read on its own — the script has no way to find what
-`/shipcheck:refresh` wrote unless this step hands it the resolved path. Skipping
-this is a silently stale corpus, which is the one failure mode this tool exists
-to prevent.
+Recompute `$CORPUS` here rather than assuming the earlier resolve still applies
+— shell state does not carry over between Bash calls, so `scan.py` only ever
+sees what this specific `--corpus` argument passes it.
 
 Read `.shipcheck/scan.json`. It has three keys:
 
@@ -77,27 +95,27 @@ First, triage from `facts` alone, before reading anything, to cut the search
 space:
 
 - No `Subscriptions`/IAP packages in `facts.dependencies` → skip 3.1.2 entirely,
-  don't read `apple/subscriptions.md`.
+  don't read `$CORPUS/apple/subscriptions.md`.
 - Category isn't Health, Dating, Kids, or Gambling → skip the category-specific
   corpus files (`5.1.3`, `5.1.4`, `5.3`, `1.1.4`) entirely.
 - `facts.metadata` has no screenshot descriptions → skip 2.3.3.
 - Android platform not requested → skip the Play-specific rows below.
 
-Then, only for what's left standing, check `corpus/patterns/rn-expo-rejections.md`
+Then, only for what's left standing, check `$CORPUS/patterns/rn-expo-rejections.md`
 for the matching `detect: judgment` entries and read the one or two corpus
 files each cites — the pattern file tells you which file, so you don't need
 this table to also enumerate them:
 
 | Area | Look at | Corpus (read only if this area is live) |
 |---|---|---|
-| Metadata accuracy (2.3.x) | description, keywords, What's New, screenshot descriptions | `apple/asrg.sections/2.3*.md` |
-| Paywall disclosure (3.1.2) | `Paywall` + `Subscriptions` metadata, paywall component in source | `apple/asrg.sections/3.1.2*.md` |
-| Minimum functionality (4.2) | dependency list, route count, `react-native-webview` share of the app | `apple/asrg.sections/4.2*.md` |
-| Login services (4.8) | check the exemptions before asserting | `apple/asrg.sections/4.8.md` |
-| Privacy labels vs SDKs | analytics/attribution SDKs vs `Data collected` field | `apple/app-privacy-details.md` |
+| Metadata accuracy (2.3.x) | description, keywords, What's New, screenshot descriptions | `$CORPUS/apple/asrg.sections/2.3*.md` |
+| Paywall disclosure (3.1.2) | `Paywall` + `Subscriptions` metadata, paywall component in source | `$CORPUS/apple/asrg.sections/3.1.2*.md` |
+| Minimum functionality (4.2) | dependency list, route count, `react-native-webview` share of the app | `$CORPUS/apple/asrg.sections/4.2*.md` |
+| Login services (4.8) | check the exemptions before asserting | `$CORPUS/apple/asrg.sections/4.8.md` |
+| Privacy labels vs SDKs | analytics/attribution SDKs vs `Data collected` field | `$CORPUS/apple/app-privacy-details.md` |
 | Category rules | declared category and age rating | the one matching file, not all four |
-| Data safety (Play) | permissions vs declared data | `google/data-safety.md` |
-| Testing gate (Play) | quote the tester count/duration from the file, never memory | `google/testing-requirements.md` |
+| Data safety (Play) | permissions vs declared data | `$CORPUS/google/data-safety.md` |
+| Testing gate (Play) | quote the tester count/duration from the file, never memory | `$CORPUS/google/testing-requirements.md` |
 
 A scan with no subscriptions, no screenshots described, and a plain category
 should touch maybe 3-4 corpus files total in this step, not all nine rows.
