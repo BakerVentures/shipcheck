@@ -201,7 +201,8 @@ evals/              claude plugin eval case for the judgment half (early-access
 server/validate.js  license endpoint (deploy yourself)
 docs/               landing page + assets/demo GIFs, served by GitHub Pages from /docs
 marketing/          launch playbooks: Show HN, Reddit, PH, directories, LS setup
-examples/           a deliberately non-compliant Expo app and a bare-RN one, for testing
+examples/           a deliberately non-compliant Expo app, a bare-RN one, and a
+                    genuinely clean one -- for testing both the fail and pass paths
 ```
 
 ## Not a guarantee

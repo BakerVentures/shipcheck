@@ -50,3 +50,43 @@ jobs:
             exit 1
           fi
           echo "Gate fired for the right reason: score=$SCORE critical=$CRITICAL"
+
+  # The self-scan job above only ever exercises the fail path. Every fixture
+  # that existed before this job was deliberately violation-seeded, so a bug
+  # in the "app is actually fine" path -- the action passing cleanly, with
+  # real populated outputs, not just "didn't crash" -- had no test coverage
+  # at all. That blind spot pattern is exactly what produced several real
+  # bugs in scan.py/report.py/bin/shipcheck earlier (see git log for
+  # "clean app" / "v0.2.5"). This job closes it at the Action layer too.
+  clean-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ShipCheck against the genuinely clean fixture
+        id: shipcheck
+        continue-on-error: true
+        uses: BakerVentures/shipcheck@v1
+        with:
+          path: examples/clean-expo-app
+          platform: both
+          offline: "true"
+          fail-on: critical
+
+      - name: Assert it passed cleanly -- and for the right reason
+        run: |
+          if [ "${{ steps.shipcheck.outcome }}" != "success" ]; then
+            echo "::error::Expected the action to succeed on the genuinely clean fixture, but it reported '${{ steps.shipcheck.outcome }}'. Either the fixture stopped being clean or the action has a false positive -- both need investigating."
+            exit 1
+          fi
+          SCORE="${{ steps.shipcheck.outputs.score }}"
+          CRITICAL="${{ steps.shipcheck.outputs.critical }}"
+          if [ -z "$SCORE" ] || [ -z "$CRITICAL" ]; then
+            echo "::error::The action succeeded, but its score/critical outputs are empty ('$SCORE'/'$CRITICAL'). A silent early-exit before the real scan ran would also look like a clean pass -- require the real outputs to trust this."
+            exit 1
+          fi
+          if [ "$CRITICAL" -ne 0 ]; then
+            echo "::error::critical=$CRITICAL, but this fixture is meant to be clean. It has a real, unseeded problem, or the fixture drifted."
+            exit 1
+          fi
+          echo "Passed for the right reason: score=$SCORE critical=$CRITICAL"

@@ -22,6 +22,20 @@ import report                                        # noqa: E402
 
 FIXTURE = os.path.join(ROOT, "examples", "bad-expo-app")
 BARE_RN_FIXTURE = os.path.join(ROOT, "examples", "bare-rn-app")
+CLEAN_FIXTURE = os.path.join(ROOT, "examples", "clean-expo-app")
+
+# examples/clean-expo-app has no seeded violations at all -- it exists because
+# every other fixture is deliberately broken, so a bug in the "app is actually
+# fine" reporting path (a dangling separator, a report referencing a section
+# that never renders, a check with no pass entry for the success case) had no
+# test coverage until this fixture was added. See git log for "v0.2.5".
+CLEAN_MUST_HAVE_ZERO_FINDINGS = True
+CLEAN_MUST_PASS = [
+    ("1024px icon has no alpha channel", "ASC:screenshot-specifications"),
+    ("Export compliance key is set", "ASC:export-compliance"),
+    ("Target API level meets Play's floor", "play:target-api-level"),
+    ("No placeholder text in metadata", "2.3.1"),
+]
 
 # examples/bare-rn-app has no app.json/app.config -- it exists specifically to
 # catch the class of bug where a check silently assumes Expo's config shape
@@ -122,6 +136,36 @@ def run_bare_rn_checks():
     return fails
 
 
+def run_clean_checks():
+    fails = []
+    subprocess.run([sys.executable, os.path.join(HERE, "scan.py"),
+                    "--project", CLEAN_FIXTURE, "--offline",
+                    "--out", "/tmp/shipcheck-selftest-clean.json"],
+                   check=True, capture_output=True)
+    with open("/tmp/shipcheck-selftest-clean.json", encoding="utf-8") as f:
+        data = json.load(f)
+    findings = data["findings"]
+    passes = data.get("passes") or []
+
+    print("\nGenuinely clean project (no seeded violations)")
+    if CLEAN_MUST_HAVE_ZERO_FINDINGS:
+        if not findings:
+            print("  ok     0 findings on a genuinely clean app")
+        else:
+            desc = "0 findings on a genuinely clean app"
+            got = ", ".join(f["id"] for f in findings)
+            print("  FAIL   %s (got: %s)" % (desc, got)); fails.append(desc)
+
+    have = {(p.get("title"), p.get("clause")) for p in passes}
+    for title, clause in CLEAN_MUST_PASS:
+        if (title, clause) in have:
+            print("  ok     %s" % title)
+        else:
+            desc = "pass: %s" % title
+            print("  FAIL   %s (not recorded)" % desc); fails.append(desc)
+    return fails
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true")
@@ -173,6 +217,7 @@ def main():
               % len({f["clause"] for f in data["findings"] if f["clause"]}))
 
     fails += run_bare_rn_checks()
+    fails += run_clean_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))

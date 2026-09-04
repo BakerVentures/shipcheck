@@ -14,8 +14,14 @@ server/node_modules/
 !examples/bad-expo-app/node_modules/
 !examples/bad-expo-app/node_modules/**
 
+# clean-expo-app's node_modules just needs to exist (node_modules_present=True)
+# -- no stub packages needed, since nothing in this fixture requires one.
+!examples/clean-expo-app/node_modules/
+!examples/clean-expo-app/node_modules/**
+
 # but do ship the example report as sample output
 !examples/bad-expo-app/shipcheck-report.md
+!examples/clean-expo-app/shipcheck-report.md
 
 bindings.json
 evals/results/
