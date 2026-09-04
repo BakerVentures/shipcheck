@@ -1,8 +1,8 @@
 # X launch thread
 
-1/ My Expo app got rejected 3 times on one release. Privacy manifest in a package I didn't know I depended on. Paywall missing the renewal period. Screenshot of a feature behind a flag.
+1/ The App Store rejection that actually cost me a review cycle was paywall copy: fake-discount pricing, flagged because the price on the button has to be the real one. Not something I'd have caught reading my own JavaScript.
 
-None of it was in my code. So I built the check I wished I'd had.
+So I built the check I wished I'd had.
 
 2/ shipcheck is a Claude Code plugin. Run /shipcheck:scan in your RN/Expo repo and it reads app.json, plists, entitlements, every SDK's PrivacyInfo.xcprivacy, and your listing metadata, then checks all of it against the App Store guidelines.
 
@@ -16,7 +16,7 @@ None of it was in my code. So I built the check I wished I'd had.
 
 [GIF: docs/demo/shipcheck-reply.gif]
 
-6/ It runs inside your own Claude Code. Your code stays on your machine. That also means it costs me nothing per scan, so the first scan on every app is free.
+6/ It runs inside your own Claude Code. Your code stays on your machine. That also means it costs me nothing per scan, so every app gets a free scan, not just a one-time trial.
 
 $29 per app after that, $49/yr unlimited.
 
