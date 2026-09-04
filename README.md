@@ -185,16 +185,23 @@ Stored at `~/.shipcheck/license`, cached for 7 days.
 ```
 .claude-plugin/     plugin.json, marketplace.json
 skills/shipcheck/   SKILL.md — the reasoning procedure
-commands/           the five slash commands
+commands/           six slash commands (license and unlock are the same command,
+                    two names — see /shipcheck:license)
 scripts/            fetch_corpus.py, scan.py, report.py, license.py
                     htmlmd.py, docc.py, asrg.py  (extractors)
+                    selftest.py                  (26 seeded violations + regressions)
                     data/rn_sdk_map.json         (structural rules)
 corpus/             cached policy, chunked, + manifest.json
 corpus/patterns/    hand-curated RN/Expo rejection patterns
+bin/shipcheck       standalone CLI — the deterministic half, no Claude Code needed
+action.yml          GitHub Action wrapping the CLI, for CI
+.github/workflows/  self-test on every push, weekly corpus refresh, action dogfood
+evals/              claude plugin eval case for the judgment half (early-access
+                    tooling; see evals/*/README.md for its current limitations)
 server/validate.js  license endpoint (deploy yourself)
-docs/               landing page, served by GitHub Pages from /docs
+docs/               landing page + assets/demo GIFs, served by GitHub Pages from /docs
 marketing/          launch playbooks: Show HN, Reddit, PH, directories, LS setup
-examples/           a deliberately non-compliant Expo app, for testing
+examples/           a deliberately non-compliant Expo app and a bare-RN one, for testing
 ```
 
 ## Not a guarantee
