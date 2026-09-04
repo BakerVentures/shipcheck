@@ -6,13 +6,15 @@ None of it was in my code. So I built the check I wished I'd had.
 
 2/ shipcheck is a Claude Code plugin. Run /shipcheck:scan in your RN/Expo repo and it reads app.json, plists, entitlements, every SDK's PrivacyInfo.xcprivacy, and your listing metadata, then checks all of it against the App Store guidelines.
 
-[GIF of scan output]
+[GIF: docs/demo/shipcheck-scan.gif -- real output, not staged]
 
 3/ Every finding gives you the clause, the current guideline text, what the reviewer will say, and the fix. Not "review privacy settings." The actual key to add and the actual reason code.
 
 4/ Guidelines are fetched live and hashed. /shipcheck:refresh shows a diff of what Apple changed since your last scan. Nobody else is watching that page for you.
 
 5/ Already rejected? /shipcheck:reply takes the Resolution Center message and drafts the response in the register reviewers respond to.
+
+[GIF: docs/demo/shipcheck-reply.gif]
 
 6/ It runs inside your own Claude Code. Your code stays on your machine. That also means it costs me nothing per scan, so the first scan on every app is free.
 

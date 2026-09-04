@@ -26,7 +26,24 @@ Two more blockers to clear first, both stated in their own rules:
     obstacle, not just a formality. Worth reading their full CONTRIBUTING.md
     before deciding whether to submit at all.
 
-Also submit at: claudemarketplaces.com, claudeskills.info, awesomeclaude.ai, agentskill.club, mcpmarket.com. Each has a paste-the-URL form.
+Also submit at: claudemarketplaces.com, claudeskills.info, awesomeclaude.ai, agentskill.club, mcpmarket.com.
+Checked these directly rather than trusting "paste-the-URL form" -- that
+assumption didn't hold:
+  - claudemarketplaces.com: no visible submission form without logging in
+    (Login is the only path found).
+  - claudeskills.info: /submit redirects straight to a Google OAuth consent
+    screen asking to grant the site access to your real Google account.
+    Not something to click through casually -- decide deliberately whether
+    you want claudeskills.info to have that grant before doing this one.
+  - agentskill.club: says it "automatically discovers and synchronizes GitHub
+    repositories daily" -- may index shipcheck without any manual submission
+    at all, given it's a public, well-structured repo already. No submission
+    link found in a quick pass; worth checking back in a week before trying
+    to force a manual submit.
+  - mcpmarket.com: not checked. shipcheck is a Claude Code plugin (skills +
+    commands + scripts), not an MCP server -- this directory's category may
+    not even apply.
+  - awesomeclaude.ai: not checked.
 
 ## GitHub repo settings
 Topics: claude-code, claude-code-plugin, app-store, app-review, expo, react-native, ios, google-play, aso
