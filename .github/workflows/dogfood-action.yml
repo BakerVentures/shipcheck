@@ -27,10 +27,26 @@ jobs:
           offline: "true"
           fail-on: critical
 
-      - name: Assert the gate actually fired
+      - name: Assert the gate actually fired -- and for the right reason
         run: |
+          # outcome=failure alone is not enough to trust: the very first
+          # version of this workflow "passed" because an internal step
+          # crashed and skipped the real gating logic entirely, not because
+          # the gate made a real decision. Require the outputs it should have
+          # produced along the way, so a regression back to that shows up as
+          # a clear failure here instead of a silent false pass.
           if [ "${{ steps.shipcheck.outcome }}" != "failure" ]; then
             echo "::error::Expected the action to fail on the seeded-violation fixture (fail-on: critical), but it reported '${{ steps.shipcheck.outcome }}'. Either the fixture stopped being broken or the gate silently stopped working -- both need investigating before this action ships to real users."
             exit 1
           fi
-          echo "Gate fired as expected: outcome=${{ steps.shipcheck.outcome }}, score=${{ steps.shipcheck.outputs.score }}, critical=${{ steps.shipcheck.outputs.critical }}"
+          SCORE="${{ steps.shipcheck.outputs.score }}"
+          CRITICAL="${{ steps.shipcheck.outputs.critical }}"
+          if [ -z "$SCORE" ] || [ -z "$CRITICAL" ]; then
+            echo "::error::The action failed, but its score/critical outputs are empty ('$SCORE'/'$CRITICAL'). That means an internal step crashed before reaching the real gate, the same false-positive this assertion exists to catch -- not a genuine severity-based decision."
+            exit 1
+          fi
+          if [ "$CRITICAL" -lt 1 ]; then
+            echo "::error::critical=$CRITICAL, but this fixture has seeded critical findings. The gate fired for the wrong reason."
+            exit 1
+          fi
+          echo "Gate fired for the right reason: score=$SCORE critical=$CRITICAL"

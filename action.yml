@@ -45,7 +45,18 @@ runs:
         ARGS=("${{ inputs.path }}" "--platform" "${{ inputs.platform }}")
         [ "${{ inputs.offline }}" = "true" ] && ARGS+=("--offline")
 
-        "${{ github.action_path }}/bin/shipcheck" scan "${ARGS[@]}" | tee /tmp/shipcheck.txt
+        # bin/shipcheck scan exits 1 on a critical finding BY DESIGN -- that
+        # is how it signals severity to a caller. GitHub Actions runs `run:`
+        # steps under bash's implicit -e (errexit), on top of -o pipefail
+        # above: without the || true, that intentional nonzero exit aborts
+        # this whole script right here, before the report is generated or
+        # outputs are written -- and the dedicated fail-on gating step below
+        # never even runs (it shows up as "skipped", not "failure"). Found by
+        # actually running this action for real: the first version passed a
+        # test that asserted "the action failed" without checking *why*, and
+        # it had failed for the wrong reason -- a crashed step, not a
+        # deliberate gate decision.
+        "${{ github.action_path }}/bin/shipcheck" scan "${ARGS[@]}" | tee /tmp/shipcheck.txt || true
         if [ "${{ inputs.report }}" = "true" ]; then
           "${{ github.action_path }}/bin/shipcheck" report "${ARGS[@]}" || true
         fi
