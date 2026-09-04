@@ -1,6 +1,66 @@
 # shipcheck launch kit
 
-Status as of this session: the repo is live, installable, and CI is green.
+Status as of 2026-09-04 (a second, much longer session on top of the first):
+the repo is live, installable, CI is green, and the plugin has been through
+ten version bumps (v0.2.2 → v0.2.10) fixing real bugs found by dogfooding
+against a genuinely clean fixture and a headless plugin session, not just
+code review. See below for what changed and why "is it launch-ready" now
+splits cleanly into "yes, for free-tier use" and "no, not for paid" -- and
+every remaining item under 'Still needs you' traces back to the same two
+root blockers: Lemon Squeezy isn't set up, and `server/validate.js` isn't
+deployed.
+
+## Done, this second session
+
+- [x] **Four real bugs in htmlmd.py/docc.py** (the corpus HTML→Markdown
+      renderer) that were corrupting real report citations -- a sentence-
+      splitting bug (found via visually QA-ing new SEO pages, confirmed
+      already live in `examples/bad-expo-app/shipcheck-report.md`), a
+      decorative Apple icon rendering as broken `![alt]` markdown, a
+      regression the first fix introduced, and 69 more bare-image instances
+      across the corpus. v0.2.2 → v0.2.4.
+- [x] **Four bugs in the "app is actually fine" scan/report path**, which had
+      zero test coverage anywhere (every fixture that existed was
+      deliberately violation-seeded): a dangling separator in the terminal
+      summary, a report referencing a section that never rendered, and
+      missing pass-on-success entries for four checks the README's own
+      example already claimed existed. v0.2.5 → v0.2.7 (iOS + Android).
+- [x] **`/shipcheck:refresh` was a complete no-op** -- it re-fetched policy
+      text correctly but no scan ever read it back, because
+      `${CLAUDE_PLUGIN_DATA}` (where refresh writes) is markdown-level text
+      substitution, not a real environment variable a Python subprocess can
+      read -- confirmed against Claude Code's own docs. First fix attempt
+      (v0.2.8) didn't actually work; caught that with a marker-injection
+      test against the real installed plugin, traced the real cause, and
+      shipped the actual fix (v0.2.9 + v0.2.10, judgment-layer reads too).
+      Verified with `--output-format stream-json` against a real session --
+      every one of 29 corpus-related tool calls hit the refreshed path.
+- [x] **Added `examples/clean-expo-app`** -- a genuinely compliant fixture,
+      the first one in the repo. Wired into `selftest.py` and a new
+      `clean-scan` CI job that runs the real tagged Action and asserts a
+      genuine pass with real outputs, closing the same test-coverage gap at
+      the CI layer too.
+- [x] **The real comparison SEO page** (`docs/guidelines/vs-free-claude-code-checkers.html`),
+      built from `competitive-analysis.md`'s actual measured data against
+      greenlight, not the speculative "vs. AcceptMyApp" page the original
+      pre-launch research suggested -- linked from the homepage right before
+      pricing.
+- [x] Landing page: dark mode, a sourced stat-band ("9.1M submissions
+      evaluated, 2M+ rejected, 443K+ for privacy" -- verified against Apple's
+      actual May 2026 Newsroom release, not just the research doc's
+      citation), the missing "why not just ask Claude" FAQ entry, the agency
+      pricing card de-emphasized per the UX research, `--json` on the CLI.
+- [x] **Fixed the unverified launch-post anecdote** in `show-hn.md`,
+      `x-thread.md`, and `product-hunt.md` -- all three opened with a
+      first-person rejection story that couldn't be verified. Replaced with
+      the real, sourced story already found this session (RizzMaxx's own
+      fake-discount-paywall rejection). Also added the Product Hunt
+      gallery's "3 PNGs of report sections," which never existed.
+- [x] A `git stash` between `git add` and `git commit` silently dropped
+      several files' staged changes once during this session -- caught it by
+      checking the real CI run, not by trusting the commit message, and
+      recovered with a follow-up commit. Worth knowing if a future commit
+      here looks incomplete relative to what was intended.
 
 ## Done
 
