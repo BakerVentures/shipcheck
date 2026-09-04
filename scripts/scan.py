@@ -130,9 +130,15 @@ class Scan:
         return os.path.exists(self.p(*parts))
 
     def read(self, *parts):
+        # Every config file this reads (app.json, package.json, eas.json,
+        # build.gradle, shipcheck.metadata.md) is legitimately a few KB.
+        # Bounded at the one shared helper so every caller gets the limit
+        # for free, same reasoning as the cap in grep_source: this runs
+        # against a PR's own files in CI, and nothing here should trust
+        # "small config file" without enforcing it.
         try:
             with open(self.p(*parts), encoding="utf-8", errors="replace") as f:
-                return f.read()
+                return f.read(5 * 1024 * 1024)
         except OSError:
             return None
 
@@ -974,7 +980,11 @@ class Scan:
                     try:
                         with open(os.path.join(dirpath, fn), encoding="utf-8",
                                   errors="ignore") as f:
-                            if rx.search(f.read()):
+                            # A legitimate .ts/.tsx source file is rarely more
+                            # than a few hundred KB; 4 MB is generous headroom
+                            # for a real file and a hard stop for a maliciously
+                            # huge one committed to a PR this scans in CI.
+                            if rx.search(f.read(4 * 1024 * 1024)):
                                 return os.path.relpath(os.path.join(dirpath, fn), self.root)
                     except OSError:
                         pass
