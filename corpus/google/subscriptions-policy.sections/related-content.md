@@ -1,4 +1,4 @@
-<!-- source=subscriptions-policy clause=related-content url=https://support.google.com/googleplay/android-developer/answer/10281818 fetched=2026-09-04T16:10:07+00:00 -->
+<!-- source=subscriptions-policy clause=related-content url=https://support.google.com/googleplay/android-developer/answer/10281818 fetched=2026-09-05T02:02:38+00:00 -->
 
 ## Related content
 

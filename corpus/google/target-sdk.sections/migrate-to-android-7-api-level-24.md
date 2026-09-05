@@ -1,17 +1,17 @@
-<!-- source=target-sdk clause=migrate-to-android-7-api-level-24 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T16:10:14+00:00 -->
+<!-- source=target-sdk clause=migrate-to-android-7-api-level-24 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-05T02:02:46+00:00 -->
 
 ### Migrate to Android 7 (API level 24)
 
 The following considerations apply to apps targeting Android 7.0 and higher versions of the platform:
 
-- Doze and App Standby Design for behaviors described in [Optimizing for Doze and App Standby](/training/monitoring-device-state/doze-standby), which encompasses incremental changes introduced across several platform releases. When a device is in Doze and App Standby Mode, the system behaves as follows: Restricts network access Defers alarms, syncs, and jobs Restricts GPS and Wi-Fi scans
+- Doze and App Standby Design for behaviors described in [Optimizing for Doze and App Standby](/training/monitoring-device-state/doze-standby), which encompasses incremental changes introduced across several platform releases. When a device is in Doze and App Standby Mode, the system behaves as follows:
   Restricts network access
   Defers alarms, syncs, and jobs
   Restricts GPS and Wi-Fi scans
   Restricts normal-priority
   [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)
   messages.
-- Permission Changes The system restricts access to app private directories.
+- Permission Changes
   The system restricts access to app private directories.
   Exposing a `file://` URI outside of your app triggers a `FileUriExposedException`. If you need to share files outside of your app, implement
   [`FileProvider`](/training/secure-file-sharing/setup-sharing)

@@ -168,6 +168,21 @@ def _inline(node):
                 # illustration's description) -- keep it as plain text
                 # rather than emit invalid, unresolvable image syntax.
                 parts.append(alt)
+        elif t in ("ul", "ol"):
+            # A block-level list has no sensible inline rendering -- skip it
+            # here rather than falling to the generic else branch below,
+            # which flattened it into plain text. That mattered when a <li>'s
+            # *only* content was a nested list with no text of its own
+            # (real case: Apple's guideline 1.2, an <li> wrapping just a
+            # <ul>): the caller in _blocks()'s ul/ol branch computes
+            # _inline(li) for the item's own text *and* separately walks
+            # `li`'s nested ul/ol children to render them as indented
+            # sub-items, so a list falling through to plain text here made
+            # the same content render twice -- once flattened inline, once
+            # properly nested. Callers that do want a nested list's content
+            # (that same ul/ol branch) call _blocks() on it directly instead
+            # of going through _inline().
+            pass
         else:
             parts.append(_inline(c))
     return "".join(parts)

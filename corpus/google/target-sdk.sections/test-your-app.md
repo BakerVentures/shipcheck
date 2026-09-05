@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=test-your-app url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T16:10:14+00:00 -->
+<!-- source=target-sdk clause=test-your-app url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-05T02:02:46+00:00 -->
 
 ## Test your app
 
@@ -11,7 +11,7 @@ to guide your testing process. We suggest testing:
   Go to your app's App Info screen, and disable each permission.
   Open the app and ensure no crashes.
   - Perform core use case tests and ensure required permissions are
-- Handles Doze with expected results and no errors. Using adb, place your test device into Doze while your app is running.
+- Handles Doze with expected results and no errors.
   Using adb, place your test device into Doze while your app is running.
   - Test any use cases that trigger Firebase Cloud Messaging messages.
   - Test any use cases that use Alarms or Jobs.
@@ -19,7 +19,7 @@ to guide your testing process. We suggest testing:
   Set your app into App Standby
   - Test any use cases that trigger Firebase Cloud Messaging messages.
   - Test any use cases that use Alarms.
-- Handles new photos / video being taken Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
+- Handles new photos / video being taken
   Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
   correctly (that is, moved to JobScheduler jobs).
   Ensure that any critical use cases that depend on these events still

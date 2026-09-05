@@ -3,8 +3,8 @@ shipcheck_source_id: target-api-level
 title: "Meet Google Play's target API level requirement"
 url: https://support.google.com/googleplay/android-developer/answer/11926878
 final_url: https://support.google.com/googleplay/android-developer/answer/11926878?hl=en
-fetched_at: 2026-09-04T16:10:07+00:00
-sha256: aa879dc556400bbca3eda654e105f4df830a45a9baeb8ff3ab043d1da9424426
+fetched_at: 2026-09-05T02:02:37+00:00
+sha256: 75acee404deaba5da032e3887d8aaf33b60f52c9bd9c0950ccedd84f2ea1c4cf
 vendor: google
 ---
 
@@ -86,25 +86,25 @@ Currently, existing apps (across mobile and Android Auto) must target Android 15
 
 | **New apps** | **Existing apps** |
 | --- | --- |
-| When you publish a new app, you must target Android 16 (API level 36) or higher. | If your existing app targets Android 15 (API level 35) or higher, then your app is compliant with this policy. If your existing app’s target is lower than Android 15 (API level 35), it will stop being available to all new users whose devices run Android OS versions higher than your apps’ target API levels, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions If you plan to update this app to a higher target API level, you can submit an extension request to continue getting distributed to all users on Google Play until November 1 , 2026. Impacted apps will receive an extension request form link via their **Notifications**. When you update your app, you must target Android 16 (API level 36) or higher. |
+| When you publish a new app, you must target Android 16 (API level 36) or higher. | If your existing app targets Android 15 (API level 35) or higher, then your app is compliant with this policy. If your existing app’s target is lower than Android 15 (API level 35), it will stop being available to all new users whose devices run Android OS versions higher than your apps’ target API levels, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions When you update your app, you must target Android 16 (API level 36) or higher. |
 
 ### Wear OS app requirements
 
 | **New apps** | **Existing apps** |
 | --- | --- |
-| When you publish a new Wear app, you must target Android 15 (API level 35) or higher. | If your existing Wear app targets Android 14 (API level 34) or higher, then your app is compliant with this policy. If your existing app’s target is Android 13 (API level 33) or Lower, it will stop being available to all Google Play users whose devices run Android OS versions newer than your apps’ target API level, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions If you plan to update this app to target Android 15 (API level 35) or higher, you can submit an extension request to continue getting distributed to all users on Google Play until November 1 , 2026. Impacted apps will receive an extension request form link via their **Notifications**. When you update your app, you must target Android 15 (API level 35) or higher. |
+| When you publish a new Wear app, you must target Android 15 (API level 35) or higher. | If your existing Wear app targets Android 14 (API level 34) or higher, then your app is compliant with this policy. If your existing app’s target is Android 13 (API level 33) or Lower, it will stop being available to all Google Play users whose devices run Android OS versions newer than your apps’ target API level, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions When you update your app, you must target Android 15 (API level 35) or higher. |
 
 ### Android TV requirements
 
 | **New apps** | **Existing apps** |
 | --- | --- |
-| When you publish a new TV app, you must target Android 14 (API level 34) or higher. | If your existing Android TV app targets Android 13 (API level 33), then your app is compliant with this policy. If your existing app’s target is Android 12 (API level 31) or Lower, it will stop being available to all Google Play users whose devices run Android OS versions newer than your apps’ target API level, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions. If you plan to update this app to target Android 14 (API level 34) or higher, you can submit an extension request to continue getting distributed to all users on Google Play until November 1 , 2026. Impacted apps will receive an extension request form link via their **Notifications**. When you update your app, you must target Android 14 (API level 34) or higher. |
+| When you publish a new TV app, you must target Android 14 (API level 34) or higher. | If your existing Android TV app targets Android 13 (API level 33), then your app is compliant with this policy. If your existing app’s target is Android 12 (API level 31) or Lower, it will stop being available to all Google Play users whose devices run Android OS versions newer than your apps’ target API level, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions. When you update your app, you must target Android 14 (API level 34) or higher. |
 
 ### Android Automotive OS requirements
 
 | **New apps** | **Existing apps** |
 | --- | --- |
-| When you publish a new Android Automotive OS app, you must target Android 15 (API level 35) or higher. | If your existing Android Automotive OS app targets Android 12L (API level 32) or higher, then your app is compliant with this policy. If your existing app targets Android 12 (API level 31) or lower, it will stop being available to all Google Play users whose devices run Android OS versions newer than your apps’ target API level, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions If you plan to update this app to target Android 15 (API level 35) or higher, you can submit an extension request to continue getting distributed to all users on Google Play until November 1 , 2026. Impacted apps will receive an extension request form link in their **Notifications**. When you update your app, you must target Android 15 (API level 35) or higher. |
+| When you publish a new Android Automotive OS app, you must target Android 15 (API level 35) or higher. | If your existing Android Automotive OS app targets Android 12L (API level 32) or higher, then your app is compliant with this policy. If your existing app targets Android 12 (API level 31) or lower, it will stop being available to all Google Play users whose devices run Android OS versions newer than your apps’ target API level, as your app wasn’t built to meet the safety and quality standard that these users expect from newer Android OS versions When you update your app, you must target Android 15 (API level 35) or higher. |
 
 ### Android XR requirements
 

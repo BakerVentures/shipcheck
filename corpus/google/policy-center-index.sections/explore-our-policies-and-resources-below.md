@@ -1,4 +1,4 @@
-<!-- source=policy-center-index clause=explore-our-policies-and-resources-below url=https://play.google/developer-content-policy/ fetched=2026-09-04T16:10:04+00:00 -->
+<!-- source=policy-center-index clause=explore-our-policies-and-resources-below url=https://play.google/developer-content-policy/ fetched=2026-09-05T02:02:34+00:00 -->
 
 ## Explore our policies and resources below
 

@@ -3,7 +3,7 @@ shipcheck_source_id: hig-in-app-purchase
 title: "HIG: In-app purchase"
 url: https://developer.apple.com/design/human-interface-guidelines/in-app-purchase
 final_url: https://developer.apple.com/tutorials/data/design/human-interface-guidelines/in-app-purchase.json
-fetched_at: 2026-09-04T16:10:00+00:00
+fetched_at: 2026-09-05T02:02:31+00:00
 sha256: e6f61632bbea2a46f0d014d9217fd365676d2d634b9bd0d530a9c4d86ee85e09
 vendor: apple
 ---

@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=restrictions-for-personal-and-sensitive-data-access url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-04T16:10:06+00:00 -->
+<!-- source=user-data-policy clause=restrictions-for-personal-and-sensitive-data-access url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-05T02:02:36+00:00 -->
 
 ## Restrictions for Personal and Sensitive Data Access
 
@@ -16,7 +16,7 @@ In addition to the requirements above, the table below describes requirements fo
 | Your app handles non-public phonebook or contact information | We don't allow unauthorized publishing or disclosure of people's non-public contacts. |
 | Your app contains anti-virus or security functionality, such as anti-virus, anti-malware, or security-related features | Your app must post a privacy policy that, together with any in-app disclosures, explain what user data your app collects and transmits, how it's used, and the type of parties with whom it's shared. |
 | Your app targets children | Your app must not include an SDK that is not approved for use in child-directed services. See [Designing Apps for Children and Families](https://support.google.com/googleplay/android-developer/answer/9893335) for full policy language and requirements. |
-| Your app collects or links persistent device identifiers (for example, IMEI, IMSI, SIM Serial #, etc.) | Persistent device identifiers may not be linked to other personal and sensitive user data or resettable device identifiers except for the purposes of Telephony linked to a SIM identity (for example, wifi calling linked to a carrier account), and Enterprise device management apps using device owner mode. These uses must be prominently disclosed to users as specified in the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311) policy. Please [consult this resource](https://developer.android.com/training/articles/user-data-ids) for alternative unique identifiers. Please read the [Ads](https://support.google.com/googleplay/android-developer/answer/9857753) policy for additional guidelines for Android Advertising ID. |
+| Your app collects or links persistent device identifiers (for example, IMEI, IMSI, SIM Serial #, etc.) | Persistent device identifiers may not be linked to other personal and sensitive user data or resettable device identifiers except for the purposes of These uses must be prominently disclosed to users as specified in the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311) policy. Please [consult this resource](https://developer.android.com/training/articles/user-data-ids) for alternative unique identifiers. Please read the [Ads](https://support.google.com/googleplay/android-developer/answer/9857753) policy for additional guidelines for Android Advertising ID. |
 
 **Key Considerations**
 

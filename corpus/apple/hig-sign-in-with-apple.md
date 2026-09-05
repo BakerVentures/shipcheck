@@ -3,7 +3,7 @@ shipcheck_source_id: hig-sign-in-with-apple
 title: "HIG: Sign in with Apple"
 url: https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple
 final_url: https://developer.apple.com/tutorials/data/design/human-interface-guidelines/sign-in-with-apple.json
-fetched_at: 2026-09-04T16:10:01+00:00
+fetched_at: 2026-09-05T02:02:32+00:00
 sha256: ad0ade9cc5dc33202f5c7b4e6ac61f1b3e44ba185f5872bfc4a6796f88addbde
 vendor: apple
 ---

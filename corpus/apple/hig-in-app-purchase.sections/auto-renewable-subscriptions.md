@@ -1,4 +1,4 @@
-<!-- source=hig-in-app-purchase clause=auto-renewable-subscriptions url=https://developer.apple.com/design/human-interface-guidelines/in-app-purchase fetched=2026-09-04T16:10:00+00:00 -->
+<!-- source=hig-in-app-purchase clause=auto-renewable-subscriptions url=https://developer.apple.com/design/human-interface-guidelines/in-app-purchase fetched=2026-09-05T02:02:31+00:00 -->
 
 ## Auto-renewable subscriptions
 

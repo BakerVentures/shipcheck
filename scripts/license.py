@@ -33,7 +33,7 @@ import sys
 import time
 import urllib.request
 
-VERSION = "0.2.10"
+VERSION = "0.2.11"
 HOME = os.path.expanduser("~/.shipcheck")
 LICENSE_FILE = os.path.join(HOME, "license")
 CACHE_FILE = os.path.join(HOME, "cache.json")

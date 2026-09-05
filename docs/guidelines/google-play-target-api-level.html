@@ -53,7 +53,7 @@ footer a{color:var(--muted)}
 </header>
 
 <div class="eyebrow">GOOGLE PLAY · TARGET API LEVEL</div>
-<h1>Google Play&#x27;s target API level requirement, as of 2026-09-04</h1>
+<h1>Google Play&#x27;s target API level requirement, as of 2026-09-05</h1>
 <p class="lede">This floor moves roughly once a year and Google enforces it at the Play Console upload step -- get it wrong and the release is blocked before any review happens.</p>
 
 <div class="quote">
@@ -65,7 +65,7 @@ footer a{color:var(--muted)}
 </div>
 
 <h2>Why this number is dangerous to memorize</h2>
-<p>It moves. The table above is quoted live from Google&#x27;s own page, fetched 2026-09-04 and re-fetched weekly by ShipCheck&#x27;s corpus refresh -- not typed in by hand once and left to go stale. A blog post or Stack Overflow answer citing &quot;the current requirement&quot; is very often citing last year&#x27;s number.</p>
+<p>It moves. The table above is quoted live from Google&#x27;s own page, fetched 2026-09-05 and re-fetched weekly by ShipCheck&#x27;s corpus refresh -- not typed in by hand once and left to go stale. A blog post or Stack Overflow answer citing &quot;the current requirement&quot; is very often citing last year&#x27;s number.</p>
 <h2>The Expo-specific fix</h2>
 <p>`targetSdkVersion` lives in `android/build.gradle` for a bare or prebuilt project. In a managed Expo project without a checked-in `android/` directory, set it via the `expo-build-properties` config plugin instead -- editing `android/build.gradle` directly gets silently overwritten on the next `expo prebuild`.</p>
 
@@ -80,7 +80,7 @@ footer a{color:var(--muted)}
 </div>
 
 <footer>
-  Guideline text quoted from Play Console Help, target API level requirements, fetched 2026-09-04 and cached with a SHA-256 in
+  Guideline text quoted from Play Console Help, target API level requirements, fetched 2026-09-05 and cached with a SHA-256 in
   <a href="https://github.com/BakerVentures/shipcheck/blob/master/corpus/manifest.json">corpus/manifest.json</a> --
   the same corpus <a href="https://github.com/BakerVentures/shipcheck">ShipCheck</a> cites in a real scan, not separately maintained copy.
   Not affiliated with Apple Inc. or Google LLC. This page is not a guarantee of approval.

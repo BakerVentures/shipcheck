@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=which-developers-need-to-complete-the-data-safety-form-in-pl url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-04T16:10:05+00:00 -->
+<!-- source=data-safety clause=which-developers-need-to-complete-the-data-safety-form-in-pl url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-05T02:02:36+00:00 -->
 
 ### Which developers need to complete the Data safety form in Play Console?
 

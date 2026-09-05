@@ -26,7 +26,7 @@
   ],
   [
     "google-play-target-api-level",
-    "Google Play's target API level requirement, as of 2026-09-04",
+    "Google Play's target API level requirement, as of 2026-09-05",
     "Google Play's current target API level requirement for new apps and updates, quoted directly, with the deadline and the fix for React Native / Expo."
   ],
   [

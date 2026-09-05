@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=clearly-describing-subscriptions url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-04T16:10:00+00:00 -->
+<!-- source=subscriptions clause=clearly-describing-subscriptions url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-05T02:02:31+00:00 -->
 
 ### Clearly describing subscriptions
 

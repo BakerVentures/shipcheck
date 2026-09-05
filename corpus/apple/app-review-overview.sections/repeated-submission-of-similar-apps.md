@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=repeated-submission-of-similar-apps url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T16:09:58+00:00 -->
+<!-- source=app-review-overview clause=repeated-submission-of-similar-apps url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-05T02:02:30+00:00 -->
 
 ### Repeated submission of similar apps
 

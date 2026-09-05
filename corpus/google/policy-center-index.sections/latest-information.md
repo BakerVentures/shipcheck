@@ -1,4 +1,4 @@
-<!-- source=policy-center-index clause=latest-information url=https://play.google/developer-content-policy/ fetched=2026-09-04T16:10:04+00:00 -->
+<!-- source=policy-center-index clause=latest-information url=https://play.google/developer-content-policy/ fetched=2026-09-05T02:02:34+00:00 -->
 
 ### Latest Information
 
@@ -30,8 +30,7 @@ If you're a developer and you're having issues with Google Play or access to Goo
 
 [Request mediation
 *(for EU based developers)*
-If you are a developer based in the EU and you offer goods or services to consumers located in the EU, learn more about how you can resolve disputes with Google Play through mediation.
-(EU only)](https://support.google.com/googleplay/android-developer/topic/9877065)
+If you are a developer based in the EU and you offer goods or services to consumers located in the EU, learn more about how you can resolve disputes with Google Play through mediation.](https://support.google.com/googleplay/android-developer/topic/9877065)
 
 [Publisher Content Policy for Google Play Books
 

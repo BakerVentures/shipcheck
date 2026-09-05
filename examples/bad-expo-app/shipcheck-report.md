@@ -1,6 +1,6 @@
 # ShipCheck report
 
-**Bad App** · v1.0.0 · generated 2026-09-04 12:52
+**Bad App** · v1.0.0 · generated 2026-09-04 20:03
 
 ## Rejection risk: 100 / 100
 
@@ -10,7 +10,7 @@
 
 **13 block the upload** — App Store Connect will not accept a build until these are fixed · **8 are metadata only** and need no new build — you can fix those in App Store Connect right now.
 
-> Checked against policy text fetched 2026-09-04 from 37 official Apple and Google sources. Run `/shipcheck:refresh` to re-fetch and see what changed.
+> Checked against policy text fetched 2026-09-05 from 37 official Apple and Google sources. Run `/shipcheck:refresh` to re-fetch and see what changed.
 
 ---
 
@@ -433,7 +433,6 @@ Without the key iOS terminates the app the moment the permission is requested, w
 > A user’s primary account is the account they establish with your app for the purposes of identifying themselves, signing in, and accessing your features and associated services.
 > 
 > Another login service is not required if:
-> Your app exclusively uses your […]
 > 
 > — [4.8](https://developer.apple.com/app-store/review/guidelines/#login-services)
 
@@ -1269,4 +1268,4 @@ ShipCheck could not verify these. They are not passes:
 
 ---
 
-<sub>ShipCheck v0.2.10 · unlimited tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>
+<sub>ShipCheck v0.2.11 · unlimited tier · findings are advisory: App Review outcomes are decided by Apple and Google, not by this tool.</sub>

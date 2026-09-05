@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=brazil-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T16:10:02+00:00 -->
+<!-- source=age-ratings clause=brazil-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-05T02:02:33+00:00 -->
 
 ### Brazil age rating values
 
@@ -16,10 +16,10 @@ Possible values for self-rated Brazil age pictograms are:
 
 | Rating | Definition |
 | --- | --- |
-| AL | Apps that contain no objectionable material but may contain instances of the following content: **In-App Controls:** Parental controls Age assurance |
-| A6 | Apps that contain: **Capabilities:** User-generated content **Violence:** Infrequent cartoon or fantasy violence **Chance-Based Activities:** Infrequent contests |
-| A10 | Apps that contain: **Mature Themes:** Infrequent profanity and crude humor Infrequent horror or fear themes **Medical or Wellness:** Health and wellness topics **Violence:** Infrequent guns or other weapons |
-| A12 | Apps that contain: **Capabilities:** Advertising Messaging and chat **Mature Themes:** Frequent profanity and crude humor **Medical or Wellness:** Infrequent medical or treatment information **Sexuality or Nudity:** Infrequent mature or suggestive themes Infrequent sexual content or nudity **Violence:** Frequent cartoon or fantasy violence Infrequent realistic violence Frequent guns or other weapons **Chance-Based Activities:** Infrequent simulated gambling |
-| A14 | Apps that contain: **Mature Themes:** Frequent horror or fear themes Infrequent alcohol, tobacco, or drug use or references |
-| A16 | Apps that contain: **Capabilities:** Unrestricted web access Infrequent guns or other weapons Social media Social media disabled for users under 13 **Mature Themes:** Frequent alcohol, tobacco, or drug use or references **Medical or Wellness:** Frequent medical or treatment information |
-| A18 | Apps that contain: **Sexuality or Nudity:** Frequent mature or suggestive themes Frequent sexual content or nudity **Violence:** Frequent realistic violence **Chance-Based Activities:** Frequent gambling Frequent simulated gambling Loot boxes |
+| AL | Apps that contain no objectionable material but may contain instances of the following content: **In-App Controls:** |
+| A6 | Apps that contain: **Capabilities:** **Violence:** **Chance-Based Activities:** |
+| A10 | Apps that contain: **Mature Themes:** **Medical or Wellness:** **Violence:** |
+| A12 | Apps that contain: **Capabilities:** **Mature Themes:** **Medical or Wellness:** **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |
+| A14 | Apps that contain: **Mature Themes:** |
+| A16 | Apps that contain: **Capabilities:** **Mature Themes:** **Medical or Wellness:** |
+| A18 | Apps that contain: **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |

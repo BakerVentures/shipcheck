@@ -3,8 +3,8 @@ shipcheck_source_id: target-sdk
 title: "Meet Google Play's target API level requirement (Android Developers)"
 url: https://developer.android.com/google/play/requirements/target-sdk
 final_url: https://developer.android.com/google/play/requirements/target-sdk?hl=en
-fetched_at: 2026-09-04T16:10:14+00:00
-sha256: 43f23a03589b43e2f7490f4a1e01456c5606d2e401fcd2fe0dcc48bc90c22329
+fetched_at: 2026-09-05T02:02:46+00:00
+sha256: 34866cd7c043e13f05088db60b30370833d28d420e8479b54c797ba6c82537f3
 vendor: google
 ---
 
@@ -98,7 +98,7 @@ Continue by following the instructions in the next section.
 
 The following considerations apply to apps targeting Android 6.0 and higher versions of the platform:
 
-- [Runtime Permissions](/training/permissions/requesting) Dangerous permissions are only granted at runtime. Your UI flows must provide affordances for granting these permissions. Wherever possible, ensure your app is prepared to handle rejection of permission requests. For example, if a user declines a request to access the device's GPS, ensure your app has another way to proceed.
+- [Runtime Permissions](/training/permissions/requesting)
   Dangerous permissions are only granted at runtime. Your UI flows must provide affordances for granting these permissions.
   Wherever possible, ensure your app is prepared to handle rejection of permission requests. For example, if a user declines a request to access the device's GPS, ensure your app has another way to proceed.
 
@@ -111,14 +111,14 @@ Continue by following the instructions in the next section.
 
 The following considerations apply to apps targeting Android 7.0 and higher versions of the platform:
 
-- Doze and App Standby Design for behaviors described in [Optimizing for Doze and App Standby](/training/monitoring-device-state/doze-standby), which encompasses incremental changes introduced across several platform releases. When a device is in Doze and App Standby Mode, the system behaves as follows: Restricts network access Defers alarms, syncs, and jobs Restricts GPS and Wi-Fi scans
+- Doze and App Standby Design for behaviors described in [Optimizing for Doze and App Standby](/training/monitoring-device-state/doze-standby), which encompasses incremental changes introduced across several platform releases. When a device is in Doze and App Standby Mode, the system behaves as follows:
   Restricts network access
   Defers alarms, syncs, and jobs
   Restricts GPS and Wi-Fi scans
   Restricts normal-priority
   [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)
   messages.
-- Permission Changes The system restricts access to app private directories.
+- Permission Changes
   The system restricts access to app private directories.
   Exposing a `file://` URI outside of your app triggers a `FileUriExposedException`. If you need to share files outside of your app, implement
   [`FileProvider`](/training/secure-file-sharing/setup-sharing)
@@ -146,11 +146,11 @@ The following considerations apply to apps targeting Android 8.0 and higher vers
   - Apps running in the background have limited access to location data.
     On devices with Google Play services, use the [fused location provider](https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient) to get periodic location
     updates.
-- [Notification Channels](/about/versions/oreo/android-8.0#notifications) You should define [notification interruption properties](/training/notify-user/channels#importance) on a per-channel basis. You must assign notifications to a channel for the notifications to appear.
+- [Notification Channels](/about/versions/oreo/android-8.0#notifications)
   You should define [notification interruption properties](/training/notify-user/channels#importance) on a per-channel basis.
   You must assign notifications to a channel for the notifications to appear.
   This version of the platform supports [`NotificationCompat.Builder`](/reference/kotlin/androidx/core/app/NotificationCompat.Builder).
-- [Privacy](/about/versions/oreo/android-8.0-changes#privacy-all) [ANDROID_ID](/reference/kotlin/android/provider/Settings.Secure#ANDROID_ID) is scoped per app signing key.
+- [Privacy](/about/versions/oreo/android-8.0-changes#privacy-all)
   [ANDROID_ID](/reference/kotlin/android/provider/Settings.Secure#ANDROID_ID) is scoped per app signing key.
 
 For an exhaustive list of changes introduced in Android 8.0 (API level 26), see the [Behavior Changes](/about/versions/oreo/android-8.0-changes)
@@ -158,17 +158,17 @@ page for that version of the platform.
 
 ### Migrate from Android 8 (API 26) to Android 9 (API 28)
 
-- [Power Management](/about/versions/pie/power) [App Standby buckets](/about/versions/pie/power#buckets) bring new
+- [Power Management](/about/versions/pie/power)
   [App Standby buckets](/about/versions/pie/power#buckets) bring new
   background restrictions based on app engagement, such as deferred jobs,
   alarms and quotas on high-priority messages
   [Battery saver improvements](/about/versions/pie/power#battery-saver)
   increase the limitations on app standby apps
-- [Foreground service permission](/about/versions/pie/android-9.0-changes-28#fg-svc) Need to request the normal permission
+- [Foreground service permission](/about/versions/pie/android-9.0-changes-28#fg-svc)
   Need to request the normal permission
   [`FOREGROUND_SERVICE`](/reference/kotlin/android/Manifest.permission#FOREGROUND_SERVICE)
   (not runtime permission)
-- [Privacy changes](/about/versions/pie/android-9.0-changes-all#privacy-changes-all) [Limited access to background sensors](/about/versions/pie/android-9.0-changes-all#bg-sensor-access) Restricted access to call logs, now in [`CALL_LOG`](/reference/kotlin/android/Manifest.permission_group#CALL_LOG)
+- [Privacy changes](/about/versions/pie/android-9.0-changes-all#privacy-changes-all)
   [Limited access to background sensors](/about/versions/pie/android-9.0-changes-all#bg-sensor-access)
   Restricted access to call logs, now in [`CALL_LOG`](/reference/kotlin/android/Manifest.permission_group#CALL_LOG)
   permission group
@@ -196,7 +196,7 @@ changes](/about/versions/pie/android-9.0-changes-28).
   is set to `false`, apps can additionally specify a
   [`minAspectRatio`](/reference/android/R.attr#minAspectRatio)
   which automatically letterboxes the app on narrower aspect ratios.
-- [Privacy changes](/about/versions/10/privacy/changes) [Scoped storage](/training/data-storage#scoped-storage)
+- [Privacy changes](/about/versions/10/privacy/changes)
   [Scoped storage](/training/data-storage#scoped-storage)
   - External storage access is limited only to an app-specific
   Restricted access to location while the app is in the background,
@@ -296,7 +296,7 @@ to guide your testing process. We suggest testing:
   Go to your app's App Info screen, and disable each permission.
   Open the app and ensure no crashes.
   - Perform core use case tests and ensure required permissions are
-- Handles Doze with expected results and no errors. Using adb, place your test device into Doze while your app is running.
+- Handles Doze with expected results and no errors.
   Using adb, place your test device into Doze while your app is running.
   - Test any use cases that trigger Firebase Cloud Messaging messages.
   - Test any use cases that use Alarms or Jobs.
@@ -304,7 +304,7 @@ to guide your testing process. We suggest testing:
   Set your app into App Standby
   - Test any use cases that trigger Firebase Cloud Messaging messages.
   - Test any use cases that use Alarms.
-- Handles new photos / video being taken Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
+- Handles new photos / video being taken
   Check that your app [handles the restricted](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_PICTURE`](/topic/performance/background-optimization#media-broadcasts) [and](/topic/performance/background-optimization#media-broadcasts) [`ACTION_NEW_VIDEO`](/topic/performance/background-optimization#media-broadcasts) broadcasts
   correctly (that is, moved to JobScheduler jobs).
   Ensure that any critical use cases that depend on these events still

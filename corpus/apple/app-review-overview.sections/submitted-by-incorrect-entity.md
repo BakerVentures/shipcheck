@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=submitted-by-incorrect-entity url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-04T16:09:58+00:00 -->
+<!-- source=app-review-overview clause=submitted-by-incorrect-entity url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-05T02:02:30+00:00 -->
 
 ### Submitted by incorrect entity
 

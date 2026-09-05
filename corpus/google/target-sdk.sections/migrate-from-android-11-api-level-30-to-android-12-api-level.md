@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-from-android-11-api-level-30-to-android-12-api-level url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T16:10:14+00:00 -->
+<!-- source=target-sdk clause=migrate-from-android-11-api-level-30-to-android-12-api-level url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-05T02:02:46+00:00 -->
 
 ## Migrate from Android 11 (API level 30) to Android 12 (API level 31)
 

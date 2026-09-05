@@ -1,4 +1,4 @@
-<!-- source=prepare-and-roll-out-a-release clause=manage-app-changes-on-the-publishing-overview-page url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-04T16:10:05+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=manage-app-changes-on-the-publishing-overview-page url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-05T02:02:35+00:00 -->
 
 ## Manage app changes on the Publishing overview page
 

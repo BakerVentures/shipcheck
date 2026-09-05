@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=australia-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-04T16:10:02+00:00 -->
+<!-- source=age-ratings clause=australia-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-05T02:02:33+00:00 -->
 
 ### Australia age rating values
 
@@ -8,7 +8,7 @@ As required by [Australia’s guidelines for the classification of computer game
 
 | Rating | Definition |
 | --- | --- |
-| 16+ | Apps that contain: **Capabilities:** Social media Social media disabled for users under 13 **Chance-Based Activities:** Loot boxes |
-| R 18+ | Apps that contain: **Chance-Based Activities:** Infrequent simulated gambling |
+| 16+ | Apps that contain: **Capabilities:** **Chance-Based Activities:** |
+| R 18+ | Apps that contain: **Chance-Based Activities:** |
 
 If we’re notified by the regulator that your app doesn’t meet their guidelines or requires a region-specific rating, you’ll receive a message from App Review. If you receive this message, follow the instructions and [re-submit your app for review](/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review).

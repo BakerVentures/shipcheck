@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/android/ fetched=2026-09-04T16:10:14+00:00 -->
+<!-- source=expo-submit-android clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/android/ fetched=2026-09-05T02:02:46+00:00 -->
 
 ## Automate with EAS Workflows
 

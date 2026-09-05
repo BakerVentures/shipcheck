@@ -3,7 +3,7 @@ shipcheck_source_id: submit-for-review
 title: "Overview of submitting for review"
 url: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review
 final_url: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review
-fetched_at: 2026-09-04T16:10:03+00:00
+fetched_at: 2026-09-05T02:02:33+00:00
 sha256: dedb0f60d360ee80c2ece8120b094d8da62c96101acdd5efc3b58f4af3934599
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/submit-for-review

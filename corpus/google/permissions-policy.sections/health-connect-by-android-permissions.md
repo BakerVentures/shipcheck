@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=health-connect-by-android-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-04T16:10:09+00:00 -->
+<!-- source=permissions-policy clause=health-connect-by-android-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-05T02:02:40+00:00 -->
 
 ## Health Connect by Android Permissions
 
@@ -49,7 +49,7 @@ When using Health Connect, data access and use must adhere to specific limitatio
 - Data use should be limited to providing or improving the appropriate use case or features visible in the application's user interface.
 - User data may only be transferred to third parties with explicit user consent: for security purposes (for example, to investigate abuse), to comply with applicable laws or regulations, or as part of mergers/acquisitions.
 - Human access to user data is restricted unless explicit user consent is obtained, for security purposes, to comply with laws, or when aggregated for internal operations as per legal requirements.
-- **All other transfers, uses, or sale of Health Connect data is prohibited, including:** Transferring or selling user data to third parties like advertising platforms, data brokers, or any information resellers. Transferring, selling, or using user data for serving ads, including personalized or interest-based advertising. Transferring, selling, or using user data to determine credit-worthiness or for lending purposes. Transferring, selling, or using user data with any product or service that may qualify as a medical device, unless the medical device app complies with all applicable regulations, including obtaining necessary clearances or approvals from relevant regulatory bodies (for example, U.S. FDA) for its intended use of Health Connect data, and the user has provided explicit consent for such use. Transferring, selling, or using user data for any purpose or in any manner involving Protected Health Information (as defined by HIPAA) unless user-initiated and in compliance with HIPAA regulations.
+- **All other transfers, uses, or sale of Health Connect data is prohibited, including:**
   Transferring or selling user data to third parties like advertising platforms, data brokers, or any information resellers.
   Transferring, selling, or using user data for serving ads, including personalized or interest-based advertising.
   Transferring, selling, or using user data to determine credit-worthiness or for lending purposes.

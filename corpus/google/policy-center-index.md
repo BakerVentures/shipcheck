@@ -3,8 +3,8 @@ shipcheck_source_id: policy-center-index
 title: "Google Play Developer Policy Center (section index)"
 url: https://play.google/developer-content-policy/
 final_url: https://play.google/developer-content-policy/
-fetched_at: 2026-09-04T16:10:04+00:00
-sha256: a4c52d2324224054617a4e753e21a6096abb3d8d67dff3baf7a35a100107996c
+fetched_at: 2026-09-05T02:02:34+00:00
+sha256: 364837ab809cb900ba4d45a1f442666433cb45e687cd819705fdedf34c53c398
 vendor: google
 note: "JS SPA. Section routes are not server-rendered, so only the table of contents is recoverable. Policy text comes from the support.google.com pages below."
 warnings: ["JS-rendered page: only the section index is recoverable. Policy text for these sections comes from support.google.com."]
@@ -235,8 +235,7 @@ If you're a developer and you're having issues with Google Play or access to Goo
 
 [Request mediation
 *(for EU based developers)*
-If you are a developer based in the EU and you offer goods or services to consumers located in the EU, learn more about how you can resolve disputes with Google Play through mediation.
-(EU only)](https://support.google.com/googleplay/android-developer/topic/9877065)
+If you are a developer based in the EU and you offer goods or services to consumers located in the EU, learn more about how you can resolve disputes with Google Play through mediation.](https://support.google.com/googleplay/android-developer/topic/9877065)
 
 [Publisher Content Policy for Google Play Books
 

@@ -1,4 +1,4 @@
-<!-- source=describing-data-use clause=describe-the-data-your-app-or-third-party-sdk-collects url=https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests fetched=2026-09-04T16:09:59+00:00 -->
+<!-- source=describing-data-use clause=describe-the-data-your-app-or-third-party-sdk-collects url=https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests fetched=2026-09-05T02:02:30+00:00 -->
 
 ### Describe the data your app or third-party SDK collects
 

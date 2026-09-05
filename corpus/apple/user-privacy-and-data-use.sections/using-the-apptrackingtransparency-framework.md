@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=using-the-apptrackingtransparency-framework url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-04T16:10:00+00:00 -->
+<!-- source=user-privacy-and-data-use clause=using-the-apptrackingtransparency-framework url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-05T02:02:31+00:00 -->
 
 ### Using the AppTrackingTransparency framework
 

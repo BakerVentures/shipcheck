@@ -3,8 +3,8 @@ shipcheck_source_id: export-compliance
 title: "Overview of export compliance"
 url: https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance
 final_url: https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance
-fetched_at: 2026-09-04T16:10:02+00:00
-sha256: 7cfd85641bba161780caf6356cda14a8609373d26fb1735e2ad85032f10f10ba
+fetched_at: 2026-09-05T02:02:33+00:00
+sha256: 73fae2f638150e31f0d3d70b892355914155e30a6c9409f7333b5f6fba7b65ef
 vendor: apple
 ---
 
@@ -35,4 +35,4 @@ App Store Connect provides a simple way for you to [determine your export compli
 | Scenario | Next Steps |
 | --- | --- |
 | No export compliance documentation required | [Update your app’s information property list (Info.plist) file in Xcode](https://developer.apple.com/documentation/security/complying_with_encryption_export_regulations) so that you don’t need to answer encryption questions with each app submission. |
-| Export compliance documentation required | Use App Store Connect to [submit your app encryption documentation](/help/app-store-connect/manage-app-information/determine-and-upload-app-encryption-documentation). Once the documentation is approved, attach it to your [beta build](/help/app-store-connect/test-a-beta-version/provide-export-compliance-information-for-beta-builds) or [app version build](/help/app-store-connect/manage-builds/choose-a-build-to-submit). [Update your app’s information property list (Info.plist) file in Xcode](https://developer.apple.com/documentation/security/complying_with_encryption_export_regulations) so that you don’t need to answer encryption questions with each app submission. |
+| Export compliance documentation required |  |

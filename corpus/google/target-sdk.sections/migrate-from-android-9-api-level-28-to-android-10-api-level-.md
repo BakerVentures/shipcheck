@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-from-android-9-api-level-28-to-android-10-api-level- url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T16:10:14+00:00 -->
+<!-- source=target-sdk clause=migrate-from-android-9-api-level-28-to-android-10-api-level- url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-05T02:02:46+00:00 -->
 
 ### Migrate from Android 9 (API level 28) to Android 10 (API level 29)
 
@@ -16,7 +16,7 @@
   is set to `false`, apps can additionally specify a
   [`minAspectRatio`](/reference/android/R.attr#minAspectRatio)
   which automatically letterboxes the app on narrower aspect ratios.
-- [Privacy changes](/about/versions/10/privacy/changes) [Scoped storage](/training/data-storage#scoped-storage)
+- [Privacy changes](/about/versions/10/privacy/changes)
   [Scoped storage](/training/data-storage#scoped-storage)
   - External storage access is limited only to an app-specific
   Restricted access to location while the app is in the background,

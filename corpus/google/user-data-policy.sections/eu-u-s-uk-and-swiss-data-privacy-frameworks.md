@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=eu-u-s-uk-and-swiss-data-privacy-frameworks url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-04T16:10:06+00:00 -->
+<!-- source=user-data-policy clause=eu-u-s-uk-and-swiss-data-privacy-frameworks url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-05T02:02:36+00:00 -->
 
 ## EU-U.S., UK, and Swiss Data Privacy Frameworks
 

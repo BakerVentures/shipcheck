@@ -3,8 +3,8 @@ shipcheck_source_id: payments-policy
 title: "Payments policy / Play Billing"
 url: https://support.google.com/googleplay/android-developer/answer/9858738
 final_url: https://support.google.com/googleplay/android-developer/answer/9858738?hl=en
-fetched_at: 2026-09-04T16:10:08+00:00
-sha256: b4d7efe8d7fd015e0583a175a68cd65a1ee2801076360330ae6713dea780a1df
+fetched_at: 2026-09-05T02:02:38+00:00
+sha256: e1b40e8ddf996849ca26a2719bf8ce67253d5b9993090533cbae95bd1a3db786
 vendor: google
 ---
 
@@ -12,7 +12,7 @@ vendor: google
 
 1. Developers charging for app downloads from Google Play must use Google Play's billing system as the method of payment for those transactions.
 
-1. Play-distributed apps requiring or accepting payment for access to in-app features or services, including any app functionality, digital content or goods (collectively “in-app purchases”), must use Google Play’s billing system for those transactions unless Section 3, 8, or 9 applies. Examples of app features or services requiring use of Google Play's billing system include, but are not limited to, in-app purchases of: Items (such as virtual currencies, extra lives, additional playtime, add-on items, characters, and avatars); subscription services (such as fitness, game, dating, education, music, video, service upgrades, and other content subscription services); app functionality or content (such as an ad-free version of an app or new features not available in the free version); and cloud software and services (such as data storage services, business productivity software, and financial management software).
+1. Play-distributed apps requiring or accepting payment for access to in-app features or services, including any app functionality, digital content or goods (collectively “in-app purchases”), must use Google Play’s billing system for those transactions unless Section 3, 8, or 9 applies. Examples of app features or services requiring use of Google Play's billing system include, but are not limited to, in-app purchases of:
 
 1. Google Play's billing system must not be used in cases where:
   payment is primarily:

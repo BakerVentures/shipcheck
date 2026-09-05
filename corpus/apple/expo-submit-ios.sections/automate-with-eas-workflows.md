@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-09-04T16:10:04+00:00 -->
+<!-- source=expo-submit-ios clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-09-05T02:02:34+00:00 -->
 
 ## Automate with EAS Workflows
 

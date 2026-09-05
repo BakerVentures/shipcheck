@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-to-android-8-api-level-26 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-04T16:10:14+00:00 -->
+<!-- source=target-sdk clause=migrate-to-android-8-api-level-26 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-05T02:02:46+00:00 -->
 
 ### Migrate to Android 8 (API level 26)
 
@@ -17,11 +17,11 @@ The following considerations apply to apps targeting Android 8.0 and higher vers
   - Apps running in the background have limited access to location data.
     On devices with Google Play services, use the [fused location provider](https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient) to get periodic location
     updates.
-- [Notification Channels](/about/versions/oreo/android-8.0#notifications) You should define [notification interruption properties](/training/notify-user/channels#importance) on a per-channel basis. You must assign notifications to a channel for the notifications to appear.
+- [Notification Channels](/about/versions/oreo/android-8.0#notifications)
   You should define [notification interruption properties](/training/notify-user/channels#importance) on a per-channel basis.
   You must assign notifications to a channel for the notifications to appear.
   This version of the platform supports [`NotificationCompat.Builder`](/reference/kotlin/androidx/core/app/NotificationCompat.Builder).
-- [Privacy](/about/versions/oreo/android-8.0-changes#privacy-all) [ANDROID_ID](/reference/kotlin/android/provider/Settings.Secure#ANDROID_ID) is scoped per app signing key.
+- [Privacy](/about/versions/oreo/android-8.0-changes#privacy-all)
   [ANDROID_ID](/reference/kotlin/android/provider/Settings.Secure#ANDROID_ID) is scoped per app signing key.
 
 For an exhaustive list of changes introduced in Android 8.0 (API level 26), see the [Behavior Changes](/about/versions/oreo/android-8.0-changes)

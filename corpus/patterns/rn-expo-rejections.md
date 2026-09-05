@@ -255,6 +255,39 @@ metadata and decide.
   careful about asserting it; flag it as a risk with the reasoning, not as a
   certainty.
 
+### P-38 The app itself generates or executes code that changes its own features
+- **Clause:** `2.5.2`
+- **Detect:** judgment — this is a narrow, specific category, not "uses
+  expo-updates." `expo-updates` for ordinary OTA bug-fix/content updates is
+  normal, common, and compliant on its own; do not flag `expo-updates` or
+  `eas.json`'s presence by itself, that would be a false positive on a huge
+  share of real Expo apps.
+- **Why this exists as a pattern:** in early 2026 Apple began enforcing
+  2.5.2 ("may not download, install, or execute code which introduces or
+  changes features or functionality of the app") against "vibe coding" /
+  AI-app-builder apps specifically — apps whose own core feature is
+  generating and running arbitrary code at runtime to add new functionality
+  the reviewer never saw (reported updates blocked for Replit and Vibecode,
+  Anything pulled from the store entirely). Apple's own statement was that
+  enforcement applies to any app executing code that alters its own
+  functionality, not to a named category.
+- **What actually trips this:** the app's core feature is "describe an app
+  and it builds/runs it," a plugin or extension marketplace fetched and
+  executed at runtime, or any mechanism where user-supplied or
+  server-supplied code is eval'd/interpreted to add UI, screens, or
+  capabilities beyond what shipped in the reviewed binary. Look for a
+  runtime code-execution or dynamic-UI-generation dependency
+  (e.g. a JS interpreter embedded for this purpose, not just JS itself
+  since RN apps are already interpreted) combined with product framing
+  ("build your own app," "AI app builder," "no-code") that describes this
+  as the product, not an OTA-update mechanism for the developer's own
+  content.
+- **Fix:** there usually isn't a config fix — this is a product-shape
+  question. If flagged, say so plainly as a structural risk tied to what
+  the app's core feature actually is, and point at 2.5.2's text rather than
+  asserting a verdict; this is squarely a "flag the risk, don't claim
+  certainty" case, same caution as P-26.
+
 ---
 
 ## G. Category-specific

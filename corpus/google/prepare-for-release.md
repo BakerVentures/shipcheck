@@ -3,7 +3,7 @@ shipcheck_source_id: prepare-for-release
 title: "Prepare your app for release"
 url: https://developer.android.com/studio/publish/preparing
 final_url: https://developer.android.com/studio/publish/preparing?hl=en
-fetched_at: 2026-09-04T16:10:11+00:00
+fetched_at: 2026-09-05T02:02:42+00:00
 sha256: 65bc4db71169facae8bd877c697b5c8967837580b7ec83adc37c32319a2791ff
 vendor: google
 substituted_from: https://developer.android.com/distribute/best-practices/launch/launch-checklist

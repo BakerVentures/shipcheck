@@ -3,8 +3,8 @@ shipcheck_source_id: data-safety
 title: "Provide information for Google Play's Data safety section"
 url: https://support.google.com/googleplay/android-developer/answer/10787469
 final_url: https://support.google.com/googleplay/android-developer/answer/10787469?hl=en
-fetched_at: 2026-09-04T16:10:05+00:00
-sha256: 9fd30df4b657f4e092565f9503f3de66654b39c84e6e110dbbf254c7f787f47f
+fetched_at: 2026-09-05T02:02:36+00:00
+sha256: 1e4ef95efda8f30ef756201cbf50ab8d6f15b1037559a518db8a2f25f6d4f695
 vendor: google
 ---
 
@@ -336,9 +336,9 @@ Optional format for SDKs
 | --- |
 | SDK / SDK feature that may collect or share data |
 | Data type SDK accesses and collects **Note:** Consider providing accurate technical information that will help your customers to determine which of the Play Data safety section definitions of data types applies to the data your SDK collects. In some cases, you may be comfortable using a Data safety section definition (e.g., “approximate location”) because the applicable data type is clear and does not depend on extraneous factors. In other cases, the data type definition may depend on how the given data is used after it is collected, or on the developer’s particular interpretation of Play Data safety section definitions. For example, IP addresses may be used alternatively to infer location, or to extract identifiers, or for a variety of other purposes depending on the nature of the SDK, its implementation by any given app, and other factors. **Note:** Developers do not have to declare data access as collection if it occurs solely on the user’s device as long as the data is never transmitted off the user’s device. |
-| For each data type listed: Describe required (or automatic) data access versus optional access. “Optional” includes the ability for a user to opt into or opt out of data collection. Does SDK transmit this data off the device? Describe purposes of collection and subsequent sharing and use. **Note:** In many cases, purposes of collection and sharing may depend on the particular use or implementation of your SDK by a given developer. Consider providing any relevant technical information here that will be helpful to your customers as they determine the applicable purposes to be declared in their apps’ Safety section. For example, if your SDK has optional modules, you should provide this information on a per-module basis. Does SDK transfer data to other third parties, including other apps on the user’s device? Describe the purposes for this sharing. **Note:** Developers do not have to disclose as sharing some transfers of data in their apps’ Data safety section in some circumstances, for example, where data is transferred to a service provider processing data on their behalf, or if data is transferred for specific legal purposes, and in some other cases. See the [Play Console Help article](https://support.google.com/googleplay/android-developer/answer/10787469) for more details. Consider providing any relevant technical information here that will be helpful to your customers as they evaluate whether a sharing exception applies. |
+| For each data type listed: **Note:** Developers do not have to disclose as sharing some transfers of data in their apps’ Data safety section in some circumstances, for example, where data is transferred to a service provider processing data on their behalf, or if data is transferred for specific legal purposes, and in some other cases. See the [Play Console Help article](https://support.google.com/googleplay/android-developer/answer/10787469) for more details. Consider providing any relevant technical information here that will be helpful to your customers as they evaluate whether a sharing exception applies. |
 | App level notes [complete section for any data collected or shared] |
-| Does your SDK encrypt data in transit? **Note:** If the answer is different for the different sets of data that the SDK collects, consider explaining how encryption in transit is applied to each relevant dataset. In Play’s Data safety section, developers can only declare encryption in transit if it applies to all user data that their app (including all its SDKs and libraries) collects and transmits off the user's device. Can the app developer and/or users request to delete user data collected? |
+|  |
 
 ## Frequently asked questions
 

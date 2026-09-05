@@ -3,8 +3,8 @@ shipcheck_source_id: publish-your-app
 title: "Publish your app"
 url: https://developer.android.com/studio/publish
 final_url: https://developer.android.com/studio/publish?hl=en
-fetched_at: 2026-09-04T16:10:12+00:00
-sha256: 59b621c426d825878b752d4e2a8490ee210df3df4ac40092188b2de76a2f1700
+fetched_at: 2026-09-05T02:02:43+00:00
+sha256: 9c61acb6fa71afd7d342465f37209acfd43fe96802482f486500bd7ef66395db
 vendor: google
 ---
 
@@ -25,17 +25,7 @@ here. You can also configure it to push builds to your
 [internal test distribution channel](/studio/publish/upload-bundle#test_with_play).
 
 Prepare your app for release Preparing your app for release is a multistep process involving the following
-tasks: **Configure your app for release.** At a minimum, you need to make sure that logging is disabled and removed and
-that your release variant has `debuggable false` for Groovy or
-`isDebuggable = false` for Kotlin script set. You should also
-[set your app's version information](/studio/publish/versioning). **Build and sign a release version of your app.** You can use the Gradle build files with the *release* build type to build and sign a
-release version of your app. For more information, see
-[Build and run your app](/tools/building/building-studio). **Test the release version of your app.** Before you distribute your app, you should thoroughly test the release version on at
-least one target handset device and one target tablet device.
-[Firebase Test Lab](https://firebase.google.com/docs/test-lab/android/get-started)
-is useful for testing across a variety of devices and configurations. **Update app resources for release.** Make sure that all app resources, such as multimedia files and graphics,
-are updated and included with your app or staged on the proper production servers. **Prepare remote servers and services that your app depends on.** If your app depends on external servers or services, make sure they
-are secure and production ready. You might need to perform several other tasks as part of the preparation process. For example,
+tasks: You might need to perform several other tasks as part of the preparation process. For example,
 you need to create an account on the app marketplace you want to use, if you don't already have
 one. You also need to create an icon for your app, and you might want to prepare
 an End User License Agreement (EULA) to protect yourself, your organization, and your intellectual
@@ -58,19 +48,9 @@ distributed to. Google Play also gives you access to several revenue-enhancing f
 [app licensing](/google/play/licensing). The rich array of tools
 and features, coupled with numerous end-user community features, makes Google Play the premier
 marketplace for selling and buying Android apps. [Releasing your app on Google Play](/distribute/googleplay) is a
-simple process that involves three basic steps: **Prepare promotional materials.** To fully leverage the marketing and publicity capabilities of Google Play, you need to
-create promotional materials for your app such as screenshots, videos, graphics, and
-promotional text. **Configure options and uploading assets.** Google Play lets you target your app to a worldwide pool of users and devices.
-By configuring various Google Play settings, you can choose the countries you want to
-reach, the listing languages you want to use, and the price you want to charge in each
-country. You can also configure listing details such as the app type, category, and
-content rating. When you are done configuring options, you can upload your promotional materials
-and your app as a draft app. **Publish the release version of your app.** If you are satisfied that your publishing settings are correctly configured and your
-uploaded app is ready to be released to the public, click
-**Publish**. Once it has passed Google Play review, your app will be
-live and available for download around the world. For more information, see [How Google Play works](/distribute/googleplay). Release through a website If you don't want to release your app on a marketplace like Google Play, you
+simple process that involves three basic steps: For more information, see [How Google Play works](/distribute/googleplay). Release through a website If you don't want to release your app on a marketplace like Google Play, you
 can make the app available for download on your own website or server, including
-on a private or enterprise server. To release through a website: [Prepare your app for release](/tools/publishing/preparing). Host the release-ready APK file on your website. Provide a download link to users. When users browse to the download link from their Android-powered devices,
+on a private or enterprise server. To release through a website: When users browse to the download link from their Android-powered devices,
 the file is downloaded and the Android system automatically starts installing it on
 the device.
 
@@ -89,12 +69,6 @@ version of Android running on the user's device: ![Screenshot showing the settin
 unknown apps from different sources.](/static/images/publishing/publishing_unknown_apps_sm.png) **Figure 1.** The **Install unknown apps** system settings screen,
 where users grant permission for a particular source to install unknown
 apps.
-On devices running Android 8.0 (API level 26) and higher, users must
-navigate to the **Install unknown apps** system settings screen to enable
-app installations from a particular source.
-On devices running Android 7.1.1 (API level 25) and lower, users must
-either enable the **Unknown sources** system setting or allow a single
-installation of an unknown app.
 Install unknown apps On devices running Android 8.0 (API level 26) and higher, users must grant
 permission to install apps from a source that isn't a first-party app store. To
 do so, they must enable the **Allow app installs** setting for that

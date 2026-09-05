@@ -3,7 +3,7 @@ shipcheck_source_id: testing-requirements
 title: "App testing requirements for new personal developer accounts"
 url: https://support.google.com/googleplay/android-developer/answer/14151465
 final_url: https://support.google.com/googleplay/android-developer/answer/14151465?hl=en
-fetched_at: 2026-09-04T16:10:09+00:00
+fetched_at: 2026-09-05T02:02:39+00:00
 sha256: d5681f48d897412b37dc8a4139d5f2736f9b0784389d5382f433d97046747f0b
 vendor: google
 note: "The 12-tester / 14-day closed-testing gate for new personal accounts."

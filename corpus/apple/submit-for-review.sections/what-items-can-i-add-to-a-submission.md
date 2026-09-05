@@ -1,4 +1,4 @@
-<!-- source=submit-for-review clause=what-items-can-i-add-to-a-submission url=https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review fetched=2026-09-04T16:10:03+00:00 -->
+<!-- source=submit-for-review clause=what-items-can-i-add-to-a-submission url=https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review fetched=2026-09-05T02:02:33+00:00 -->
 
 ### What items can I add to a submission?
 
