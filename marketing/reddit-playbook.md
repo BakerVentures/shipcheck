@@ -10,10 +10,14 @@ F5Bot (f5bot.com) keywords, all lowercase:
 - guideline 2.1
 - guideline 4.2
 - guideline 4.3
+- guideline 4.8
+- guideline 3.1.1
 - guideline 3.1.2
 - guideline 5.1.1
 - itms-91061
+- itms-91053
 - privacy manifest
+- app tracking transparency
 - resolution center
 - expo rejected
 - react native rejected
