@@ -104,16 +104,23 @@ deployed.
 
 ## Still needs you — this is the actual blocker on taking money
 
-Everything below needs your identity or banking. I did not attempt any of it —
-account creation and entering financial/tax info are hard lines I don't cross
-even on request.
+Everything below needs your identity or banking. Account creation, passwords
+and financial/tax info are hard lines I don't cross even on request.
 
-1. **Lemon Squeezy.** No existing account on this machine. Per
-   `lemon-squeezy-setup.md`: create the store, the three products (one-time
-   $29 / yearly $49 / yearly $149), and license keys.
-2. **Paste the three checkout URLs** into `docs/index.html`
-   (`REPLACE_CHECKOUT_SINGLE/YEARLY/AGENCY`) — the only placeholders left in
-   the file (confirmed live on the deployed page).
+1. **Activate the Lemon Squeezy store.** The store exists
+   (`bakerventures.lemonsqueezy.com`, account "Baker Ventures LLC") and I built
+   all three products and the LAUNCH discount inside it on 2026-09-06 — see the
+   status tables at the top of `lemon-squeezy-setup.md` for exactly what was
+   configured. What is left is what only you can do: **Verify your identity**
+   (Setup step 3), **2FA** (step 4) and **Connect a bank account** (step 7).
+   Until identity verification is done the store is stuck in test mode and the
+   storefront answers "This store has not been activated."
+2. **Then finish the live-mode checklist** in `lemon-squeezy-setup.md` — confirm
+   the three products and LAUNCH survived the copy into live mode, re-check the
+   discount's product scoping, and **paste the three live checkout URLs** into
+   `docs/index.html` (`REPLACE_CHECKOUT_SINGLE/YEARLY/AGENCY`, lines 168/174/177
+   — the only placeholders left in the file). The test-mode URLs are not
+   reusable; live copies have different ids.
 3. **Deploy `server/validate.js`.** Render Dashboard → New → Blueprint →
    connect this repo → Apply. It'll prompt for `LEMONSQUEEZY_API_KEY` first;
    the three `VARIANT_*` ids come after you create the products in step 1.

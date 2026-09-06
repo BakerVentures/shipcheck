@@ -1,5 +1,78 @@
 # Lemon Squeezy setup (no monthly fee; 5% + 50¢ per sale)
 
+## Status as of 2026-09-06
+
+Configured in the dashboard. Account "Baker Ventures LLC"; storefront
+<https://bakerventures.lemonsqueezy.com> (not yet activated):
+
+| Step | State |
+| --- | --- |
+| 1. Create store | done |
+| 2. Store settings (logo, contact email) | done |
+| 3. Verify identity / activate store | **you** — personal ID details |
+| 4. Two-factor authentication | **you** — your own device |
+| 5. Products (all three) | done, published |
+| 6. Discount code LAUNCH | done, active |
+| 7. Connect a bank account | **you** — banking details |
+
+Products as actually created (product id in parentheses):
+
+| Product | Price | License keys | Length | Activation limit |
+| --- | --- | --- | --- | --- |
+| ShipCheck · One App (1341681) | $29 one-time | on | unlimited (never expires) | 1 |
+| ShipCheck · Unlimited (1341682) | $49/year | on | tied to subscription | 10 |
+| ShipCheck · Agency (1341687) | $149/year | on | tied to subscription | 50 |
+
+Each product's email receipt carries the thank-you note
+"Run /shipcheck:unlock in Claude Code and paste this key."
+
+Discount code (id 1122711): **LAUNCH**, $10 fixed amount off, scoped to One App
+and Unlimited only (not Agency), limited to 100 redemptions across all
+customers, currently Active.
+
+### Test mode, and what it means for the above
+
+All of the above was created while the dashboard's *Test mode* toggle was on.
+Lemon Squeezy keeps test data completely separate from live data, and the
+toggle **cannot be switched off until the store is activated** (step 3) — so
+test mode was not a choice, it is where a not-yet-activated store puts you.
+
+The fix was applied: every product and the discount was pushed across with the
+"Copy to Live Mode" item in each row's `...` menu. Lemon Squeezy confirmed
+"Your product is now in live mode!" for ShipCheck · One App and "Your discount
+is now in live mode!" for LAUNCH. The same menu item was clicked for Agency and
+Unlimited but their toasts had already faded before they could be read, so
+those two are **probable, not confirmed** — verify after activation rather than
+assuming, and do not simply click Copy to Live Mode again, which would create
+duplicate live products.
+
+Verification is blocked until activation: with test mode locked on, the live
+list is not viewable in the dashboard, and the public storefront
+<https://bakerventures.lemonsqueezy.com> answers "This store has not been
+activated."
+
+**After you finish step 3, do these in order:**
+
+1. Switch *Test mode* off.
+2. Confirm the live list holds exactly three products — One App $29, Unlimited
+   $49/yr, Agency $149/yr — and one LAUNCH discount. Recreate anything missing
+   from the tables above; delete any duplicate.
+3. Open the live LAUNCH code and confirm it is still scoped to One App and
+   Unlimited only. A copied discount's product scoping points at the products
+   it was built against, and the live products are new records with new ids, so
+   this is the most likely thing to have come across wrong.
+4. Collect the three live checkout URLs (row `...` → Share → Checkout Link) and
+   paste them into `docs/index.html` over `REPLACE_CHECKOUT_SINGLE` (line 168),
+   `REPLACE_CHECKOUT_YEARLY` (line 174) and `REPLACE_CHECKOUT_AGENCY` (line
+   177).
+
+A checkout link looks like
+`https://bakerventures.lemonsqueezy.com/checkout/buy/<variant-uuid>`. **The
+test-mode URLs are not reusable** — a copied product gets a new id, so its
+checkout URL differs from its test-mode twin. Take the URLs from live mode.
+
+## Original plan
+
 1. Create store "shipcheck". Enable license keys under Settings → Licensing.
 
 2. Products (three, all with "Generate license keys" on):
