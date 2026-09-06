@@ -70,6 +70,136 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 @media (max-width:560px){.pricing{grid-template-columns:1fr}.checks li{grid-template-columns:1fr;gap:2px}}
 @media (prefers-reduced-motion:no-preference){.term{animation:none}}
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://bakerventures.github.io/shipcheck/#org",
+      "name": "Baker Ventures",
+      "url": "https://bakerventures.github.io/shipcheck/",
+      "sameAs": [
+        "https://github.com/BakerVentures"
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://bakerventures.github.io/shipcheck/#app",
+      "name": "ShipCheck",
+      "alternateName": "shipcheck",
+      "description": "A Claude Code plugin that scans a React Native or Expo project and its store listing against the live App Store Review Guidelines and Google Play policies, cites the exact clause, and gives the fix.",
+      "url": "https://bakerventures.github.io/shipcheck/",
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "Static analysis and app-store compliance checker",
+      "operatingSystem": "macOS, Linux, Windows",
+      "softwareVersion": "0.2.11",
+      "softwareRequirements": "Claude Code",
+      "installUrl": "https://github.com/BakerVentures/shipcheck",
+      "codeRepository": "https://github.com/BakerVentures/shipcheck",
+      "license": "https://github.com/BakerVentures/shipcheck/blob/master/LICENSE",
+      "isAccessibleForFree": true,
+      "author": {
+        "@id": "https://bakerventures.github.io/shipcheck/#org"
+      },
+      "publisher": {
+        "@id": "https://bakerventures.github.io/shipcheck/#org"
+      },
+      "sameAs": [
+        "https://github.com/BakerVentures/shipcheck"
+      ],
+      "featureList": [
+        "Scans React Native and Expo projects for App Store rejection risk",
+        "Checks store-listing metadata against App Store Review Guidelines",
+        "Checks Google Play policy compliance including target API level",
+        "Cites the exact guideline clause from live-fetched policy text",
+        "Drafts App Review Resolution Center replies",
+        "Runs in CI as a GitHub Action or standalone CLI"
+      ],
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free scan",
+          "price": "0",
+          "priceCurrency": "USD",
+          "url": "https://bakerventures.github.io/shipcheck/#pricing",
+          "category": "Risk score plus top three findings, on every app"
+        },
+        {
+          "@type": "Offer",
+          "name": "One app",
+          "price": "29",
+          "priceCurrency": "USD",
+          "url": "https://bakerventures.github.io/shipcheck/#pricing",
+          "category": "Full report, unlimited rescans, reply drafts, one app forever"
+        },
+        {
+          "@type": "Offer",
+          "name": "Unlimited",
+          "price": "49",
+          "priceCurrency": "USD",
+          "url": "https://bakerventures.github.io/shipcheck/#pricing",
+          "category": "Unlimited apps, billed yearly"
+        },
+        {
+          "@type": "Offer",
+          "name": "Agency",
+          "price": "149",
+          "priceCurrency": "USD",
+          "url": "https://bakerventures.github.io/shipcheck/#pricing",
+          "category": "Unlimited apps shareable across a team, billed yearly"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://bakerventures.github.io/shipcheck/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does my code get uploaded anywhere?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The scan runs in your own Claude Code session. The only network calls are fetching Apple and Google's public policy pages and, if you buy a license, a key check that sends the key and plugin version and nothing else."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it guarantee approval?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. It catches the rejections that come from the guidelines and from common React Native and Expo configuration mistakes. It can't run your app or predict a reviewer's mood."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why React Native and Expo specifically?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Because that's where the config-level rejections cluster: transitive permission strings, SDK privacy manifests, Expo Go leftovers. Native Swift projects work too, with less depth."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why not just ask Claude to review my app against the guidelines?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Because \"the guidelines\" in Claude's training data are however old the model's cutoff is, and Apple and Google change these pages constantly. shipcheck fetches the live pages, hashes them, and cites the clause off disk — /shipcheck:refresh shows you exactly what changed since your last scan. A citation in your report is text it actually fetched, not text a model remembered."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Refunds?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Fourteen days, no questions. Email the address on your receipt."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <div class="wrap">

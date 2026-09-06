@@ -202,3 +202,12 @@ with open(os.path.join(OUT, "index.html"), "w", encoding="utf-8") as f:
 with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write(ggp.render_sitemap(index_links))
 print("wrote", os.path.join(OUT, "index.html"), "and sitemap.xml (merged)")
+
+# The site-root sitemap (the one robots.txt points crawlers at) was written by
+# gen_guideline_pages at import time, before this script's pages existed, so it
+# has to be re-rendered here against the merged list too -- otherwise every
+# comparison page is missing from the sitemap crawlers actually read.
+_root_sitemap = os.path.join(ROOT, "docs", "sitemap.xml")
+with open(_root_sitemap, "w", encoding="utf-8") as f:
+    f.write(ggp.render_root_sitemap(index_links))
+print("wrote", _root_sitemap, "(merged)")

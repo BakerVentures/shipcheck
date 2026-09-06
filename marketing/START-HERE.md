@@ -131,7 +131,22 @@ and financial/tax info are hard lines I don't cross even on request.
    `scripts/license.py` to your Render URL and commit it, or tell early users
    to `export SHIPCHECK_VALIDATE_URL=...`.
 5. Set F5Bot keywords per `reddit-playbook.md`.
-6. **The landing page promises a 14-day no-questions refund** (`docs/index.html`,
+6. **Submit the sitemap to Bing Webmaster Tools and Google Search Console**:
+   `https://bakerventures.github.io/shipcheck/sitemap.xml`. Bing is the one that
+   matters most — ChatGPT search and Copilot both retrieve from Bing's index, so
+   not being in Bing means those two cannot cite the site at all, regardless of
+   anything else. Both tools are free and GSC can be imported straight into Bing.
+7. **Decide where `robots.txt` should live.** `docs/robots.txt` now exists and
+   allows every AI crawler by name, but it is inert where it sits: robots.txt is
+   only read at a host root, and this is a GitHub Pages project site, so it
+   serves under `/shipcheck/` where no crawler looks.
+   `https://bakerventures.github.io/robots.txt` 404s today, which means
+   allow-all, so nothing is blocked right now and this is not urgent. To make it
+   real, either create a `bakerventures.github.io` repo holding that file at the
+   host root, or put a custom domain on this site. The file's own header
+   comment explains both. (`AIMarketing.md` argues for the custom-domain route
+   anyway, under one studio entity.)
+8. **The landing page promises a 14-day no-questions refund** (`docs/index.html`,
    the "Refunds?" FAQ line). That's a real commitment to customers, not just
    copy — set the matching refund window in Lemon Squeezy's store settings so
    the policy is actually true the moment someone buys, and decide who

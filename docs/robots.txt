@@ -1,0 +1,73 @@
+# shipcheck — https://bakerventures.github.io/shipcheck/
+# Everything here is public documentation. Crawlers, including the AI
+# assistants' retrieval bots, are welcome; being absent from their index is
+# the same as not existing when someone asks one of them what to use.
+#
+# READ THIS BEFORE TRUSTING THIS FILE. robots.txt is only honoured at the root
+# of a host. This site is a GitHub Pages *project* site, so this file serves at
+#   https://bakerventures.github.io/shipcheck/robots.txt
+# and no crawler reads it there. The file that governs this host is
+#   https://bakerventures.github.io/robots.txt
+# which currently 404s (checked 2026-09-06). A 404 there means allow-all by
+# default, so nothing is being blocked today and the rules below are not
+# fixing an active problem -- they are here so that the moment this site sits
+# at a host root the correct policy is already in place.
+#
+# To make these directives actually apply, either:
+#   a) put a robots.txt with these contents in a repo named
+#      `bakerventures.github.io` (that repo serves the host root), or
+#   b) point a custom domain at this site, which makes this file the root.
+# Either way the Sitemap line below only helps once it is at a root, so submit
+# the sitemap URL directly in Bing Webmaster Tools and Google Search Console
+# rather than relying on discovery through this file.
+
+User-agent: *
+Allow: /
+
+# Named explicitly rather than left to the wildcard: several of these bots are
+# checked for by name, and an explicit Allow is the difference between being a
+# citation candidate and being skipped.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+Sitemap: https://bakerventures.github.io/shipcheck/sitemap.xml

@@ -612,3 +612,24 @@ def render_sitemap(links):
 with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write(render_sitemap(index_links))
 print("wrote", os.path.join(OUT, "sitemap.xml"))
+
+
+# The guidelines sitemap above lists only the guideline pages. Crawlers are
+# pointed at a site-root sitemap by robots.txt, so that one has to exist too
+# and has to include the homepage -- generated here rather than hand-written
+# so a new guideline page cannot silently go missing from it.
+def render_root_sitemap(links):
+    locs = ["https://bakerventures.github.io/shipcheck/",
+            "https://bakerventures.github.io/shipcheck/guidelines/"]
+    locs += ["https://bakerventures.github.io/shipcheck/guidelines/%s.html" % slug
+             for slug, _, _ in links]
+    entries = "\n".join("  <url><loc>%s</loc></url>" % loc for loc in locs)
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            + entries + "\n</urlset>\n")
+
+
+_root_sitemap = os.path.join(ROOT, "docs", "sitemap.xml")
+with open(_root_sitemap, "w", encoding="utf-8") as f:
+    f.write(render_root_sitemap(index_links))
+print("wrote", _root_sitemap)
