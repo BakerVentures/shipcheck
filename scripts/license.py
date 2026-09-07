@@ -38,6 +38,16 @@ HOME = os.path.expanduser("~/.shipcheck")
 LICENSE_FILE = os.path.join(HOME, "license")
 CACHE_FILE = os.path.join(HOME, "cache.json")
 CACHE_TTL = 7 * 24 * 3600
+# A "no, that licence is not valid" answer is cached for minutes, not days.
+# These two must not share a TTL. A positive answer is safe to hold for a week
+# -- the worst case is a lapsed subscription staying usable a little longer.
+# A negative answer held for a week is the opposite: the realistic way to get
+# one is a transient fault at our end (a VARIANT_* env var wrong for an hour, a
+# captive portal answering JSON, a bad deploy), and with a 7-day TTL every
+# customer who happened to scan during that window stays locked out for a week
+# *after* the fault is fixed, with no way for us to reach into their machine
+# and undo it. Re-asking a few minutes later costs one HTTP request.
+NEG_CACHE_TTL = 10 * 60
 DEFAULT_ENDPOINT = os.environ.get(
     "SHIPCHECK_VALIDATE_URL", "https://api.shipcheck.dev/validate")
 FREE_FINDING_LIMIT = 3
@@ -81,7 +91,10 @@ def _cache_get(ck):
         # is a cache miss, not a crash -- falls through to a live check.
         return None
     e = c.get(ck)
-    if not isinstance(e, dict) or time.time() - e.get("checked_at", 0) > CACHE_TTL:
+    if not isinstance(e, dict):
+        return None
+    ttl = CACHE_TTL if e.get("valid", True) else NEG_CACHE_TTL
+    if time.time() - e.get("checked_at", 0) > ttl:
         return None
     return e
 
@@ -132,9 +145,19 @@ def check(app_id=None, endpoint=None, timeout=8):
     if cached:
         tier = cached.get("tier", "unlimited")
         valid = cached.get("valid", True)
+        when = time.strftime("%Y-%m-%d", time.localtime(cached["checked_at"]))
+        if valid:
+            reason = "cached (%s)" % when
+        else:
+            # Say plainly that this is a remembered refusal and that it expires
+            # shortly -- "cached (2026-09-06)" on its own reads like a check
+            # that succeeded, which is exactly wrong for someone who has paid
+            # and is staring at a free-tier report.
+            reason = ("cached refusal from %s; re-checked automatically within "
+                      "%d minutes, or run `shipcheck-license --clear-cache` now"
+                      % (when, NEG_CACHE_TTL // 60))
         return dict(tier=tier if valid else "free", valid=valid,
-                    reason="cached (%s)" % time.strftime(
-                        "%Y-%m-%d", time.localtime(cached["checked_at"])),
+                    reason=reason,
                     limit=None if valid else FREE_FINDING_LIMIT,
                     bound_app=cached.get("bound_app"))
 
@@ -168,13 +191,32 @@ def check(app_id=None, endpoint=None, timeout=8):
                            % type(e).__name__)
 
 
+def clear_cache():
+    """Drop every cached verdict. The remedy of last resort for a customer
+    stuck behind a stale refusal -- it has to be a real flag, because telling
+    someone in a support email to delete a JSON file by hand does not scale and
+    a prose instruction in a command's markdown only runs if a model follows
+    it. Returns True if a cache file was actually removed."""
+    try:
+        os.remove(CACHE_FILE)
+        return True
+    except OSError:
+        return False
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--app-id", default="",
                     help="bundle identifier, for per-app licence binding")
     ap.add_argument("--require-pro", action="store_true",
                     help="exit 1 if this is not a paid tier")
+    ap.add_argument("--clear-cache", action="store_true",
+                    help="forget every cached verdict, then re-check live")
     args = ap.parse_args()
+    if args.clear_cache:
+        removed = clear_cache()
+        print(json.dumps({"cleared": removed, "cache_file": CACHE_FILE},
+                         indent=2), file=sys.stderr)
     res = check(args.app_id or None)
     print(json.dumps(res, indent=2))
     if args.require_pro and not res.get("valid"):

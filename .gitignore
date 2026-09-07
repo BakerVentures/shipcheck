@@ -25,3 +25,14 @@ server/node_modules/
 
 bindings.json
 evals/results/
+
+# Launch/marketing working notes are deliberately NOT published.
+# They contain the licence-server failure mode in plain words, live Lemon
+# Squeezy discount and product ids, subreddit self-promo ratios, and internal
+# notes about other Baker Ventures products -- all of which read very badly to
+# someone who finds them from a Show HN link, and none of which a user needs.
+# competitive-analysis.md is the deliberate exception: the public
+# docs/guidelines/vs-free-claude-code-checkers.html page cites it as its source,
+# and its honesty about competitors is a credibility asset.
+marketing/*
+!marketing/competitive-analysis.md

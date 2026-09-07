@@ -12,7 +12,7 @@ reviewer will likely say, and the specific fix.
 ```
 $ /shipcheck:scan
 
-shipcheck · guidelines fetched 2026-09-04 · risk 71/100
+shipcheck · guidelines fetched 2026-09-05 · risk 71/100
 
 HIGH  5.1.1(v)    Account deletion not found
       Reviewer will say: "Your app supports account creation but does not
@@ -55,8 +55,9 @@ Then, in your Expo/RN project:
 
 First run drops a `shipcheck.metadata.md` template in your project root. Fill it
 in with what you will actually paste into App Store Connect, then scan again —
-roughly half of App Store rejections are metadata problems that cannot be seen
-from code.
+a whole class of rejection lives in that material — guideline 2.3.x, what the
+listing claims versus what the build actually does — and none of it is visible
+to a tool that only reads code.
 
 Requires Python 3.9+ (preinstalled on macOS). No pip packages, no Node
 dependencies, no build step.
@@ -124,7 +125,8 @@ gate for new personal developer accounts.
 Apple and Google change these pages constantly. ShipCheck does not hardcode
 policy text. It fetches **37 official Apple and Google pages** and caches them
 with a fetch date and a SHA-256, chunked so a citation points at an exact clause
-— the App Store Review Guidelines are split into **138 numbered clauses**, each
+— the App Store Review Guidelines are split into **numbered clauses** (137 in the
+current corpus), each
 with a deep link back to Apple's page.
 
 `/shipcheck:refresh` re-fetches everything and diffs it against the previous
@@ -201,7 +203,7 @@ evals/              claude plugin eval case for the judgment half (early-access
                     tooling; see evals/*/README.md for its current limitations)
 server/validate.js  license endpoint (deploy yourself)
 docs/               landing page + assets/demo GIFs, served by GitHub Pages from /docs
-marketing/          launch playbooks: Show HN, Reddit, PH, directories, LS setup
+marketing/          competitive analysis behind the comparison page
 examples/           a deliberately non-compliant Expo app, a bare-RN one, and a
                     genuinely clean one -- for testing both the fail and pass paths
 ```

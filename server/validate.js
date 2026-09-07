@@ -29,7 +29,8 @@
  *   SINGLE_APP_SEATS            apps a "single" licence may bind (default 1)
  *   BINDING_FILE                default ./bindings.json
  *   PORT                        default 3000
- *   CACHE_TTL_MS                default 7 days
+ *   CACHE_TTL_MS                default 7 days (positive verdicts)
+ *   NEG_CACHE_TTL_MS            default 10 minutes (refusals)
  */
 
 const express = require('express');
@@ -55,6 +56,13 @@ app.use((err, _req, res, next) => {
 // real Lemon Squeezy endpoint in every real deployment.
 const LS_VALIDATE = process.env.LS_VALIDATE_URL || 'https://api.lemonsqueezy.com/v1/licenses/validate';
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 7 * 24 * 60 * 60 * 1000);
+// Negative verdicts expire in minutes, not days -- see the long note in
+// scripts/license.py. Holding "not valid" for a week means a misconfigured
+// VARIANT_* or a bad deploy keeps refusing a paying customer long after the
+// mistake is fixed, and nothing we can do server-side reaches the client cache.
+// Both halves have to be short or the client's short TTL just re-asks a server
+// that keeps repeating the stale no.
+const NEG_CACHE_TTL_MS = Number(process.env.NEG_CACHE_TTL_MS || 10 * 60 * 1000);
 const STORE_ID = process.env.LEMONSQUEEZY_STORE_ID || '';
 const SINGLE_APP_SEATS = Number(process.env.SINGLE_APP_SEATS || 1);
 const BINDING_FILE = process.env.BINDING_FILE || path.join(__dirname, 'bindings.json');
@@ -99,7 +107,8 @@ const cache = new Map();
 const cacheGet = (k) => {
   const hit = cache.get(k);
   if (!hit) return null;
-  if (Date.now() - hit.at > CACHE_TTL_MS) { cache.delete(k); return null; }
+  const ttl = hit.valid === false ? NEG_CACHE_TTL_MS : CACHE_TTL_MS;
+  if (Date.now() - hit.at > ttl) { cache.delete(k); return null; }
   return hit;
 };
 const cacheSet = (k, v) => {

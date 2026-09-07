@@ -56,7 +56,7 @@ is empty." It never sees the description, keywords, What's New, screenshots,
 review notes, demo account, age rating, or paywall copy you are about to paste
 into App Store Connect, because nothing ever collects them.
 
-Roughly half of App Store rejections live in exactly that material (2.3.x).
+A whole class of rejection lives in exactly that material (2.3.x).
 
 `shipcheck.metadata.md` is the whole difference. It is unglamorous — a markdown
 file the developer fills in — and it is the moat, because:

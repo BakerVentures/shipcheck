@@ -43,6 +43,14 @@ def _default_corpus_dir():
             return refreshed
     return bundled
 
+# Where a free report sends someone who wants the rest of it. This used to be
+# shipcheck.dev, which is not a registered domain -- every free report was
+# ending on a link that does not resolve. Point it at the page that actually
+# exists; when the checkout links on that page go live the CTA becomes correct
+# with no change here. If a real domain is ever registered, change this line.
+BUY_URL = os.environ.get(
+    "SHIPCHECK_BUY_URL", "https://bakerventures.github.io/shipcheck/#pricing")
+
 WEIGHT = {"critical": 22, "high": 12, "medium": 5, "low": 2, "info": 0}
 CONF = {"high": 1.0, "medium": 0.75, "low": 0.5}
 BADGE = {"critical": "🔴 CRITICAL", "high": "🟠 HIGH", "medium": "🟡 MEDIUM",
@@ -277,8 +285,8 @@ def render(data, tier_info, corpus_manifest=None, corpus_dir=None):
         L.append("**$29 one-time for this app**, unlimited scans of it forever — or "
                  "**$49/year for unlimited apps** if you ship more than one.")
         L.append("")
-        L.append("Unlock: <https://shipcheck.dev> — then run "
-                 "`/shipcheck:license <your-key>` and re-scan.")
+        L.append("Unlock: <%s> — then run "
+                 "`/shipcheck:license <your-key>` and re-scan." % BUY_URL)
         L.append("")
 
     if passes:

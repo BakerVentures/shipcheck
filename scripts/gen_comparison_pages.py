@@ -145,7 +145,7 @@ PAGES.append(dict(
 
 <h2>The structural gap: greenlight can't read your store listing</h2>
 <p>Not "doesn't yet" -- <em>can't</em>, in its current shape. It reads <code>app.json</code>, so the most it can say is "expo.description is empty." It never sees the actual description, keywords, What's New text, screenshot descriptions, review notes, demo account, age rating, or paywall copy you're about to paste into App Store Connect, because nothing in its design ever collects them.</p>
-<p>Roughly half of App Store rejections live in exactly that material (guideline 2.3.x). <code>shipcheck.metadata.md</code> -- an unglamorous markdown file you fill in once -- is the actual moat, for three reasons: it's an input no code scanner has; judging it needs a model reading current guideline text, which offline bundled rules can't do; and in a Claude Code plugin, that model is the one you already have open, so it costs us nothing to run and costs you nothing extra to use.</p>
+<p>A whole class of rejection lives in exactly that material (guideline 2.3.x). <code>shipcheck.metadata.md</code> -- an unglamorous markdown file you fill in once -- is the actual moat, for three reasons: it's an input no code scanner has; judging it needs a model reading current guideline text, which offline bundled rules can't do; and in a Claude Code plugin, that model is the one you already have open, so it costs us nothing to run and costs you nothing extra to use.</p>
 
 <h2>Where greenlight is honestly better</h2>
 <ul>

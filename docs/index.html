@@ -160,7 +160,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
           "name": "Does my code get uploaded anywhere?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. The scan runs in your own Claude Code session. The only network calls are fetching Apple and Google's public policy pages and, if you buy a license, a key check that sends the key and plugin version and nothing else."
+            "text": "No. The scan runs in your own Claude Code session, and no shipcheck server ever sees your project. There are exactly three kinds of outbound request: fetching Apple's and Google's public policy pages; reachability checks on the support and privacy URLs you list in your own metadata file (skip them with --offline); and, if you buy a license, a key check carrying your key, the plugin version, and an opaque per-app token. No project path, dependency list, source, metadata, or finding is ever transmitted — _payload() in scripts/license.py is the entire request body, so you can check rather than trust me."
           }
         },
         {
@@ -213,7 +213,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 
 <pre class="term" aria-label="Example scan output"><span class="p">$</span> /shipcheck:scan
 
-<b>shipcheck</b> · guidelines fetched 2026-09-04 · risk <b>71/100</b>
+<b>shipcheck</b> · guidelines fetched 2026-09-05 · risk <b>71/100</b>
 
 <span class="r">HIGH</span>  5.1.1(v)  Account deletion not found
        Reviewer will say: "Your app supports account creation but does not
@@ -239,7 +239,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
   <small>Runs inside your own Claude Code. Your code never leaves your machine.</small>
 </div>
 
-<p class="stat">Apple's App Review team evaluated <b>9.1 million</b> submissions in 2025 and rejected <b>over 2 million</b> of them — including <b>443,000+ for privacy violations</b> alone. Most of those are one missing plist entry or a transitive SDK's privacy manifest. (<a href="https://www.apple.com/newsroom/2026/05/the-app-store-stopped-over-2-point-2-billion-usd-in-fraudulent-transactions-in-2025/">Apple Newsroom, May 2026</a>)</p>
+<p class="stat">Apple's App Review team evaluated <b>9.1 million</b> submissions in 2025 and rejected <b>over 2 million</b> of them — including <b>443,000+ for privacy violations</b> alone. (<a href="https://www.apple.com/newsroom/2026/05/the-app-store-stopped-over-2-point-2-billion-usd-in-fraudulent-transactions-in-2025/">Apple Newsroom, May 2026</a>)</p>
 
 <img src="assets/how-it-works.png" alt="Three steps: scan the project and store listing, check against live Apple and Google policy, get a ranked report with fixes" style="width:100%;max-width:100%;height:auto;border-radius:8px;margin:0 0 52px;display:block">
 <section id="checks">
@@ -279,7 +279,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 
 <section>
 <h2>Isn't there a free version of this?</h2>
-<p>Yes — several. The deterministic code and config checks are table stakes now and free everywhere, including in shipcheck's own free scan. What the free tools can't reach is your actual store listing: the description, screenshots, paywall copy, and demo account you're about to paste into App Store Connect, which is roughly half of what actually gets apps rejected. <a href="guidelines/vs-free-claude-code-checkers.html">See the measured comparison against greenlight and five other free Claude Code checkers &rarr;</a></p>
+<p>Yes — several. The deterministic code and config checks are table stakes now and free everywhere, including in shipcheck's own free scan. What the free tools can't reach is your actual store listing: the description, screenshots, paywall copy, and demo account you're about to paste into App Store Connect, a whole rejection surface (guideline 2.3.x) that a code scanner cannot see at all. <a href="guidelines/vs-free-claude-code-checkers.html">See the measured comparison against greenlight and five other free Claude Code checkers &rarr;</a></p>
 </section>
 
 <section id="pricing">
@@ -310,7 +310,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 <section>
 <h2>Questions</h2>
 <dl class="faq">
-  <dt>Does my code get uploaded anywhere?</dt><dd>No. The scan runs in your own Claude Code session. The only network calls are fetching Apple and Google's public policy pages and, if you buy a license, a key check that sends the key and plugin version and nothing else.</dd>
+  <dt>Does my code get uploaded anywhere?</dt><dd>No. The scan runs in your own Claude Code session, and no shipcheck server ever sees your project. There are exactly three kinds of outbound request: fetching Apple's and Google's public policy pages; reachability checks on the support and privacy URLs you list in your own metadata file (skip them with <code>--offline</code>); and, if you buy a license, a key check carrying your key, the plugin version, and an opaque per-app token. No project path, dependency list, source, metadata, or finding is ever transmitted — <code>_payload()</code> in <code>scripts/license.py</code> is the entire request body, so you can check rather than trust me.</dd>
   <dt>Does it guarantee approval?</dt><dd>No. It catches the rejections that come from the guidelines and from common React Native and Expo configuration mistakes. It can't run your app or predict a reviewer's mood.</dd>
   <dt>Why React Native and Expo specifically?</dt><dd>Because that's where the config-level rejections cluster: transitive permission strings, SDK privacy manifests, Expo Go leftovers. Native Swift projects work too, with less depth.</dd>
   <dt>Why not just ask Claude to review my app against the guidelines?</dt><dd>Because "the guidelines" in Claude's training data are however old the model's cutoff is, and Apple and Google change these pages constantly. shipcheck fetches the live pages, hashes them, and cites the clause off disk — <code>/shipcheck:refresh</code> shows you exactly what changed since your last scan. A citation in your report is text it actually fetched, not text a model remembered.</dd>
@@ -318,7 +318,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 </dl>
 </section>
 
-<footer>Built by an indie developer who got rejected enough times to automate it. <a href="https://github.com/BakerVentures/shipcheck">Source and issues on GitHub</a>.</footer>
+<footer>Built by an indie developer who shipped Expo apps, got caught by paywall-copy rules, and automated the check. <a href="https://github.com/BakerVentures/shipcheck">Source and issues on GitHub</a>.</footer>
 </div>
 </body>
 </html>
