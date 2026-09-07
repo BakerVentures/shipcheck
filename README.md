@@ -208,6 +208,26 @@ examples/           a deliberately non-compliant Expo app, a bare-RN one, and a
                     genuinely clean one -- for testing both the fail and pass paths
 ```
 
+## Free reference, no install needed
+
+The rejection references ShipCheck cites are published openly, with the primary
+Apple or Google document linked on every claim, at
+**<https://shipcheck.bakerventuresstudio.com>**. Useful whether or not you ever
+run the plugin:
+
+- [The required-reason API reference](https://shipcheck.bakerventuresstudio.com/rejections/required-reason-api-reference)
+  — all five categories and every approved reason code, transcribed from Apple's own documentation
+- [Apple's privacy-manifest SDK list mapped to npm packages](https://shipcheck.bakerventuresstudio.com/rejections/apple-sdk-to-npm-package-map)
+  — which of your dependencies pulls in each of the 86 listed SDKs. Also published as an open
+  dataset under CC BY 4.0: <https://github.com/BakerVentures/apple-privacy-manifest-sdk-map>
+- [The four upload-time blockers](https://shipcheck.bakerventuresstudio.com/rejections/itms-91053-missing-api-declaration)
+  — ITMS-90683, 91053, 91054/5/6 and 91061, each with the fix
+- [What reviewers actually test](https://shipcheck.bakerventuresstudio.com/rejections/guideline-2-1-what-reviewers-actually-test)
+- [The first-submission checklist](https://shipcheck.bakerventuresstudio.com/guides/first-submission-checklist)
+  and [what to do when you are rejected](https://shipcheck.bakerventuresstudio.com/guides/what-to-do-when-your-app-is-rejected)
+- [What you can check for free, without ShipCheck](https://shipcheck.bakerventuresstudio.com/compare/free-ways-to-check-your-app-before-submitting)
+  — written on our own site, because most of the pre-submission pass costs nothing
+
 ## Not a guarantee
 
 ShipCheck is advisory. App Review outcomes are decided by Apple and Google. A
