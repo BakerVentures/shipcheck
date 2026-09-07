@@ -44,12 +44,13 @@ def _default_corpus_dir():
     return bundled
 
 # Where a free report sends someone who wants the rest of it. This used to be
-# shipcheck.dev, which is not a registered domain -- every free report was
-# ending on a link that does not resolve. Point it at the page that actually
-# exists; when the checkout links on that page go live the CTA becomes correct
-# with no change here. If a real domain is ever registered, change this line.
+# shipcheck.dev, which does not resolve (SERVFAIL) -- the product's only call to
+# action was a dead link. It now points at the canonical site, the same host the
+# README links to, so a reader who follows the report and a reader who follows
+# the repo land in the same place. Overridable for anyone self-hosting.
 BUY_URL = os.environ.get(
-    "SHIPCHECK_BUY_URL", "https://bakerventures.github.io/shipcheck/#pricing")
+    "SHIPCHECK_BUY_URL",
+    "https://shipcheck.bakerventuresstudio.com/#pricing-and-why-rescans-are-unlimited")
 
 WEIGHT = {"critical": 22, "high": 12, "medium": 5, "low": 2, "info": 0}
 CONF = {"high": 1.0, "medium": 0.75, "low": 0.5}
