@@ -1047,6 +1047,15 @@ class Scan:
             self.facts["metadata_present"] = False
             return {}
         self.facts["metadata_present"] = True
+        # Comment stripping happens ONCE, on the whole joined field value, via the
+        # regex below -- it already spans multiple lines correctly (re.S). A
+        # per-line "skip if this line starts with <!--" filter used to run first
+        # and dropped only a comment's OPENING line, which then meant the regex
+        # below found no "<!--" left to pair with the trailing "-->" and matched
+        # nothing -- so a multi-line comment's continuation lines survived into
+        # the field value. Real bug: inflated App Name/Keywords to 727/238 chars
+        # against limits of 30/100 (see scripts/selftest.py's
+        # run_metadata_parser_checks). Do not reintroduce a per-line filter here.
         out, key, buf = {}, None, []
         for line in raw.splitlines():
             m = re.match(r"^##\s+(.*)$", line.strip())
@@ -1055,8 +1064,6 @@ class Scan:
                     out[key] = "\n".join(buf).strip()
                 key, buf = m.group(1).strip().lower(), []
             elif key:
-                if line.strip().startswith("<!--"):
-                    continue
                 buf.append(line)
         if key:
             out[key] = "\n".join(buf).strip()

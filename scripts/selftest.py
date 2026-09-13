@@ -14,11 +14,13 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import report                                        # noqa: E402
+import scan                                          # noqa: E402
 
 FIXTURE = os.path.join(ROOT, "examples", "bad-expo-app")
 BARE_RN_FIXTURE = os.path.join(ROOT, "examples", "bare-rn-app")
@@ -104,6 +106,65 @@ MUST_NOT_FIRE = [
      lambda ids: "PLIST-MISSING-NSMicrophoneUsageDescription" not in ids
                  and "PLIST-UNUSED-NSMicrophoneUsageDescription" in ids),
 ]
+
+
+# Real bug, found by the LockScreen worker scanning its own project: a multi-line
+# HTML comment under a field header leaked its continuation lines into the field's
+# value once the opening "<!--" line was consumed, inflating App Name and Keywords
+# to 727 and 238 chars against limits of 30 and 100 -- false criticals in a tool
+# whose entire value is trustworthy findings. Root cause was two passes fighting
+# each other in load_metadata(): a per-line "skip this line if it starts with
+# <!--" filter dropped ONLY the opening line, then the whole-field regex
+# (re.sub(r"<!--.*?-->", ...)) that was supposed to strip the rest of the comment
+# found no "<!--" left to pair with the trailing "-->" and matched nothing, so the
+# continuation lines survived into the value. Fix: let the whole-field regex be
+# the only thing that strips comments -- it already handles multi-line ones
+# correctly via DOTALL -- and stop pre-filtering lines one at a time.
+METADATA_COMMENT_FIXTURE = """# ShipCheck metadata
+
+## App name
+<!-- 30 chars max on the App Store, 30 on Play.
+     Keep it identical to Info.plist CFBundleDisplayName. -->
+Real App Name
+
+## Keywords
+<!-- iOS only, 100 chars total, comma separated, no spaces after commas
+     do not repeat words already in the app name -->
+travel,budget,expenses,split
+
+## Screenshot descriptions
+<!-- one line per screenshot describing exactly what is shown, including any
+     text overlay. ShipCheck uses this to catch screenshots that show features
+     not in the build, or that contain pricing/other-platform references. -->
+
+## Subtitle
+Plain value, no comment at all
+"""
+
+METADATA_COMMENT_MUST_EQUAL = [
+    ("app name", "Real App Name"),
+    ("keywords", "travel,budget,expenses,split"),
+    ("screenshot descriptions", ""),
+    ("subtitle", "Plain value, no comment at all"),
+]
+
+
+def run_metadata_parser_checks():
+    fails = []
+    print("\nMetadata parser: multi-line HTML comments (regression for the "
+          "LockScreen 727/238-char false-critical bug)")
+    with tempfile.TemporaryDirectory() as tmp:
+        with open(os.path.join(tmp, "shipcheck.metadata.md"), "w", encoding="utf-8") as f:
+            f.write(METADATA_COMMENT_FIXTURE)
+        md = scan.Scan(tmp).load_metadata()
+    for field, want in METADATA_COMMENT_MUST_EQUAL:
+        got = md.get(field)
+        if got == want:
+            print("  ok     %-28s %r" % (field, want))
+        else:
+            desc = "%s: got %r, want %r" % (field, got, want)
+            print("  FAIL   %s" % desc); fails.append(desc)
+    return fails
 
 
 def run_bare_rn_checks():
@@ -216,6 +277,7 @@ def main():
         print("  ok     all %d clause references resolve to cached corpus files"
               % len({f["clause"] for f in data["findings"] if f["clause"]}))
 
+    fails += run_metadata_parser_checks()
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
 
