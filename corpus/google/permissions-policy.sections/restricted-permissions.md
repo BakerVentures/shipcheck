@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=restricted-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-05T02:02:40+00:00 -->
+<!-- source=permissions-policy clause=restricted-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-14T12:54:21+00:00 -->
 
 ## Restricted Permissions
 
@@ -23,7 +23,7 @@ Certain Restricted Permissions may be subject to additional requirements as deta
 | If a user denies a restricted permission, your app must honor that decision without manipulation. | Don't use permissions to violate Google Play's [Malware](https://support.google.com/googleplay/android-developer/answer/9888380) policy, including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380#elevated-privilege-abuse). |
 | Offer a different way to perform a function if a user denies a permission, such as allowing manual data entry. | Don't manipulate or deceive users. Never pressure or trick users into granting permissions. |
 | Follow the [User Data](https://support.google.com/googleplay/android-developer/answer) policy, because all data accessed through these permissions is sensitive. | Don't deny a user a reasonable alternative if they decline a Restricted Permission; ensure the app remains functional. |
-| Request dangerous permissions (for example, `READ_CALENDAR`) with a runtime request and a clear explanation. | Don't request without justification. Only request a restricted permission for a compelling, critical feature that has no alternative. |
-| Direct users to the system settings page for approval of special permissions (for example, `SYSTEM_ALERT_WINDOW`). |  |
+| Request dangerous permissions (for example,`READ_CALENDAR`) with a runtime request and a clear explanation. | Don't request without justification. Only request a restricted permission for a compelling, critical feature that has no alternative. |
+| Direct users to the system settings page for approval of special permissions (for example,`SYSTEM_ALERT_WINDOW`). |  |
 
 ---

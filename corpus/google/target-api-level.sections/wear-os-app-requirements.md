@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=wear-os-app-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-05T02:02:37+00:00 -->
+<!-- source=target-api-level clause=wear-os-app-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-14T12:54:18+00:00 -->
 
 ### Wear OS app requirements
 

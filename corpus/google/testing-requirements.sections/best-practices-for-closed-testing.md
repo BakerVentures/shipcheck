@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=best-practices-for-closed-testing url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-05T02:02:39+00:00 -->
+<!-- source=testing-requirements clause=best-practices-for-closed-testing url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-14T12:54:20+00:00 -->
 
 ## Best practices for closed testing
 

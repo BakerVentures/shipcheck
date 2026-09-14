@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=describing-how-your-app-uses-data url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-05T02:02:31+00:00 -->
+<!-- source=user-privacy-and-data-use clause=describing-how-your-app-uses-data url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-14T12:54:12+00:00 -->
 
 ## Describing how your app uses data
 

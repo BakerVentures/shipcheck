@@ -1,4 +1,4 @@
-<!-- source=account-deletion-play clause=timeline-information url=https://support.google.com/googleplay/android-developer/answer/13327111 fetched=2026-09-05T02:02:39+00:00 -->
+<!-- source=account-deletion-play clause=timeline-information url=https://support.google.com/googleplay/android-developer/answer/13327111 fetched=2026-09-14T12:54:20+00:00 -->
 
 ## Timeline information
 

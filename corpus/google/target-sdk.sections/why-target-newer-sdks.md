@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=why-target-newer-sdks url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-05T02:02:46+00:00 -->
+<!-- source=target-sdk clause=why-target-newer-sdks url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-14T12:54:25+00:00 -->
 
 ## Why target newer SDKs?
 

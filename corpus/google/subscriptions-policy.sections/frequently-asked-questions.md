@@ -1,4 +1,4 @@
-<!-- source=subscriptions-policy clause=frequently-asked-questions url=https://support.google.com/googleplay/android-developer/answer/10281818 fetched=2026-09-05T02:02:38+00:00 -->
+<!-- source=subscriptions-policy clause=frequently-asked-questions url=https://support.google.com/googleplay/android-developer/answer/10281818 fetched=2026-09-14T12:54:19+00:00 -->
 
 ## Frequently asked questions
 

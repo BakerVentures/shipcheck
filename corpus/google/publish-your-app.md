@@ -3,7 +3,7 @@ shipcheck_source_id: publish-your-app
 title: "Publish your app"
 url: https://developer.android.com/studio/publish
 final_url: https://developer.android.com/studio/publish?hl=en
-fetched_at: 2026-09-05T02:02:43+00:00
+fetched_at: 2026-09-14T12:54:24+00:00
 sha256: 9c61acb6fa71afd7d342465f37209acfd43fe96802482f486500bd7ef66395db
 vendor: google
 ---

@@ -3,7 +3,7 @@ shipcheck_source_id: age-ratings
 title: "Age ratings values and definitions"
 url: https://developer.apple.com/help/app-store-connect/reference/age-ratings
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions
-fetched_at: 2026-09-05T02:02:33+00:00
+fetched_at: 2026-09-14T12:54:13+00:00
 sha256: 20d6e65811ae8ee3b1294ccfb41f89ea5b2fdcaa62ad6576a7c49953501773c9
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/age-ratings-definitions

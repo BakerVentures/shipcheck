@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=restrictions-for-personal-and-sensitive-data-access url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-05T02:02:36+00:00 -->
+<!-- source=user-data-policy clause=restrictions-for-personal-and-sensitive-data-access url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-14T12:54:17+00:00 -->
 
 ## Restrictions for Personal and Sensitive Data Access
 

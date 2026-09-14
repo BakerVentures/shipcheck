@@ -1,4 +1,4 @@
-<!-- source=product-page clause=in-app-purchases url=https://developer.apple.com/app-store/product-page/ fetched=2026-09-05T02:02:32+00:00 -->
+<!-- source=product-page clause=in-app-purchases url=https://developer.apple.com/app-store/product-page/ fetched=2026-09-14T12:54:13+00:00 -->
 
 ## In-app purchases
 

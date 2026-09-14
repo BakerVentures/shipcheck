@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=further-information url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-05T02:02:46+00:00 -->
+<!-- source=target-sdk clause=further-information url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-14T12:54:25+00:00 -->
 
 ## Further information
 
@@ -8,4 +8,4 @@ including our monthly partner newsletter.
 
 Content and code samples on this page are subject to the licenses described in the [Content License](/license). Java and OpenJDK are trademarks or registered trademarks of Oracle and/or its affiliates.
 
-Last updated 2026-08-14 UTC.
+Last updated 2026-09-01 UTC.

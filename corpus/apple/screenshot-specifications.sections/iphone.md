@@ -1,10 +1,28 @@
-<!-- source=screenshot-specifications clause=iphone url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-09-05T02:02:32+00:00 -->
+<!-- source=screenshot-specifications clause=iphone url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-09-14T12:54:13+00:00 -->
 
 ## iPhone
+
+iPhone Duo
+
+**Screenshot size**
+
+1398 × 2034 pixels
+
+2034 × 1398 pixels
+
+(outer display)
+
+2007 × 2853 pixels
+
+2853 × 2007 pixels
+
+(inner display)
 
 6.9" Display
 
 iPhone Air
+
+iPhone 18 Pro Max
 
 iPhone 17 Pro Max
 
@@ -87,6 +105,8 @@ Required if app runs on iPhone and screenshots for 6.9" display aren't provided
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.9" displays are used.
 
 6.3" Display
+
+iPhone 18 Pro
 
 iPhone 17 Pro
 

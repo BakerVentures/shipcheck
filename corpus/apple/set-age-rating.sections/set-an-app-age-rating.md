@@ -1,6 +1,6 @@
-<!-- source=set-age-rating clause=set-an-app-age-rating url=https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating fetched=2026-09-05T02:02:33+00:00 -->
+<!-- source=set-age-rating clause=set-an-app-age-rating url=https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating fetched=2026-09-14T12:54:14+00:00 -->
 
-### Set an app age rating
+## Set an app age rating
 
 1. In Apps, select the app you want to view.
 2. In the sidebar, under General, click App Information. **Tip:** To learn more about and view examples of the features and content used to determine age ratings, select a category from the panel of examples on the App Information Page. You can also browse [Age rating categories](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#age-rating-categories).

@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=ranking-subscriptions-within-the-group url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-05T02:02:31+00:00 -->
+<!-- source=subscriptions clause=ranking-subscriptions-within-the-group url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-14T12:54:12+00:00 -->
 
 ### Ranking subscriptions within the group
 

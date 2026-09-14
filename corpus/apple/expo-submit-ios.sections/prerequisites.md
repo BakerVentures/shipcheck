@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=prerequisites url=https://docs.expo.dev/submit/ios/ fetched=2026-09-05T02:02:34+00:00 -->
+<!-- source=expo-submit-ios clause=prerequisites url=https://docs.expo.dev/submit/ios/ fetched=2026-09-14T12:54:15+00:00 -->
 
 ## Prerequisites
 

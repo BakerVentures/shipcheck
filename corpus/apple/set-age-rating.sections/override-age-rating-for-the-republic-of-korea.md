@@ -1,4 +1,4 @@
-<!-- source=set-age-rating clause=override-age-rating-for-the-republic-of-korea url=https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating fetched=2026-09-05T02:02:33+00:00 -->
+<!-- source=set-age-rating clause=override-age-rating-for-the-republic-of-korea url=https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating fetched=2026-09-14T12:54:14+00:00 -->
 
 ### Override age rating for the Republic of Korea
 

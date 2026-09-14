@@ -3,8 +3,8 @@ shipcheck_source_id: set-age-rating
 title: "Set an app age rating"
 url: https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating
 final_url: https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating
-fetched_at: 2026-09-05T02:02:33+00:00
-sha256: de95630beb36e16584e457adb65a6f705c6987d227854ccf189f3ca8a608c04c
+fetched_at: 2026-09-14T12:54:14+00:00
+sha256: 9b2daf59d953b20e51c590722ea6538d20d2017de8eb9449d97ac41296cbd739
 vendor: apple
 note: "Added alongside age-ratings: covers the questionnaire that drives mismatches."
 ---
@@ -34,7 +34,7 @@ Depending on your responses, an age rating is assigned to each country or region
 
 **Required role:** Account Holder, Admin, App Manager, or Marketing. [View role permissions.](/help/app-store-connect/reference/account-management/role-permissions)
 
-### Set an app age rating
+## Set an app age rating
 
 1. In Apps, select the app you want to view.
 2. In the sidebar, under General, click App Information. **Tip:** To learn more about and view examples of the features and content used to determine age ratings, select a category from the panel of examples on the App Information Page. You can also browse [Age rating categories](/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions#age-rating-categories).
