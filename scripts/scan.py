@@ -755,6 +755,39 @@ class Scan:
                  corpus="apple/third-party-sdk-requirements.md",
                  itms="ITMS-91061")
 
+    # Whether an auth-capable package is actually REACHED at runtime, not just
+    # listed in package.json. Two earlier, real, rejected designs, in order:
+    #
+    # 1. "The package is a dependency" -- what shipped originally, and what produced
+    #    two false CRITICALs against a real app (MoveWitness/rentcheck):
+    #    @supabase/supabase-js was a dependency wired into its own never-called
+    #    wrapper file, so "this app creates accounts" was simply not true yet.
+    # 2. "The package is imported somewhere in source" -- still not enough. The
+    #    unused wrapper genuinely DOES import the package, once, in the exact
+    #    file that defines it and nowhere else calls it. An import check can't
+    #    tell "wired up" from "sitting in one dead file" because both look
+    #    identical to it.
+    #
+    # What's actually checkable here, given this scanner is standard-library-only
+    # and regex-based (no real AST, no import-graph reachability analysis), is
+    # whether an auth METHOD is actually INVOKED somewhere in source -- not just
+    # imported. Covers Supabase's `.auth.*` namespace, Firebase's modular
+    # `signInWith*`/`createUserWithEmailAndPassword` free functions, and
+    # Clerk/NextAuth-style `useAuth()`/`useUser()`/`useSession()` hooks. It does
+    # NOT cover every auth library's exact call shape that exists — deliberately:
+    # a miss here does not mean "no accounts", it means "not confirmed", and the
+    # two callers below treat those as different findings (a low-confidence
+    # WARNING that says so, not a CRITICAL asserting something unproven) rather
+    # than picking a side a regex cannot actually decide.
+    AUTH_CALL_PATTERN = (
+        r"\.auth\.(?:signIn\w*|signUp|signOut|getSession|getUser|"
+        r"onAuthStateChange|updateUser|verifyOtp|resetPasswordForEmail|"
+        r"exchangeCodeForSession)\s*\("
+        r"|\bsignInWith(?:Password|OAuth|IdToken|Otp|Apple|Google|Facebook|"
+        r"CustomToken|EmailAndPassword|PhoneNumber|Redirect|Popup|Credential)\s*\("
+        r"|\bcreateUserWithEmailAndPassword\s*\("
+        r"|\buse(?:Auth|User|Session)\s*\(")
+
     def check_signin_with_apple(self, deps, cfg, plist):
         third_party, satisfied = [], []
         for pkg in deps:
@@ -766,19 +799,42 @@ class Scan:
         self.facts["third_party_login_packages"] = third_party
         self.facts["apple_auth_packages"] = satisfied
         if third_party and not satisfied:
-            self.add("SIWA-MISSING", "critical",
-                     "Third-party login present with no Sign in with Apple",
-                     clause="4.8",
-                     evidence="Third-party login from: %s. No expo-apple-authentication "
-                              "or @invertase/react-native-apple-authentication in "
-                              "dependencies." % ", ".join(third_party),
-                     fix="Add `expo-apple-authentication`, render an "
-                         "`AppleAuthenticationButton` alongside your other login "
-                         "buttons, and enable the Sign In with Apple capability "
-                         "(`expo.ios.usesAppleSignIn: true`). Guideline 4.8 requires an "
-                         "equivalent privacy-preserving login option whenever a "
-                         "third-party service sets up the primary account.",
-                     corpus="apple/asrg.sections/4.8.md")
+            if self.grep_source(self.AUTH_CALL_PATTERN):
+                self.add("SIWA-MISSING", "critical",
+                         "Third-party login present with no Sign in with Apple",
+                         clause="4.8",
+                         evidence="Third-party login from: %s, and a real sign-in/"
+                                  "sign-up call site was found in source. No "
+                                  "expo-apple-authentication or "
+                                  "@invertase/react-native-apple-authentication in "
+                                  "dependencies." % ", ".join(third_party),
+                         fix="Add `expo-apple-authentication`, render an "
+                             "`AppleAuthenticationButton` alongside your other login "
+                             "buttons, and enable the Sign In with Apple capability "
+                             "(`expo.ios.usesAppleSignIn: true`). Guideline 4.8 requires "
+                             "an equivalent privacy-preserving login option whenever a "
+                             "third-party service sets up the primary account.",
+                         corpus="apple/asrg.sections/4.8.md")
+            else:
+                self.add("SIWA-UNCONFIRMED", "medium",
+                         "Third-party login SDK present, but no sign-in call site "
+                         "found -- cannot confirm accounts are actually created",
+                         clause="4.8",
+                         evidence="%s is a dependency, but ShipCheck found no "
+                                  "sign-in/sign-up call anywhere in source (checked "
+                                  ".auth.signIn*/.signOut/.signInWith*/"
+                                  "createUserWithEmailAndPassword/useAuth()/"
+                                  "useSession()-style calls). This is common for an "
+                                  "SDK that is configured but not wired up yet."
+                                  % ", ".join(third_party),
+                         fix="If your app already creates accounts through this SDK "
+                             "in a shape ShipCheck did not recognize, add "
+                             "`expo-apple-authentication` per guideline 4.8. If "
+                             "accounts are not live yet, there is nothing to fix "
+                             "until they are -- re-run ShipCheck once sign-in is "
+                             "actually wired up.",
+                         confidence="low",
+                         corpus="apple/asrg.sections/4.8.md")
         elif third_party and satisfied:
             self.passes.append(dict(
                 title="Sign in with Apple present",
@@ -818,17 +874,41 @@ class Scan:
             return
         hit = self.grep_source(r"delete[_ ]?account|deleteAccount|deleteUser|"
                                r"account[_ ]?deletion|removeAccount")
-        if not hit:
+        if hit:
+            return
+        # Same reasoning as check_signin_with_apple's AUTH_CALL_PATTERN gate: a
+        # package that triggers "account-deletion" (e.g. any Supabase/Firebase-
+        # shaped auth SDK) does not mean accounts genuinely exist yet -- it can be
+        # configured and dead, imported only inside its own unused wrapper. Only
+        # assert the CRITICAL when there is an actual sign-in/sign-up call site to
+        # back it up; otherwise say plainly that this could not be confirmed.
+        if self.grep_source(self.AUTH_CALL_PATTERN):
             self.add("ACCOUNT-DELETE-MISSING", "critical",
                      "App creates accounts but no in-app account deletion found",
                      clause="5.1.1v",
-                     evidence="Auth via %s; no delete-account code path found in source."
+                     evidence="Auth via %s, and a real sign-in/sign-up call site was "
+                              "found in source; no delete-account code path found."
                               % ", ".join(accounts),
                      fix="Add an in-app control that permanently deletes the account "
                          "(not just a link to support, and not sign-out). Apple has "
                          "required this since 30 June 2022 for any app that supports "
                          "account creation.",
                      confidence="medium",
+                     corpus="apple/asrg.sections/5.1.1v.md")
+        else:
+            self.add("ACCOUNT-DELETE-UNCONFIRMED", "medium",
+                     "Auth SDK present, but no sign-in call site found -- cannot "
+                     "confirm accounts are actually created",
+                     clause="5.1.1v",
+                     evidence="%s is a dependency, but ShipCheck found no sign-in/"
+                              "sign-up call anywhere in source, and no delete-account "
+                              "code path either. Common for an SDK that is configured "
+                              "but not wired up yet." % ", ".join(accounts),
+                     fix="If accounts are already live in a shape ShipCheck did not "
+                         "recognize, add an in-app account-deletion control per "
+                         "guideline 5.1.1(v). If accounts are not live yet, there is "
+                         "nothing to fix until they are.",
+                     confidence="low",
                      corpus="apple/asrg.sections/5.1.1v.md")
 
     def check_export_compliance(self, plist):

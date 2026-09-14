@@ -167,6 +167,79 @@ def run_metadata_parser_checks():
     return fails
 
 
+# Real regression, found by scanning an actual app (MoveWitness/rentcheck) during
+# the 2026-09-13 outage: SIWA-MISSING and ACCOUNT-DELETE-MISSING fired as CRITICAL
+# purely because @supabase/supabase-js was a package.json dependency, even though
+# the app's own source explicitly documents the auth client as "CONFIGURED BUT NOT
+# YET USED AT RUNTIME" and nothing in the app calls it. Fix (see scan.py's
+# AUTH_CALL_PATTERN) requires an actual auth-method call site before asserting the
+# CRITICAL; short of that it asserts SIWA-UNCONFIRMED / ACCOUNT-DELETE-UNCONFIRMED
+# instead -- a MEDIUM, low-confidence finding that names its own uncertainty
+# rather than a CRITICAL asserting something unproven. Both directions are tested:
+# an app that genuinely wires up auth must still get the CRITICAL, not just the
+# app with the dead wrapper getting spared.
+DEAD_AUTH_WRAPPER = """\
+import { createClient } from '@supabase/supabase-js';
+
+// CONFIGURED BUT NOT YET USED AT RUNTIME -- nothing in this app calls this yet.
+let client = null;
+export function getSupabase() {
+  if (!client) client = createClient(process.env.EXPO_PUBLIC_SUPABASE_URL, process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY);
+  return client;
+}
+export function isSupabaseConfigured() {
+  return true;
+}
+"""
+
+LIVE_AUTH_WRAPPER = """\
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.EXPO_PUBLIC_SUPABASE_URL, process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY);
+
+export async function signIn(email, password) {
+  return supabase.auth.signInWithPassword({ email, password });
+}
+"""
+
+
+def run_auth_confirmation_checks():
+    fails = []
+    print("\nAuth call-site confirmation (regression for the MoveWitness "
+          "false-CRITICAL bug)")
+    cases = [
+        ("dead wrapper (MoveWitness's actual shape) must NOT assert CRITICAL",
+         DEAD_AUTH_WRAPPER, {"SIWA-UNCONFIRMED", "ACCOUNT-DELETE-UNCONFIRMED"},
+         {"SIWA-MISSING", "ACCOUNT-DELETE-MISSING"}),
+        ("live sign-in call site must still assert CRITICAL",
+         LIVE_AUTH_WRAPPER, {"SIWA-MISSING", "ACCOUNT-DELETE-MISSING"},
+         {"SIWA-UNCONFIRMED", "ACCOUNT-DELETE-UNCONFIRMED"}),
+    ]
+    for desc, wrapper_src, want_ids, forbid_ids in cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "src", "lib"), exist_ok=True)
+            with open(os.path.join(tmp, "src", "lib", "supabase.ts"), "w",
+                      encoding="utf-8") as f:
+                f.write(wrapper_src)
+            s = scan.Scan(tmp)
+            s.check_signin_with_apple(["@supabase/supabase-js"], None, None)
+            s.check_account_deletion(["@supabase/supabase-js"])
+            ids = {f["id"] for f in s.findings}
+        missing = want_ids - ids
+        unwanted = forbid_ids & ids
+        if not missing and not unwanted:
+            print("  ok     %s" % desc)
+        else:
+            bits = []
+            if missing:
+                bits.append("missing %s" % sorted(missing))
+            if unwanted:
+                bits.append("should not have fired %s" % sorted(unwanted))
+            fdesc = "%s (%s)" % (desc, "; ".join(bits))
+            print("  FAIL   %s" % fdesc); fails.append(fdesc)
+    return fails
+
+
 def run_bare_rn_checks():
     fails = []
     subprocess.run([sys.executable, os.path.join(HERE, "scan.py"),
@@ -278,6 +351,7 @@ def main():
               % len({f["clause"] for f in data["findings"] if f["clause"]}))
 
     fails += run_metadata_parser_checks()
+    fails += run_auth_confirmation_checks()
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
 
