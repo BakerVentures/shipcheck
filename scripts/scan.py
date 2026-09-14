@@ -788,6 +788,18 @@ class Scan:
         r"|\bcreateUserWithEmailAndPassword\s*\("
         r"|\buse(?:Auth|User|Session)\s*\(")
 
+    # Same reasoning as AUTH_CALL_PATTERN: an IAP package in package.json does
+    # not mean the app actually sells anything yet -- it can be installed and
+    # configured with zero real purchase call sites (a "Go Pro" screen never
+    # wired up is the exact analog of an auth wrapper nobody calls). Guideline
+    # 3.1.1's restore-purchases requirement only applies once IAP is genuinely
+    # live, so gate the CRITICAL-shaped finding on evidence of a real call.
+    IAP_CALL_PATTERN = (
+        r"\.purchasePackage\s*\(|\.purchaseProduct\s*\(|\.purchaseDiscountedPackage\s*\("
+        r"|\.getOfferings\s*\(|Purchases\.configure\s*\("
+        r"|\brequestPurchase\s*\(|\brequestSubscription\s*\(|\binitConnection\s*\("
+        r"|\bconnectAsync\s*\(|\bpurchaseItemAsync\s*\(|\bgetProductsAsync\s*\(")
+
     def check_signin_with_apple(self, deps, cfg, plist):
         third_party, satisfied = [], []
         for pkg in deps:
@@ -851,7 +863,9 @@ class Scan:
             return
         src = self.grep_source(r"restorePurchases|restoreTransactions|"
                                r"syncPurchases|restore_purchases")
-        if not src:
+        if src:
+            return
+        if self.grep_source(self.IAP_CALL_PATTERN):
             self.add("RESTORE-MISSING", "high",
                      "No restore-purchases call found in source",
                      clause="3.1.1",
@@ -863,6 +877,21 @@ class Scan:
                          "equivalent. Apps selling non-consumables or subscriptions "
                          "must let a returning user restore entitlements.",
                      confidence="medium",
+                     corpus="apple/asrg.sections/3.1.1.md")
+        else:
+            self.add("RESTORE-UNCONFIRMED", "medium",
+                     "IAP SDK present, but no purchase call site found -- cannot "
+                     "confirm the app actually sells anything yet",
+                     clause="3.1.1",
+                     evidence="%s is a dependency, but ShipCheck found no purchase/"
+                              "offerings/connection call anywhere in source, and no "
+                              "restore call either. Common for an IAP SDK that is "
+                              "configured but not wired up yet." % ", ".join(iap),
+                     fix="If purchases are already live in a shape ShipCheck did not "
+                         "recognize, add a \"Restore Purchases\" control per guideline "
+                         "3.1.1. If IAP is not live yet, there is nothing to fix until "
+                         "it is.",
+                     confidence="low",
                      corpus="apple/asrg.sections/3.1.1.md")
 
     def check_account_deletion(self, deps):

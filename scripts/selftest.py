@@ -240,6 +240,59 @@ def run_auth_confirmation_checks():
     return fails
 
 
+DEAD_IAP_WRAPPER = """\
+import Purchases from 'react-native-purchases';
+
+// CONFIGURED BUT NOT YET USED AT RUNTIME -- nothing in this app calls this yet.
+export function setupPurchases() {
+  Purchases.setLogLevel('DEBUG');
+}
+"""
+
+LIVE_IAP_WRAPPER = """\
+import Purchases from 'react-native-purchases';
+
+export async function buyPro() {
+  const offerings = await Purchases.getOfferings();
+  return Purchases.purchasePackage(offerings.current.availablePackages[0]);
+}
+"""
+
+
+def run_iap_confirmation_checks():
+    fails = []
+    print("\nIAP call-site confirmation (same bug class as the MoveWitness "
+          "false-CRITICAL fix, applied to RESTORE-MISSING)")
+    cases = [
+        ("dead wrapper (installed, never called) must NOT assert high-severity",
+         DEAD_IAP_WRAPPER, {"RESTORE-UNCONFIRMED"}, {"RESTORE-MISSING"}),
+        ("live purchase call site with no restore call must still assert high-severity",
+         LIVE_IAP_WRAPPER, {"RESTORE-MISSING"}, {"RESTORE-UNCONFIRMED"}),
+    ]
+    for desc, wrapper_src, want_ids, forbid_ids in cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "src", "lib"), exist_ok=True)
+            with open(os.path.join(tmp, "src", "lib", "purchases.ts"), "w",
+                      encoding="utf-8") as f:
+                f.write(wrapper_src)
+            s = scan.Scan(tmp)
+            s.check_iap(["react-native-purchases"], None)
+            ids = {f["id"] for f in s.findings}
+        missing = want_ids - ids
+        unwanted = forbid_ids & ids
+        if not missing and not unwanted:
+            print("  ok     %s" % desc)
+        else:
+            bits = []
+            if missing:
+                bits.append("missing %s" % sorted(missing))
+            if unwanted:
+                bits.append("should not have fired %s" % sorted(unwanted))
+            fdesc = "%s (%s)" % (desc, "; ".join(bits))
+            print("  FAIL   %s" % fdesc); fails.append(fdesc)
+    return fails
+
+
 def run_bare_rn_checks():
     fails = []
     subprocess.run([sys.executable, os.path.join(HERE, "scan.py"),
@@ -352,6 +405,7 @@ def main():
 
     fails += run_metadata_parser_checks()
     fails += run_auth_confirmation_checks()
+    fails += run_iap_confirmation_checks()
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
 
