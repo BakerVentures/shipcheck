@@ -861,11 +861,36 @@ class Scan:
         self.facts["iap_packages"] = iap
         if not iap:
             return
-        src = self.grep_source(r"restorePurchases|restoreTransactions|"
-                               r"syncPurchases|restore_purchases")
+        restore_pattern = (r"restorePurchases|restoreTransactions|"
+                           r"syncPurchases|restore_purchases")
+        src = self.grep_source(restore_pattern)
         if src:
             return
-        if self.grep_source(self.IAP_CALL_PATTERN):
+        # If the restore-call search itself gave up at the file cap, "no
+        # restore call found" is not actually established -- the real call
+        # could be past file 4000. Asserting RESTORE-MISSING from an
+        # incomplete search would be exactly the false-CRITICAL-from-
+        # uncertainty bug this file keeps getting fixed for; fall through to
+        # the UNCONFIRMED branch instead of trusting the negative.
+        restore_search_complete = restore_pattern not in self.facts.get("grep_truncated", set())
+        if not restore_search_complete:
+            self.add("RESTORE-UNCONFIRMED", "medium",
+                     "IAP SDK present, but the source tree is too large to fully "
+                     "search for a restore-purchases call -- cannot confirm one "
+                     "is missing",
+                     clause="3.1.1",
+                     evidence="%s is a dependency; the search for a restore call "
+                              "stopped at ShipCheck's file-count cap before covering "
+                              "the whole source tree, so a real restorePurchases/"
+                              "restoreTransactions call may exist past where it gave "
+                              "up. Asserting it is missing would not be a confirmed "
+                              "finding." % ", ".join(iap),
+                     fix="Confirm manually whether a \"Restore Purchases\" control "
+                         "exists per guideline 3.1.1 -- ShipCheck's automated search "
+                         "could not cover this project's full source tree.",
+                     confidence="low",
+                     corpus="apple/asrg.sections/3.1.1.md")
+        elif self.grep_source(self.IAP_CALL_PATTERN):
             self.add("RESTORE-MISSING", "high",
                      "No restore-purchases call found in source",
                      clause="3.1.1",
@@ -901,8 +926,9 @@ class Scan:
         self.facts["account_packages"] = accounts
         if not accounts:
             return
-        hit = self.grep_source(r"delete[_ ]?account|deleteAccount|deleteUser|"
-                               r"account[_ ]?deletion|removeAccount")
+        delete_pattern = (r"delete[_ ]?account|deleteAccount|deleteUser|"
+                          r"account[_ ]?deletion|removeAccount")
+        hit = self.grep_source(delete_pattern)
         if hit:
             return
         # Same reasoning as check_signin_with_apple's AUTH_CALL_PATTERN gate: a
@@ -911,7 +937,28 @@ class Scan:
         # configured and dead, imported only inside its own unused wrapper. Only
         # assert the CRITICAL when there is an actual sign-in/sign-up call site to
         # back it up; otherwise say plainly that this could not be confirmed.
-        if self.grep_source(self.AUTH_CALL_PATTERN):
+        # Same guard as check_iap: if the delete-account search itself gave up
+        # at the file cap, its "no delete-account code found" is not actually
+        # established -- don't compound an incomplete search with the second
+        # grep into a false CRITICAL.
+        delete_search_complete = delete_pattern not in self.facts.get("grep_truncated", set())
+        if not delete_search_complete:
+            self.add("ACCOUNT-DELETE-UNCONFIRMED", "medium",
+                     "Auth SDK present, but the source tree is too large to fully "
+                     "search for a delete-account code path -- cannot confirm one "
+                     "is missing",
+                     clause="5.1.1v",
+                     evidence="%s is a dependency; the search for a delete-account "
+                              "code path stopped at ShipCheck's file-count cap before "
+                              "covering the whole source tree, so it may exist past "
+                              "where the search gave up. Asserting it is missing "
+                              "would not be a confirmed finding." % ", ".join(accounts),
+                     fix="Confirm manually whether in-app account deletion exists per "
+                         "guideline 5.1.1(v) -- ShipCheck's automated search could not "
+                         "cover this project's full source tree.",
+                     confidence="low",
+                     corpus="apple/asrg.sections/5.1.1v.md")
+        elif self.grep_source(self.AUTH_CALL_PATTERN):
             self.add("ACCOUNT-DELETE-MISSING", "critical",
                      "App creates accounts but no in-app account deletion found",
                      clause="5.1.1v",
@@ -1122,6 +1169,15 @@ class Scan:
 
     # ------------------------------------------------------------- shared
     def grep_source(self, pattern, exts=(".ts", ".tsx", ".js", ".jsx")):
+        # Returning bare None for both "searched everything, no match" and
+        # "gave up at the file cap, don't know" would be the same false-pass
+        # bug class this scanner has been fixed for repeatedly: a caller
+        # that treats None as a confirmed absence can end up asserting a
+        # CRITICAL from an incomplete search. Callers that need to tell the
+        # two apart check self.facts["grep_truncated"] for this pattern
+        # (the return value itself stays path-or-None for every existing
+        # caller -- see check_iap/check_account_deletion for the one shape
+        # where the difference actually changes a verdict).
         rx = re.compile(pattern, re.I)
         roots = [self.p(d) for d in ("app", "src", "components", "screens", "lib", "features")]
         roots = [r for r in roots if os.path.isdir(r)] or [self.root]
@@ -1135,6 +1191,7 @@ class Scan:
                         continue
                     checked += 1
                     if checked > 4000:
+                        self.facts.setdefault("grep_truncated", set()).add(pattern)
                         return None
                     try:
                         with open(os.path.join(dirpath, fn), encoding="utf-8",

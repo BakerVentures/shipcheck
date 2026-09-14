@@ -332,6 +332,66 @@ def run_url_reachability_checks():
     return fails
 
 
+def run_grep_truncation_checks():
+    fails = []
+    print("\ngrep_source file-cap truncation must not compound with a second "
+          "grep into a false CRITICAL (RESTORE-MISSING / ACCOUNT-DELETE-MISSING "
+          "from a search that never finished)")
+
+    real_grep_source = scan.Scan.grep_source
+    restore_pattern = (r"restorePurchases|restoreTransactions|"
+                       r"syncPurchases|restore_purchases")
+    delete_pattern = (r"delete[_ ]?account|deleteAccount|deleteUser|"
+                      r"account[_ ]?deletion|removeAccount")
+
+    def make_fake_grep_source(truncate_pattern):
+        def fake_grep_source(self, pattern, exts=(".ts", ".tsx", ".js", ".jsx")):
+            if pattern == truncate_pattern:
+                self.facts.setdefault("grep_truncated", set()).add(pattern)
+                return None
+            return real_grep_source(self, pattern, exts)
+        return fake_grep_source
+
+    cases = [
+        ("IAP: restore-call search truncated, a real purchase call site "
+         "exists -- must NOT assert RESTORE-MISSING",
+         "lib", "purchases.ts", LIVE_IAP_WRAPPER, restore_pattern,
+         lambda s: s.check_iap(["react-native-purchases"], None),
+         {"RESTORE-UNCONFIRMED"}, {"RESTORE-MISSING"}),
+        ("Account deletion: delete-code search truncated, a real sign-in "
+         "call site exists -- must NOT assert ACCOUNT-DELETE-MISSING",
+         "lib", "supabase.ts", LIVE_AUTH_WRAPPER, delete_pattern,
+         lambda s: s.check_account_deletion(["@supabase/supabase-js"]),
+         {"ACCOUNT-DELETE-UNCONFIRMED"}, {"ACCOUNT-DELETE-MISSING"}),
+    ]
+    for desc, subdir, fname, src, truncate_pattern, run, want_ids, forbid_ids in cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "src", subdir), exist_ok=True)
+            with open(os.path.join(tmp, "src", subdir, fname), "w",
+                      encoding="utf-8") as f:
+                f.write(src)
+            scan.Scan.grep_source = make_fake_grep_source(truncate_pattern)
+            try:
+                s = scan.Scan(tmp)
+                run(s)
+            finally:
+                scan.Scan.grep_source = real_grep_source
+            ids = {f["id"] for f in s.findings}
+        missing = want_ids - ids
+        unwanted = forbid_ids & ids
+        if not missing and not unwanted:
+            print("  ok     %s" % desc)
+        else:
+            bits = []
+            if missing:
+                bits.append("missing %s" % sorted(missing))
+            if unwanted:
+                bits.append("should not have fired %s" % sorted(unwanted))
+            fdesc = "%s (%s)" % (desc, "; ".join(bits))
+            print("  FAIL   %s" % fdesc); fails.append(fdesc)
+    return fails
+
+
 def run_bare_rn_checks():
     fails = []
     subprocess.run([sys.executable, os.path.join(HERE, "scan.py"),
@@ -446,6 +506,7 @@ def main():
     fails += run_auth_confirmation_checks()
     fails += run_iap_confirmation_checks()
     fails += run_url_reachability_checks()
+    fails += run_grep_truncation_checks()
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
 
