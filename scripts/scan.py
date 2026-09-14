@@ -1268,9 +1268,11 @@ class Scan:
             url = (md.get(field) or "").strip().split()[0] if md.get(field) else ""
             if not url.startswith("http"):
                 continue
-            ok, detail = head_ok(url)
+            ok, detail, confirmed = head_ok(url)
             self.facts.setdefault("url_checks", {})[url] = detail
-            if not ok:
+            if ok:
+                continue
+            if confirmed:
                 self.add("URL-DEAD-%s" % field.replace(" ", "-"), "critical",
                          "%s is not reachable" % field.title(),
                          clause="2.3.8" if "support" in field else "5.1.1",
@@ -1278,6 +1280,25 @@ class Scan:
                          fix="Fix or replace the URL. Reviewers open every link in the "
                              "listing; a dead privacy policy URL is an automatic "
                              "rejection.")
+            else:
+                # No HTTP response at all -- DNS failure, timeout, connection
+                # reset. That's just as consistent with a network hiccup on
+                # the machine running the scan as with a genuinely dead URL,
+                # so don't assert the same CRITICAL a real HTTP error response
+                # earns. Name the uncertainty instead.
+                self.add("URL-UNCONFIRMED-%s" % field.replace(" ", "-"), "medium",
+                         "%s could not be reached -- may be a network issue, "
+                         "not necessarily a dead link" % field.title(),
+                         clause="2.3.8" if "support" in field else "5.1.1",
+                         evidence="%s -> %s (no HTTP response at all -- DNS, "
+                                  "timeout, or connection failure, not a server "
+                                  "error response)" % (url, detail),
+                         fix="ShipCheck could not connect to this URL at all. "
+                             "That can mean the link is genuinely dead, or that "
+                             "this machine's network had a problem during the "
+                             "scan. Open the URL in a browser to confirm before "
+                             "treating this as a rejection risk.",
+                         confidence="low")
 
     # ------------------------------------------------------------------ run
     def run(self):
@@ -1358,22 +1379,29 @@ def png_info(path):
 
 
 def head_ok(url, timeout=12):
+    """Returns (ok, detail, confirmed). `confirmed` is True only when the
+    server actually answered (even with an error status) -- that's a real
+    signal a reviewer hitting the same URL would also see. `confirmed` is
+    False when there was no HTTP response at all (DNS failure, timeout,
+    connection reset): that's just as consistent with a network problem on
+    the machine running the scan as with a genuinely dead URL, so callers
+    should not treat it with the same certainty as a confirmed dead link."""
     for method in ("HEAD", "GET"):
         try:
             req = urllib.request.Request(url, method=method, headers={
                 "User-Agent": "ShipCheck/0.1 (link checker)"})
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 if 200 <= r.status < 400:
-                    return True, "HTTP %d" % r.status
-                return False, "HTTP %d" % r.status
+                    return True, "HTTP %d" % r.status, True
+                return False, "HTTP %d" % r.status, True
         except urllib.error.HTTPError as e:
             if e.code in (403, 405) and method == "HEAD":
                 continue
-            return False, "HTTP %d" % e.code
+            return False, "HTTP %d" % e.code, True
         except Exception as e:                       # noqa: BLE001
             if method == "GET":
-                return False, type(e).__name__
-    return False, "unreachable"
+                return False, type(e).__name__, False
+    return False, "unreachable", False
 
 
 def main():

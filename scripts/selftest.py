@@ -293,6 +293,45 @@ def run_iap_confirmation_checks():
     return fails
 
 
+def run_url_reachability_checks():
+    fails = []
+    print("\nURL reachability: confirmed-dead vs network-unconfirmed "
+          "(a transient network blip during a scan must not assert the "
+          "same CRITICAL as a real HTTP error response)")
+    cases = [
+        ("a real HTTP 404 response must still assert CRITICAL",
+         lambda url, timeout=12: (False, "HTTP 404", True),
+         {"URL-DEAD-privacy-policy-url"}, {"URL-UNCONFIRMED-privacy-policy-url"}),
+        ("a DNS/timeout failure with no HTTP response must NOT assert CRITICAL",
+         lambda url, timeout=12: (False, "URLError", False),
+         {"URL-UNCONFIRMED-privacy-policy-url"}, {"URL-DEAD-privacy-policy-url"}),
+    ]
+    md = {"privacy policy url": "https://example.com/privacy"}
+    real_head_ok = scan.head_ok
+    try:
+        for desc, fake_head_ok, want_ids, forbid_ids in cases:
+            scan.head_ok = fake_head_ok
+            with tempfile.TemporaryDirectory() as tmp:
+                s = scan.Scan(tmp)
+                s.check_urls(md)
+                ids = {f["id"] for f in s.findings}
+            missing = want_ids - ids
+            unwanted = forbid_ids & ids
+            if not missing and not unwanted:
+                print("  ok     %s" % desc)
+            else:
+                bits = []
+                if missing:
+                    bits.append("missing %s" % sorted(missing))
+                if unwanted:
+                    bits.append("should not have fired %s" % sorted(unwanted))
+                fdesc = "%s (%s)" % (desc, "; ".join(bits))
+                print("  FAIL   %s" % fdesc); fails.append(fdesc)
+    finally:
+        scan.head_ok = real_head_ok
+    return fails
+
+
 def run_bare_rn_checks():
     fails = []
     subprocess.run([sys.executable, os.path.join(HERE, "scan.py"),
@@ -406,6 +445,7 @@ def main():
     fails += run_metadata_parser_checks()
     fails += run_auth_confirmation_checks()
     fails += run_iap_confirmation_checks()
+    fails += run_url_reachability_checks()
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
 
