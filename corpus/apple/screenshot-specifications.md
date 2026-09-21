@@ -3,8 +3,8 @@ shipcheck_source_id: screenshot-specifications
 title: "Screenshot specifications"
 url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
-fetched_at: 2026-09-05T02:02:32+00:00
-sha256: 9329cca4ab348aae1b4c6547398e4d6f1ce6e74f5d4c077cf098b1b7906a5357
+fetched_at: 2026-09-21T12:53:57+00:00
+sha256: 054b4843be076f9f30888aded967ebae667a1e1a05de933b3163da5ea36835c9
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications
 note: "Moved under /reference/app-information/."
@@ -24,9 +24,31 @@ You can upload one to 10 screenshots in `.jpeg`, `.jpg`, and `.png` formats, wit
 
 ## iPhone
 
+iPhone Duo
+
+**Screenshot size**
+
+1398 × 2034 pixels
+
+2034 × 1398 pixels
+
+(outer display)
+
+2007 × 2853 pixels
+
+2853 × 2007 pixels
+
+(inner display)
+
+**Note**
+
+Support for uploading assets for this device in App Store Connect will be available later this year.
+
 6.9" Display
 
 iPhone Air
+
+iPhone 18 Pro Max
 
 iPhone 17 Pro Max
 
@@ -109,6 +131,8 @@ Required if app runs on iPhone and screenshots for 6.9" display aren't provided
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.9" displays are used.
 
 6.3" Display
+
+iPhone 18 Pro
 
 iPhone 17 Pro
 
@@ -550,7 +574,7 @@ Required for Apple Vision Pro
 
 Apple Watch
 
-Ultra 3, Ultra 2, Ultra, Series 11, Series 10, Series 9, Series 8, Series 7, Series 6, Series 5, Series 4, Series 3, Series 2, Series 1, SE 3, SE 2, SE
+Ultra 4, Ultra 3, Ultra 2, Ultra, Series 12, Series 11, Series 10, Series 9, Series 8, Series 7, Series 6, Series 5, Series 4, Series 3, Series 2, Series 1, SE 3, SE 2, SE
 
 **Screenshot size**
 
@@ -558,7 +582,7 @@ One of the following:
 
 422 x 514 pixels
 
-(Ultra 3)
+(Ultra 4, Ultra 3)
 
 410 x 502 pixels
 
@@ -566,7 +590,7 @@ One of the following:
 
 416 x 496 pixels
 
-(Series 11, Series 10)
+(Series 12, Series 11, Series 10)
 
 396 x 484 pixels
 

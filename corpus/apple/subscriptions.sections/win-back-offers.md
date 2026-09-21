@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=win-back-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-05T02:02:31+00:00 -->
+<!-- source=subscriptions clause=win-back-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-21T12:53:48+00:00 -->
 
 ### Win-back offers
 
@@ -22,7 +22,7 @@ For more information on these placement types, see [set up win-back offers](/hel
 
 When [configuring win-back offers](/help/app-store-connect/manage-subscriptions/set-up-win-back-offers/) in App Store Connect, you provide offer details and select the offer priority. Your priority selection affects how your offer is ranked within your app, in someone’s Subscription settings, and on the App Store (if you’ve chosen to promote it). Apple uses your subscription display name and description when displaying your win-back offer, so be sure this information is accurate.
 
-If you’d like to display your offer on the App Store, you’ll need an approved [subscription image](/help/app-store-connect/manage-in-app-purchases/view-and-edit-in-app-purchase-information#add-or-remove-an-image). Aim for a simple graphic that’s different than your app icon or screenshots that conveys the essence of the In-App Purchase included as part of the offer.
+If you’d like to display your offer on the App Store, you’ll need an approved [subscription image](/help/app-store-connect/manage-in-app-purchases/view-and-edit-in-app-purchase-information#add-or-remove-an-image). Aim for a simple graphic that’s different than your app icon or screenshots that conveys the essence of the Apple In-App Purchase included as part of the offer.
 
 By default, [streamlined purchasing](/help/app-store-connect/manage-subscriptions/manage-streamlined-purchasing) is turned on for your app or game, which lets people complete a purchase from outside your app. You can turn this off in App Store Connect if you wish.
 

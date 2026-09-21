@@ -3,8 +3,8 @@ shipcheck_source_id: target-sdk
 title: "Meet Google Play's target API level requirement (Android Developers)"
 url: https://developer.android.com/google/play/requirements/target-sdk
 final_url: https://developer.android.com/google/play/requirements/target-sdk?hl=en
-fetched_at: 2026-09-05T02:02:46+00:00
-sha256: 34866cd7c043e13f05088db60b30370833d28d420e8479b54c797ba6c82537f3
+fetched_at: 2026-09-21T12:54:09+00:00
+sha256: a222b2d30b3e2943e8f8b3c2f7833142d363e1c6ff1f93a365d02e2369b1d494
 vendor: google
 ---
 
@@ -321,4 +321,4 @@ including our monthly partner newsletter.
 
 Content and code samples on this page are subject to the licenses described in the [Content License](/license). Java and OpenJDK are trademarks or registered trademarks of Oracle and/or its affiliates.
 
-Last updated 2026-08-14 UTC.
+Last updated 2026-09-16 UTC.

@@ -3,8 +3,8 @@ shipcheck_source_id: subscriptions
 title: "Auto-renewable subscriptions"
 url: https://developer.apple.com/app-store/subscriptions/
 final_url: https://developer.apple.com/app-store/subscriptions/
-fetched_at: 2026-09-05T02:02:31+00:00
-sha256: b7204c7d2a8411357da2695abedb14a3e2c37cbe91420c32dc2382c62526a86e
+fetched_at: 2026-09-21T12:53:48+00:00
+sha256: feb8d840ea8fdc038046863e02908cf3849e451a24802b4021b05ff8e086a9f7
 vendor: apple
 ---
 
@@ -25,12 +25,12 @@ Many types of apps can take advantage of subscriptions, including apps that offe
 
 ### Getting ready
 
-To offer subscriptions, youʼll need to configure them in App Store Connect and use StoreKit APIs in your app. You’ll also need to assign each subscription to a subscription group (a group of subscriptions with different access levels, prices, and durations that people can choose from), then add details such as a name, price, and description. This information displays in the In-App Purchases section of your app’s product page on the App Store. Ensure that the subscriptions are available across all device types that your app supports. Consider allowing a way for subscribers to see the status of their subscription within your app, along with upgrade, crossgrade, and downgrade options, as well as a way to easily manage or turn off their auto-renewable subscription. Make sure to follow our design and review guidelines.
+To offer subscriptions, youʼll need to configure them in App Store Connect and use StoreKit APIs in your app. You’ll also need to assign each subscription to a subscription group (a group of subscriptions with different access levels, prices, and durations that people can choose from), then add details such as a name, price, and description. This information displays in the Apple In-App Purchases section of your app’s product page on the App Store. Ensure that the subscriptions are available across all device types that your app supports. Consider allowing a way for subscribers to see the status of their subscription within your app, along with upgrade, crossgrade, and downgrade options, as well as a way to easily manage or turn off their auto-renewable subscription. Make sure to follow our design and review guidelines.
 
 To get ready:
 
-- Watch the [In-App Purchase and Subscriptions videos](/videos/app-store-distribution-marketing/).
-- Refer to the [In-App Purchase StoreKit API documentation](/documentation/storekit/in-app_purchase/).
+- Watch the [Apple In-App Purchase and Subscriptions videos](/videos/app-store-distribution-marketing/).
+- Refer to the [Apple In-App Purchase StoreKit API documentation](/documentation/storekit/in-app_purchase/).
 - Learn how to configure your subscriptions in [App Store Connect Help](/help/app-store-connect/).
 - Use the [App Store Server API](/documentation/appstoreserverapi/) and enable [App Store Server Notifications](/documentation/appstoreservernotifications/) to get real-time changes to the status of your subscriptions.
 
@@ -100,7 +100,7 @@ Apps with auto-renewable subscriptions can choose from 800 price points across a
 
 **Pricing tool.** The App Store Connect pricing tool can help you manage pricing based on current exchange rates. If there’s a tax change or currency adjustment in a particular region, the price of subscriptions won’t generally be affected unless you decide to pass the change on to your users. If you want to change the price of a subscription in a specific market, it’s important to understand which markets are tax inclusive before you take action. For example, if you decide to lower the subscription price for users in Germany, the revenue you’ll receive will be the purchase price minus the European Union’s value added tax (VAT) and minus Apple’s commission. The default pricing in the App Store Connect pricing tool is inclusive of applicable taxes that Apple collects and remits. For more information, review Schedule 2 of the Apple Developer Program License Agreement, which describes territories that have different tax treatments.
 
-App Store Connect also lets you [assign tax categories](/help/app-store-connect/manage-app-information/set-a-tax-category/) to your apps and In-App Purchases. These categories are based on your app’s content (for example, videos, books, or news publications) and determine which tax regulations apply in each territory, allowing Apple to administer tax for you at specific rates.
+App Store Connect also lets you [assign tax categories](/help/app-store-connect/manage-app-information/set-a-tax-category/) to your apps and Apple In-App Purchases. These categories are based on your app’s content (for example, videos, books, or news publications) and determine which tax regulations apply in each territory, allowing Apple to administer tax for you at specific rates.
 
 ### Family Sharing
 
@@ -124,7 +124,7 @@ Resources:
 
 ### Offering subscriptions to multiple apps
 
-You can offer auto-renewable subscriptions to access multiple apps. Each app must be approved to use auto-renewable In-App Purchases and published under the same developer account.
+You can offer auto-renewable subscriptions to access multiple apps. Each app must be approved to use auto-renewable Apple In-App Purchases and published under the same developer account.
 
 Use App Store Connect to set up separate and equivalent auto-renewable subscriptions for each app included in the multiapp subscription so that people can subscribe from any app. To help people avoid paying multiple times for the same offering, make sure to verify that they’re active subscribers before showing any subscription options. [View details on determining if a subscription is active](/app-store/subscriptions/#keeping-subscribers).
 
@@ -169,11 +169,11 @@ In the purchase flow for a free trial, clearly indicate how long the free trial 
 
 ### Promoting subscriptions on the App Store
 
-You can promote In-App Purchases directly on the App Store, so people can find your subscription or introductory offer and initiate a purchase even before downloading your app. Promoted In-App Purchases appear on your product page, can display in search results, and may be featured on the Today, Games, or Apps tabs. Choose to promote up to 20 In-App Purchases at a time to help you effectively increase discoverability for content within your app. This can be particularly effective for letting new customers know about introductory offers.
+You can promote Apple In-App Purchases directly on the App Store, so people can find your subscription or introductory offer and initiate a purchase even before downloading your app. Promoted Apple In-App Purchases appear on your product page, can display in search results, and may be featured on the Today, Games, or Apps tabs. Choose to promote up to 20 Apple In-App Purchases at a time to help you effectively increase discoverability for content within your app. This can be particularly effective for letting new customers know about introductory offers.
 
 [Learn about promoting your in-app purchases](/app-store/promoting-in-app-purchases/)
 
-Promoted In-App Purchases have unique metadata to communicate their value.
+Promoted Apple In-App Purchases have unique metadata to communicate their value.
 
 ## Providing subscription offers
 
@@ -202,7 +202,7 @@ When setting up offers in App Store Connect, you’ll choose the offer type, eli
 
 ### Introductory offers
 
-Introductory offers allow new subscribers to experience your subscription before paying full price. Display offers within your app using [StoreKit](/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/implementing_introductory_offers_in_your_app), and [promote](/help/app-store-connect/configure-in-app-purchase-settings/promote-in-app-purchases/) the offer’s In-App Purchase to display it on the App Store. When promoted, your offer appears on your product page and may display in search results as well as on the Today, Games, and Apps tabs — helping to further discovery of your offer. You can [create an introductory offer](/help/app-store-connect/manage-subscriptions/set-up-introductory-offers-for-auto-renewable-subscriptions/) for each subscription per territory. Customers can redeem one introductory offer per subscription group.
+Introductory offers allow new subscribers to experience your subscription before paying full price. Display offers within your app using [StoreKit](/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/subscriptions_and_offers/implementing_introductory_offers_in_your_app), and [promote](/help/app-store-connect/configure-in-app-purchase-settings/promote-in-app-purchases/) the offer’s Apple In-App Purchase to display it on the App Store. When promoted, your offer appears on your product page and may display in search results as well as on the Today, Games, and Apps tabs — helping to further discovery of your offer. You can [create an introductory offer](/help/app-store-connect/manage-subscriptions/set-up-introductory-offers-for-auto-renewable-subscriptions/) for each subscription per territory. Customers can redeem one introductory offer per subscription group.
 
 ### Offer codesNow available on macOS
 
@@ -266,7 +266,7 @@ For more information on these placement types, see [set up win-back offers](/hel
 
 When [configuring win-back offers](/help/app-store-connect/manage-subscriptions/set-up-win-back-offers/) in App Store Connect, you provide offer details and select the offer priority. Your priority selection affects how your offer is ranked within your app, in someone’s Subscription settings, and on the App Store (if you’ve chosen to promote it). Apple uses your subscription display name and description when displaying your win-back offer, so be sure this information is accurate.
 
-If you’d like to display your offer on the App Store, you’ll need an approved [subscription image](/help/app-store-connect/manage-in-app-purchases/view-and-edit-in-app-purchase-information#add-or-remove-an-image). Aim for a simple graphic that’s different than your app icon or screenshots that conveys the essence of the In-App Purchase included as part of the offer.
+If you’d like to display your offer on the App Store, you’ll need an approved [subscription image](/help/app-store-connect/manage-in-app-purchases/view-and-edit-in-app-purchase-information#add-or-remove-an-image). Aim for a simple graphic that’s different than your app icon or screenshots that conveys the essence of the Apple In-App Purchase included as part of the offer.
 
 By default, [streamlined purchasing](/help/app-store-connect/manage-subscriptions/manage-streamlined-purchasing) is turned on for your app or game, which lets people complete a purchase from outside your app. You can turn this off in App Store Connect if you wish.
 
@@ -309,7 +309,7 @@ The [Get All Subscription Statuses](/documentation/appstoreserverapi/get_all_sub
 
 Use the [Get All Subscription Statuses](/documentation/appstoreserverapi/get_all_subscription_statuses/) endpoint and [Get Transaction History](/documentation/appstoreserverapi/get_transaction_history/) endpoint to determine the status of your users’ subscriptions and view transaction history, so you can identify and act on:
 
-**Voluntary churn.** Determine if a subscriber has turned off auto-renew for a particular subscription using the [Get All Subscription Statuses](/documentation/appstoreserverapi/get_all_subscription_statuses/) endpoint. You can also use App Store Server Notifications to get real-time updates about changes in a user’s status and key events related to their In-App Purchases, such as a change in renewal status. Use this information to take action in response. For example, you might present a promotional offer or suggest an alternate tier that better fits their needs. When a subscription expires, you can lock access to the subscription’s content or service. Be sure to inform the user of any changes and let them know if there’s anything they need to do in response and how to resubscribe if needed.
+**Voluntary churn.** Determine if a subscriber has turned off auto-renew for a particular subscription using the [Get All Subscription Statuses](/documentation/appstoreserverapi/get_all_subscription_statuses/) endpoint. You can also use App Store Server Notifications to get real-time updates about changes in a user’s status and key events related to their Apple In-App Purchases, such as a change in renewal status. Use this information to take action in response. For example, you might present a promotional offer or suggest an alternate tier that better fits their needs. When a subscription expires, you can lock access to the subscription’s content or service. Be sure to inform the user of any changes and let them know if there’s anything they need to do in response and how to resubscribe if needed.
 
 **Involuntary churn.** Sometimes a subscriber might experience a billing issue, such as an expired credit card, that causes their subscription to expire. Starting in iOS 16.4 and iPadOS 16.4, if a subscription doesn’t successfully renew, a system-provided sheet appears in your app upon launch with a prompt that lets customers update the payment method for their Apple Account. If you’d like, you can choose to delay or suppress this sheet in StoreKit using [messages](/documentation/storekit/message) and [display](/documentation/storekit/message/3963915-display/).
 

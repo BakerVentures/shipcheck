@@ -1,4 +1,4 @@
-<!-- source=product-page clause=in-app-purchases url=https://developer.apple.com/app-store/product-page/ fetched=2026-09-05T02:02:32+00:00 -->
+<!-- source=product-page clause=in-app-purchases url=https://developer.apple.com/app-store/product-page/ fetched=2026-09-21T12:53:57+00:00 -->
 
 ## In-app purchases
 
@@ -6,8 +6,8 @@ Users can view and start an in-app purchase from your product page. In-app purch
 
 In-app purchases can also appear in search results and be featured on the Today, Games, and Apps tabs. When users tap on an in-app purchase in these locations, they are taken to your product page where they can read your app’s description, view screenshots and app previews, or start the in-app purchase. If they don’t have your app installed on their device when they start the in-app purchase, they’ll be prompted to download or purchase the app to complete the transaction.
 
-For details, see [Promoting Your In-App Purchases](/app-store/promoting-in-app-purchases/).
+For details, see [Promoting Your Apple In-App Purchases](/app-store/promoting-in-app-purchases/).
 
-In-App Purchase
+Apple In-App Purchase
 
-In-App Purchase
+Apple In-App Purchase

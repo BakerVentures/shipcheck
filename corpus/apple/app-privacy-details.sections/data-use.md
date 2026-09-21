@@ -1,4 +1,4 @@
-<!-- source=app-privacy-details clause=data-use url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-09-05T02:02:31+00:00 -->
+<!-- source=app-privacy-details clause=data-use url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-09-21T12:53:47+00:00 -->
 
 ## Data use
 
