@@ -161,6 +161,10 @@ dependency list, no source, no metadata, no findings.
 If the license endpoint is unreachable, ShipCheck fails **open** and treats you
 as licensed. An outage on our side never blocks your release.
 
+Full detail — what the license endpoint receives, stores and logs, who the third
+parties are, and how to have anything deleted — is in
+[docs/privacy-policy.md](docs/privacy-policy.md).
+
 ## Pricing
 
 | | Free | $29 one-time | $49 / year | $149 / year |
