@@ -800,6 +800,62 @@ class Scan:
         r"|\brequestPurchase\s*\(|\brequestSubscription\s*\(|\binitConnection\s*\("
         r"|\bconnectAsync\s*\(|\bpurchaseItemAsync\s*\(|\bgetProductsAsync\s*\(")
 
+    # F1 (adversarial review 2026-09-23): the checks below key off a ~6-package
+    # allowlist in rn_sdk_map.json. Any other auth/billing mechanism -- a raw
+    # fetch to a custom backend, Auth0, Amplify/Cognito, Appwrite, Stytch, Magic,
+    # direct StoreKit/Stripe/web-billing -- was invisible: the check returned
+    # early and emitted NOTHING, scoring a login-walled hard-paywall app 0/100.
+    # These two signals are read straight from source, independent of the package
+    # list, and are used ONLY to raise a *gap* ("could not confirm -- verify
+    # manually"), never a CRITICAL. A generous pattern is the right call here:
+    # the whole failure mode being fixed is silence, so err toward flagging.
+    #
+    # SOURCE_AUTH_SIGNAL catches the shapes AUTH_CALL_PATTERN misses: Amplify v6
+    # free functions (signIn()/signUp()), Auth0 (authorize()/useAuth0), a raw
+    # fetch to a /login|/register|/auth endpoint, and unmapped auth vendors.
+    SOURCE_AUTH_SIGNAL = (
+        r"\bsignIn\s*\(|\bsignUp\s*\(|\bconfirmSignUp\s*\(|\bfetchAuthSession\s*\("
+        r"|\bauthorize\s*\(|\buseAuth0\b|\bAuth0Provider\b|\bnew\s+Auth0\b"
+        r"|\bfetch\s*\(\s*[`'\"][^`'\"]*/(?:login|log-in|signin|sign-in|register|"
+        r"signup|sign-up|auth|session|token)\b"
+        r"|[`'\"][^`'\"]*/(?:login|signin|sign-in|register|signup|sign-up)[`'\"]"
+        r"|aws-amplify|\bAmplify\.configure\b|\bCognito\b|\bAppwrite\b|\bStytch\b"
+        r"|@stytch/|magic-sdk|\bnew\s+Magic\b|@magic-sdk|@ory/|\bDescope\b|@descope/")
+
+    # SOURCE_PURCHASE_SIGNAL catches direct StoreKit, RevenueCat's Purchases
+    # global used without the mapped package, Stripe / web-billing, and paywall
+    # UI strings. grep_source compiles every pattern with re.I, so these all
+    # match case-insensitively.
+    SOURCE_PURCHASE_SIGNAL = (
+        r"\bStoreKit\b|\bSKProduct\b|\bSKPayment\b|\bSKProductsRequest\b"
+        r"|\bPurchases\.(?:configure|getOfferings|purchasePackage|purchaseProduct)\b"
+        r"|@stripe/stripe-react-native|\buseStripe\b|\bpresentPaymentSheet\b"
+        r"|\bconfirmPayment\b|\bcreatePaymentIntent\b|checkout\.stripe\.com"
+        r"|\brevenuecat\b|web[_-]?billing|\bStripeProvider\b"
+        r"|\brestore\s+purchases?\b|\bstart\s+free\s+trial\b|\bsubscribe\s+now\b"
+        r"|\bupgrade\s+to\s+pro\b|\bunlock\s+premium\b|\bgo\s+premium\b"
+        r"|\bmanage\s+subscription\b|\bpaywall\b")
+
+    def source_shows_auth(self):
+        """Path to the first file showing any auth call shape (mapped-SDK
+        AUTH_CALL_PATTERN OR the F1 unmapped-vendor signal), else None. Memoized
+        so it walks the tree at most once."""
+        if not hasattr(self, "_auth_sig_done"):
+            self._auth_sig = (self.grep_source(self.AUTH_CALL_PATTERN)
+                              or self.grep_source(self.SOURCE_AUTH_SIGNAL))
+            self._auth_sig_done = True
+            self.facts["source_auth_signal"] = self._auth_sig
+        return self._auth_sig
+
+    def source_shows_purchase(self):
+        """Path to the first file showing a purchase/paywall shape, else None.
+        Memoized."""
+        if not hasattr(self, "_purchase_sig_done"):
+            self._purchase_sig = self.grep_source(self.SOURCE_PURCHASE_SIGNAL)
+            self._purchase_sig_done = True
+            self.facts["source_purchase_signal"] = self._purchase_sig
+        return self._purchase_sig
+
     def check_signin_with_apple(self, deps, cfg, plist):
         third_party, satisfied = [], []
         for pkg in deps:
@@ -860,6 +916,20 @@ class Scan:
                ((self.map["packages"].get(p) or {}).get("triggers") or [])]
         self.facts["iap_packages"] = iap
         if not iap:
+            # F1: a paywall can exist through direct StoreKit, Stripe, web
+            # billing, or RevenueCat used without the mapped package. Do NOT
+            # score 3.1.1/3.1.2 as clean just because no mapped IAP SDK is in
+            # package.json -- if source shows a purchase/paywall shape, raise a
+            # gap so it gets verified by hand rather than silently passing.
+            sig = self.source_shows_purchase()
+            if sig:
+                self.gap("in-app purchase obligations (3.1.1 restore / 3.1.2 "
+                         "disclosure) could not be confirmed",
+                         "Source shows a purchase/paywall shape (%s) but no IAP SDK "
+                         "ShipCheck maps is in package.json, so it cannot verify a "
+                         "Restore Purchases control (3.1.1) or the paywall's terms "
+                         "disclosure (3.1.2). If this app sells anything, verify both "
+                         "manually." % sig)
             return
         restore_pattern = (r"restorePurchases|restoreTransactions|"
                            r"syncPurchases|restore_purchases")
@@ -925,6 +995,19 @@ class Scan:
                     ((self.map["packages"].get(p) or {}).get("triggers") or [])]
         self.facts["account_packages"] = accounts
         if not accounts:
+            # F1: accounts can be created through a mechanism not in the SDK map
+            # (raw fetch to a backend, Auth0, Amplify/Cognito, Appwrite, ...).
+            # Never return silently -- if source shows an auth shape, say the
+            # 5.1.1(v) obligation could not be confirmed rather than scoring 0.
+            sig = self.source_shows_auth()
+            if sig:
+                self.gap("account deletion (5.1.1(v)) could not be confirmed",
+                         "Source shows an auth/sign-in shape (%s) that is not one of "
+                         "the account SDKs ShipCheck maps, so it cannot tell whether "
+                         "accounts are created or whether an in-app account-deletion "
+                         "control exists. If this app lets people create an account, "
+                         "Apple has required an in-app delete-account control since "
+                         "30 June 2022 (5.1.1(v)); verify it manually." % sig)
             return
         delete_pattern = (r"delete[_ ]?account|deleteAccount|deleteUser|"
                           r"account[_ ]?deletion|removeAccount")
@@ -986,6 +1069,113 @@ class Scan:
                          "nothing to fix until they are.",
                      confidence="low",
                      corpus="apple/asrg.sections/5.1.1v.md")
+
+    def check_submission_structure(self, deps, md):
+        """F2 (adversarial review 2026-09-23): model the submission-structure
+        gap that rejected Nearvo builds 4/5/6. For a hard-paywall app the
+        reviewer must be able to complete the purchase, so the subscription/IAP
+        MUST be attached to THIS version's review submission or it is an
+        automatic 2.1(b). ShipCheck cannot see the ASC submission, so whenever a
+        paywall is plausibly present -- by mapped SDK, by the F1 source signal,
+        or by the developer's own metadata -- it raises this as a blocking
+        checklist item rather than staying silent (learned.md 2026-09-22)."""
+        md = md or {}
+        subs_meta = (md.get("subscriptions") or "").strip().lower()
+        subs_yes = subs_meta.startswith("yes")
+        paywall_meta = (md.get("paywall") or "").strip()
+        review_notes = (md.get("review notes") or "").strip()
+        iap_sdk = self.facts.get("iap_packages") or []
+        purchase_sig = self.source_shows_purchase()
+        if not (iap_sdk or subs_yes or purchase_sig):
+            return
+        why = []
+        if iap_sdk:
+            why.append("IAP SDK %s in package.json" % ", ".join(iap_sdk))
+        if purchase_sig:
+            why.append("a purchase/paywall code signal (%s)" % purchase_sig)
+        if subs_yes:
+            why.append('metadata answers "Subscriptions: yes"')
+        if paywall_meta:
+            why.append("a paywall is described in metadata")
+        fix = ("In App Store Connect, attach the subscription/IAP to THIS "
+               "version's review submission (select the products in the version "
+               "page's In-App Purchases section BEFORE you submit). The ASC API "
+               "cannot do this -- it is a manual Console step. A version-only "
+               "submission of a hard-paywall app is an automatic 2.1(b) rejection "
+               "because the reviewer cannot complete the purchase (this rejected "
+               "three builds of one of the studio's apps).")
+        if not review_notes:
+            fix += (" Also paste the paywall's product list, price, and exact test "
+                    "steps into your App Review notes -- that field is currently "
+                    "empty in your metadata.")
+        self.add("IAP-ATTACH-SUBMISSION", "high",
+                 "Confirm the subscription/IAP is attached to THIS version's "
+                 "review submission",
+                 clause="2.1",
+                 evidence="A paywall is plausibly present (%s). ShipCheck cannot "
+                          "read the App Store Connect submission, so it cannot "
+                          "confirm the product is attached to it -- and this is the "
+                          "exact gap that rejects hard-paywall apps under 2.1(b)."
+                          % "; ".join(why),
+                 fix=fix,
+                 confidence="high",
+                 corpus="apple/asrg.sections/2.1.md")
+
+    def check_accounts_reconcile(self, md):
+        """F3 (adversarial review 2026-09-23): cross-check the developer's
+        self-reported metadata against what the code actually shows. A metadata
+        self-report is not evidence -- a login-walled app whose metadata says
+        "Accounts: no" must not sail through."""
+        md = md or {}
+        accounts_meta = (md.get("accounts") or "").strip().lower()
+        code_auth = self.source_shows_auth()
+        if code_auth and accounts_meta.startswith("no"):
+            self.add("META-ACCOUNTS-RECONCILE", "high",
+                     "Code shows sign-in/account calls but metadata says "
+                     '"Accounts: no"',
+                     clause="2.1",
+                     evidence="A sign-in/sign-up shape was found in source (%s) but "
+                              "shipcheck.metadata.md answers Accounts: no. One of "
+                              "them is wrong." % code_auth,
+                     fix="Reconcile before submitting. If the app creates accounts, "
+                         "set Accounts: yes, put a working demo account in App Review "
+                         "notes (2.1), and confirm an in-app account-deletion control "
+                         "exists (5.1.1(v)). If it does not create accounts, remove "
+                         "the sign-in code. A reviewer who hits a login wall with no "
+                         "credentials rejects under 2.1.",
+                     confidence="medium",
+                     corpus="apple/asrg.sections/2.1.md")
+        elif accounts_meta.startswith("yes") and not code_auth:
+            self.gap("metadata says Accounts: yes but no sign-in call site was found",
+                     "shipcheck.metadata.md answers Accounts: yes, but ShipCheck "
+                     "found no sign-in/sign-up shape in source. Either accounts are "
+                     "created through a mechanism it did not recognise, or the "
+                     "metadata is wrong -- verify which before submitting.")
+
+        # accounts=yes obliges in-app account deletion regardless of which SDK
+        # (or no SDK) is used. If the mapped-SDK path already raised an
+        # account-deletion finding, don't double up.
+        if accounts_meta.startswith("yes"):
+            delete_pattern = (r"delete[_ ]?account|deleteAccount|deleteUser|"
+                              r"account[_ ]?deletion|removeAccount")
+            has_delete = self.grep_source(delete_pattern)
+            search_complete = delete_pattern not in self.facts.get("grep_truncated", set())
+            already_flagged = any(f["id"].startswith("ACCOUNT-DELETE")
+                                  for f in self.findings)
+            if not has_delete and search_complete and not already_flagged:
+                self.add("ACCOUNT-DELETE-METADATA", "high",
+                         "Metadata says the app has accounts, but no in-app "
+                         "account-deletion code path was found",
+                         clause="5.1.1v",
+                         evidence="Accounts: yes in shipcheck.metadata.md; no "
+                                  "delete-account/deleteUser code path found in "
+                                  "source (checked independent of which auth SDK is "
+                                  "used).",
+                         fix="Add an in-app control that permanently deletes the "
+                             "account. Apple has required this since 30 June 2022 for "
+                             "any app that supports account creation (5.1.1(v)).",
+                         confidence="medium",
+                         corpus="apple/asrg.sections/5.1.1v.md")
 
     def check_export_compliance(self, plist):
         if "ITSAppUsesNonExemptEncryption" not in plist:
@@ -1325,9 +1515,27 @@ class Scan:
             url = (md.get(field) or "").strip().split()[0] if md.get(field) else ""
             if not url.startswith("http"):
                 continue
-            ok, detail, confirmed = head_ok(url)
+            ok, detail, confirmed, blocked = head_ok(url)
             self.facts.setdefault("url_checks", {})[url] = detail
             if ok:
+                continue
+            if blocked:
+                # F4: 403/405 on every method is a WAF/Cloudflare bot block, not
+                # a dead page. A reviewer opening it in a browser sees the real
+                # page, so this is info-level, not a gating CRITICAL. Crying wolf
+                # on a healthy link trains the developer to ignore real ones.
+                self.add("URL-BOT-BLOCKED-%s" % field.replace(" ", "-"), "low",
+                         "%s answered 403/405 to ShipCheck but is likely fine in a "
+                         "browser" % field.title(),
+                         clause="2.3.8" if "support" in field else "5.1.1",
+                         evidence="%s -> %s. A 403/405 to an automated link checker "
+                                  "(tried with a browser-like User-Agent too) is the "
+                                  "signature of a WAF/Cloudflare bot block, not a "
+                                  "dead page." % (url, detail),
+                         fix="Open the URL in a browser to confirm it loads. If it "
+                             "does, no action is needed -- this is not a dead link. "
+                             "Only 404/410/5xx are treated as genuinely broken.",
+                         confidence="low")
                 continue
             if confirmed:
                 self.add("URL-DEAD-%s" % field.replace(" ", "-"), "critical",
@@ -1402,6 +1610,8 @@ class Scan:
             self.check_signin_with_apple(deps, cfg, plist)
             self.check_iap(deps, cfg)
             self.check_account_deletion(deps)
+            self.check_submission_structure(deps, md)
+            self.check_accounts_reconcile(md)
             self.check_export_compliance(plist)
             self.check_dev_artifacts(deps + devdeps, cfg)
 
@@ -1435,30 +1645,58 @@ def png_info(path):
                 has_alpha=color_type in (4, 6) or trns)
 
 
+BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+              "AppleWebKit/537.36 (KHTML, like Gecko) "
+              "Chrome/124.0.0.0 Safari/537.36")
+
+
 def head_ok(url, timeout=12):
-    """Returns (ok, detail, confirmed). `confirmed` is True only when the
-    server actually answered (even with an error status) -- that's a real
-    signal a reviewer hitting the same URL would also see. `confirmed` is
-    False when there was no HTTP response at all (DNS failure, timeout,
-    connection reset): that's just as consistent with a network problem on
-    the machine running the scan as with a genuinely dead URL, so callers
-    should not treat it with the same certainty as a confirmed dead link."""
-    for method in ("HEAD", "GET"):
+    """Returns (ok, detail, confirmed, blocked).
+
+    - ok:        a 2xx/3xx response on some method.
+    - confirmed: the server actually answered (any HTTP status). A real signal
+                 a reviewer hitting the same URL would also see. False only when
+                 there was no HTTP response at all (DNS failure, timeout,
+                 connection reset), which is as consistent with a network blip
+                 on the scan machine as with a dead URL.
+    - blocked:   F4 (adversarial review 2026-09-23). The only failing statuses
+                 seen were 403/405, which is the signature of a WAF/Cloudflare
+                 bot block (bakerventuresstudio.com itself sits behind
+                 Cloudflare, as do most policy-generator hosts). Such a page is
+                 reachable in a browser and to a reviewer, so callers must NOT
+                 treat it as a dead link -- reserve CRITICAL for 404/410/5xx.
+
+    Tries HEAD then GET with the link-checker UA, then GET once more with a
+    browser-like UA before concluding a 403/405 is a genuine bot block."""
+    saw_blocked = False
+    last_err = "unreachable"
+    attempts = (("HEAD", "ShipCheck/0.1 (link checker)"),
+                ("GET", "ShipCheck/0.1 (link checker)"),
+                ("GET", BROWSER_UA))
+    for method, ua in attempts:
         try:
-            req = urllib.request.Request(url, method=method, headers={
-                "User-Agent": "ShipCheck/0.1 (link checker)"})
+            req = urllib.request.Request(url, method=method,
+                                         headers={"User-Agent": ua})
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 if 200 <= r.status < 400:
-                    return True, "HTTP %d" % r.status, True
-                return False, "HTTP %d" % r.status, True
+                    return True, "HTTP %d" % r.status, True, False
+                if r.status in (403, 405):
+                    saw_blocked = True
+                    last_err = "HTTP %d" % r.status
+                    continue
+                return False, "HTTP %d" % r.status, True, False
         except urllib.error.HTTPError as e:
-            if e.code in (403, 405) and method == "HEAD":
+            if e.code in (403, 405):
+                saw_blocked = True
+                last_err = "HTTP %d" % e.code
                 continue
-            return False, "HTTP %d" % e.code, True
+            return False, "HTTP %d" % e.code, True, False
         except Exception as e:                       # noqa: BLE001
-            if method == "GET":
-                return False, type(e).__name__, False
-    return False, "unreachable", False
+            last_err = type(e).__name__
+            continue
+    if saw_blocked:
+        return False, "%s (bot-blocked)" % last_err, True, True
+    return False, last_err, False, False
 
 
 def main():
