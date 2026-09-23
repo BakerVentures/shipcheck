@@ -49,9 +49,13 @@ Delete nothing. Keep the `##` headings exactly as they are.
      If yes: how does a user delete their account in-app? -->
 
 ## Subscriptions
-<!-- Does your app sell subscriptions or IAP? yes/no.
+<!-- Answer yes or no on the first line. Does your app sell subscriptions or IAP?
      If yes: list each product, its price, its duration, whether there is a free
-     trial and its length, and paste the exact terms text shown on the paywall. -->
+     trial and its length, and paste the exact terms text shown on the paywall.
+     ShipCheck also reminds you of one thing the ASC API cannot check for you:
+     each product must be attached to THIS version's review submission in App
+     Store Connect before you submit, or a hard-paywall app is an automatic
+     2.1(b) rejection because the reviewer cannot complete the purchase. -->
 
 ## Paywall
 <!-- Describe the paywall screen: what is visible before purchase, where price,

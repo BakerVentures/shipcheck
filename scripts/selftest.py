@@ -298,13 +298,22 @@ def run_url_reachability_checks():
     print("\nURL reachability: confirmed-dead vs network-unconfirmed "
           "(a transient network blip during a scan must not assert the "
           "same CRITICAL as a real HTTP error response)")
+    # head_ok now returns (ok, detail, confirmed, blocked); blocked marks a
+    # 403/405-on-every-method bot block (F4).
     cases = [
         ("a real HTTP 404 response must still assert CRITICAL",
-         lambda url, timeout=12: (False, "HTTP 404", True),
-         {"URL-DEAD-privacy-policy-url"}, {"URL-UNCONFIRMED-privacy-policy-url"}),
+         lambda url, timeout=12: (False, "HTTP 404", True, False),
+         {"URL-DEAD-privacy-policy-url"},
+         {"URL-UNCONFIRMED-privacy-policy-url", "URL-BOT-BLOCKED-privacy-policy-url"}),
         ("a DNS/timeout failure with no HTTP response must NOT assert CRITICAL",
-         lambda url, timeout=12: (False, "URLError", False),
-         {"URL-UNCONFIRMED-privacy-policy-url"}, {"URL-DEAD-privacy-policy-url"}),
+         lambda url, timeout=12: (False, "URLError", False, False),
+         {"URL-UNCONFIRMED-privacy-policy-url"},
+         {"URL-DEAD-privacy-policy-url", "URL-BOT-BLOCKED-privacy-policy-url"}),
+        ("F4: a 403/405 bot block (answered on every method) must be low, "
+         "NOT a CRITICAL dead link",
+         lambda url, timeout=12: (False, "HTTP 403 (bot-blocked)", True, True),
+         {"URL-BOT-BLOCKED-privacy-policy-url"},
+         {"URL-DEAD-privacy-policy-url", "URL-UNCONFIRMED-privacy-policy-url"}),
     ]
     md = {"privacy policy url": "https://example.com/privacy"}
     real_head_ok = scan.head_ok
@@ -315,9 +324,12 @@ def run_url_reachability_checks():
                 s = scan.Scan(tmp)
                 s.check_urls(md)
                 ids = {f["id"] for f in s.findings}
+                too_severe = [f["id"] for f in s.findings
+                              if f["id"].startswith("URL-BOT-BLOCKED")
+                              and scan.SEV.get(f["severity"], 0) > scan.SEV["low"]]
             missing = want_ids - ids
             unwanted = forbid_ids & ids
-            if not missing and not unwanted:
+            if not missing and not unwanted and not too_severe:
                 print("  ok     %s" % desc)
             else:
                 bits = []
@@ -325,6 +337,8 @@ def run_url_reachability_checks():
                     bits.append("missing %s" % sorted(missing))
                 if unwanted:
                     bits.append("should not have fired %s" % sorted(unwanted))
+                if too_severe:
+                    bits.append("bot-blocked finding above low severity %s" % too_severe)
                 fdesc = "%s (%s)" % (desc, "; ".join(bits))
                 print("  FAIL   %s" % fdesc); fails.append(fdesc)
     finally:
@@ -452,6 +466,172 @@ def run_clean_checks():
     return fails
 
 
+# ---------------------------------------------------------------------------
+# Adversarial-review regressions (2026-09-23). These are the false-PASS bugs
+# that would have let a Nearvo-class app through: obligations detected ONLY from
+# a ~6-package allowlist, and no model of the "IAP attached to the review
+# submission" gap. Each fixture must FAIL on the pre-fix code and PASS now.
+# ---------------------------------------------------------------------------
+
+# F1 fixture: a custom-fetch-auth + direct-StoreKit-paywall app with NO mapped
+# auth/IAP SDK, NO account deletion, NO restore, NO demo account. On the pre-fix
+# code this scored 0 findings / 0 gaps ("Nothing blocking found"). It must now
+# raise the 5.1.1(v) and 3.1.1/3.1.2 obligations as gaps -- NEVER 0/0.
+F1_AUTH_LIB = """\
+const API = 'https://api.example.com';
+export async function register(email, password) {
+  return fetch(`${API}/register`, { method: 'POST',
+    body: JSON.stringify({ email, password }) });
+}
+export async function login(email, password) {
+  return fetch(`${API}/login`, { method: 'POST',
+    body: JSON.stringify({ email, password }) });
+}
+"""
+F1_INDEX = """\
+import { login } from '../lib/auth';
+export default function Index() {
+  async function onLogin() { await login('a@b.com', 'pw'); }
+  return null;
+}
+"""
+F1_PAYWALL = """\
+import StoreKit from 'expo-storekit-shim';
+// Real hard paywall: direct StoreKit, no mapped IAP SDK, no restore control.
+export default function Paywall() {
+  async function buy(product /* SKProduct */) {
+    await SKPaymentQueue.default().addPayment(product);
+  }
+  return null; // renders "Subscribe Now" / "Unlock Premium"
+}
+"""
+F1_METADATA = """\
+# ShipCheck metadata
+## App name
+Custom Auth App
+## Description
+An app that signs people in against a custom backend and sells a subscription.
+## Privacy policy URL
+https://example.com/privacy
+## Support URL
+https://example.com/support
+## Accounts
+## Subscriptions
+## Demo account
+"""
+
+
+def _write(tmp, rel, content):
+    path = os.path.join(tmp, rel)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+
+def run_f1_source_signal_checks():
+    fails = []
+    print("\nF1 (adversarial review): auth/purchase obligations detected from "
+          "SOURCE, not just a package allowlist -- a custom-fetch-auth + "
+          "StoreKit-paywall app must NEVER score 0 findings / 0 gaps")
+    with tempfile.TemporaryDirectory() as tmp:
+        _write(tmp, "package.json", json.dumps({
+            "name": "custom-auth-app",
+            "dependencies": {"expo": "~56.0.0", "react": "18.3.1",
+                             "react-native": "0.76.0", "expo-router": "~4.0.0"}}))
+        _write(tmp, "app.json", json.dumps({"expo": {
+            "name": "Custom Auth App", "slug": "custom-auth",
+            "version": "1.0.0",
+            "ios": {"bundleIdentifier": "com.example.customauth"}}}))
+        _write(tmp, "lib/auth.ts", F1_AUTH_LIB)
+        _write(tmp, "app/index.tsx", F1_INDEX)
+        _write(tmp, "app/paywall.tsx", F1_PAYWALL)
+        _write(tmp, "shipcheck.metadata.md", F1_METADATA)
+        res = scan.Scan(tmp, platform="ios", offline=True).run()
+    findings, gaps = res["findings"], res["gaps"]
+    fid = {f["id"] for f in findings}
+    signals = " ".join(g["what"] + " " + g["why"] for g in gaps) + " " + \
+              " ".join(f["id"] + " " + (f["clause"] or "") for f in findings)
+
+    checks = [
+        ("must NOT be silent (0 findings AND 0 gaps is the exact false PASS)",
+         bool(findings) or bool(gaps)),
+        ("account-deletion 5.1.1(v) obligation is surfaced (finding or gap)",
+         "5.1.1(v)" in signals or "5.1.1v" in signals or
+         any(f.startswith("ACCOUNT-DELETE") for f in fid)),
+        ("purchase 3.1.1/3.1.2 obligation is surfaced (finding or gap)",
+         "3.1.1" in signals or "3.1.2" in signals or
+         "IAP-ATTACH-SUBMISSION" in fid),
+    ]
+    for desc, ok in checks:
+        if ok:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s" % desc); fails.append("F1: " + desc)
+    return fails
+
+
+def run_f2_submission_structure_checks():
+    fails = []
+    print("\nF2 (adversarial review): the 'IAP attached to THIS version's "
+          "submission' gap that rejected Nearvo 4/5/6 is modeled as a blocking "
+          "checklist item whenever a paywall is plausibly present")
+    cases = [
+        ("mapped IAP SDK + wired purchase call -> IAP-ATTACH-SUBMISSION",
+         "react-native-purchases", LIVE_IAP_WRAPPER, {},
+         ["react-native-purchases"]),
+        ("metadata 'Subscriptions: yes' with no SDK -> IAP-ATTACH-SUBMISSION",
+         None, None, {"subscriptions": "yes\nPro monthly $9.99"}, []),
+    ]
+    for desc, subdir_pkg, src, md, deps in cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            if src is not None:
+                _write(tmp, "src/lib/purchases.ts", src)
+            s = scan.Scan(tmp)
+            if deps:
+                s.check_iap(deps, None)
+            s.check_submission_structure(deps, md)
+            ids = {f["id"] for f in s.findings}
+        if "IAP-ATTACH-SUBMISSION" in ids:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s (IAP-ATTACH-SUBMISSION not raised)" % desc)
+            fails.append("F2: " + desc)
+    return fails
+
+
+def run_f3_metadata_reconcile_checks():
+    fails = []
+    print("\nF3 (adversarial review): a metadata self-report is cross-checked "
+          "against code -- 'Accounts: no' + a real sign-in call must reconcile, "
+          "not sail through")
+    with tempfile.TemporaryDirectory() as tmp:
+        _write(tmp, "lib/auth.ts", F1_AUTH_LIB)  # fetch('.../login') sign-in
+        s = scan.Scan(tmp)
+        s.check_accounts_reconcile({"accounts": "no"})
+        ids = {f["id"] for f in s.findings}
+    if "META-ACCOUNTS-RECONCILE" in ids:
+        print("  ok     code shows sign-in but metadata says Accounts: no -> "
+              "reconcile finding")
+    else:
+        print("  FAIL   META-ACCOUNTS-RECONCILE not raised for Accounts:no + "
+              "sign-in call"); fails.append("F3: reconcile finding")
+
+    # accounts=yes but no delete-account code path must be flagged regardless
+    # of SDK (no mapped auth SDK here at all).
+    with tempfile.TemporaryDirectory() as tmp:
+        _write(tmp, "lib/auth.ts", F1_AUTH_LIB)
+        s = scan.Scan(tmp)
+        s.check_accounts_reconcile({"accounts": "yes"})
+        ids = {f["id"] for f in s.findings}
+    if "ACCOUNT-DELETE-METADATA" in ids:
+        print("  ok     Accounts: yes + no delete-account code -> 5.1.1(v) "
+              "finding regardless of SDK")
+    else:
+        print("  FAIL   ACCOUNT-DELETE-METADATA not raised for Accounts:yes + "
+              "no deletion"); fails.append("F3: accounts=yes deletion")
+    return fails
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true")
@@ -507,6 +687,9 @@ def main():
     fails += run_iap_confirmation_checks()
     fails += run_url_reachability_checks()
     fails += run_grep_truncation_checks()
+    fails += run_f1_source_signal_checks()
+    fails += run_f2_submission_structure_checks()
+    fails += run_f3_metadata_reconcile_checks()
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
 

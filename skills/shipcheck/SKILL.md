@@ -94,8 +94,16 @@ turn, not three separate turns.
 First, triage from `facts` alone, before reading anything, to cut the search
 space:
 
-- No `Subscriptions`/IAP packages in `facts.dependencies` → skip 3.1.2 entirely,
-  don't read `$CORPUS/apple/subscriptions.md`.
+- IAP/3.1.2: skip the deep read of `$CORPUS/apple/subscriptions.md` **only** when
+  the scan shows no paywall at all — no mapped IAP package in `facts.dependencies`,
+  `facts.source_purchase_signal` is null, and there is no `IAP-ATTACH-SUBMISSION`
+  finding or purchase gap. "No mapped IAP dependency" is NOT sufficient on its own:
+  a paywall can be built on direct StoreKit, Stripe, web billing, or a vendored
+  RevenueCat, and those show up as a source signal / gap, not as a dependency. If
+  the scanner raised a purchase gap or an `IAP-ATTACH-SUBMISSION` finding, do NOT
+  skip — treat 3.1.2 as **manual verification required**: read the `Paywall`
+  metadata field and the paywall source and confirm the terms disclosure by hand
+  rather than assuming the app has no paywall.
 - Category isn't Health, Dating, Kids, or Gambling → skip the category-specific
   corpus files (`5.1.3`, `5.1.4`, `5.3`, `1.1.4`) entirely.
 - `facts.metadata` has no screenshot descriptions → skip 2.3.3.
