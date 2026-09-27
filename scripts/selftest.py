@@ -12,6 +12,7 @@ app is worse than saying nothing.
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -467,6 +468,62 @@ def run_clean_checks():
 
 
 # ---------------------------------------------------------------------------
+# PRIVACY-MANIFEST-MISSING false positive (found 2026-09-27, PolicyReady): the
+# check only ever looked for a generated ios/<App>/PrivacyInfo.xcprivacy file
+# on disk. For a managed Expo app, ios/ is CNG output -- gitignored, absent on
+# a fresh checkout or in CI -- so a project with a fully correct
+# `expo.ios.privacyManifests` in app.json (which is exactly ShipCheck's own
+# suggested fix, and what generates that file on every prebuild) still got
+# flagged. Copies bad-expo-app (which seeds this finding on purpose, and
+# already has node_modules installed) rather than mutating the checked-in
+# fixture, adds the config, and re-scans.
+# ---------------------------------------------------------------------------
+
+def run_privacy_manifest_config_checks():
+    fails = []
+    print("\nPRIVACY-MANIFEST-MISSING false positive (config-declared, no ios/)")
+    with tempfile.TemporaryDirectory() as tmp:
+        dest = os.path.join(tmp, "app")
+        shutil.copytree(FIXTURE, dest, symlinks=True)
+        app_json_path = os.path.join(dest, "app.json")
+        with open(app_json_path, encoding="utf-8") as f:
+            cfg = json.load(f)
+        cfg["expo"]["ios"]["privacyManifests"] = {
+            "NSPrivacyTracking": False,
+            "NSPrivacyTrackingDomains": [],
+            "NSPrivacyCollectedDataTypes": [],
+            "NSPrivacyAccessedAPITypes": [],
+        }
+        with open(app_json_path, "w", encoding="utf-8") as f:
+            json.dump(cfg, f)
+        # bad-expo-app has no ios/ directory at all (it seeds the finding via
+        # node_modules + no app manifest), so nothing needs deleting here --
+        # this is exactly the managed-Expo, fresh-checkout shape.
+        res = scan.Scan(dest, platform="ios", offline=True).run()
+
+    ids = {f["id"] for f in res["findings"]}
+    titles = {(p.get("title"), p.get("clause")) for p in res.get("passes") or []}
+    checks = [
+        ("PRIVACY-MANIFEST-MISSING must NOT fire when app.json declares "
+         "expo.ios.privacyManifests, even with no ios/ on disk",
+         "PRIVACY-MANIFEST-MISSING" not in ids),
+        ("a pass is recorded naming the config declaration",
+         ("App-level privacy manifest declared in config",
+          "apple:required-reason-api") in titles),
+        ("SDK-NO-MANIFEST-expo-file-system must STILL fire -- an app-level "
+         "declaration does not cover a specific SDK that ships no manifest "
+         "of its own; this fix must not become a blanket suppression",
+         "SDK-NO-MANIFEST-expo-file-system" in ids),
+    ]
+    for desc, ok in checks:
+        if ok:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s" % desc); fails.append(desc)
+    return fails
+
+
+# ---------------------------------------------------------------------------
 # Adversarial-review regressions (2026-09-23). These are the false-PASS bugs
 # that would have let a Nearvo-class app through: obligations detected ONLY from
 # a ~6-package allowlist, and no model of the "IAP attached to the review
@@ -692,6 +749,7 @@ def main():
     fails += run_f3_metadata_reconcile_checks()
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
+    fails += run_privacy_manifest_config_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))

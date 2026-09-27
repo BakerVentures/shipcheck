@@ -250,8 +250,22 @@ class Scan:
         self.facts["info_plist_sources"] = sources
         return merged
 
-    def find_privacy_manifests(self):
-        """App-level PrivacyInfo.xcprivacy plus any shipped by node_modules."""
+    def find_privacy_manifests(self, cfg):
+        """App-level PrivacyInfo.xcprivacy plus any shipped by node_modules.
+
+        `ios/` is CNG output for a managed Expo app — gitignored, and absent
+        on a fresh checkout or in CI until someone runs `expo prebuild` (or
+        a full `eas build`/`expo run:ios`). Scanning only the filesystem for
+        the generated file therefore raises PRIVACY-MANIFEST-MISSING on an
+        app that is correctly configured and whose every actual build already
+        ships a manifest — found 2026-09-27 auditing PolicyReady: the shipped
+        IPA had a correct app-level manifest that this scan could not see,
+        because `expo.ios.privacyManifests` in app.json (which generates it
+        on every prebuild) isn't itself evidence this function looked at.
+        `app_manifest_declared_in_config` is that second source of truth,
+        checked here so a config-only project (no `ios/` present at all)
+        does not get the same finding a genuinely-unconfigured one would.
+        """
         app_manifest, sdk_manifests = None, []
         for base in ("ios", "assets", "."):
             d = self.p(base)
@@ -269,6 +283,13 @@ class Scan:
                     break
             if app_manifest:
                 break
+
+        # A dict is a deliberate declaration even when every field inside it
+        # is empty/false (that's the honest shape for an app whose own code
+        # touches no required-reason API) -- so check for the key's presence,
+        # not its truthiness.
+        app_manifest_declared_in_config = (
+            isinstance((cfg.get("ios") or {}).get("privacyManifests"), dict))
 
         nm = self.p("node_modules")
         self.sdk_declared = {}
@@ -336,7 +357,7 @@ class Scan:
                      "re-scan — this is the difference between guessing and knowing.")
         self.facts["pods_present"] = self.pods_present
         self.facts["pod_manifest_count"] = len(self.pod_declared)
-        return app_manifest, sdk_manifests
+        return app_manifest, sdk_manifests, app_manifest_declared_in_config
 
     def has_native_ios(self, pkg):
         """Does this npm package contain native iOS code?
@@ -566,7 +587,8 @@ class Scan:
                              "reject boilerplate and Expo's plugin default strings.",
                          confidence="medium")
 
-    def check_required_reason(self, deps, app_manifest, sdk_manifests):
+    def check_required_reason(self, deps, app_manifest, sdk_manifests,
+                               app_manifest_declared_in_config=False):
         """Required-reason API coverage.
 
         Apple's rule, verbatim in corpus/apple/required-reason-api.md: an SDK
@@ -579,7 +601,15 @@ class Scan:
         So node_modules is the authority when it is there. The static map only
         says "this package touches required-reason API at all"; what it actually
         declares is read off disk.
+
+        `app_manifest` is the file on disk (only present if `ios/` has been
+        generated); `app_manifest_declared_in_config` is `expo.ios.privacyManifests`
+        in app.json/app.config, which is what actually generates that file on
+        every `expo prebuild` — a managed Expo app with no `ios/` checked in
+        (the normal, correct state) has NEITHER wrong nor should be flagged as
+        if it had declared nothing at all. Either one satisfies this check.
         """
+        manifest_present = bool(app_manifest) or app_manifest_declared_in_config
         touches = {}
         for pkg in deps:
             entry = self.map["packages"].get(pkg)
@@ -593,7 +623,7 @@ class Scan:
         if not self.node_modules_present:
             # Do not guess. Guessing here produces a critical finding on a
             # correctly-configured app, which is worse than saying nothing.
-            if not app_manifest:
+            if not manifest_present:
                 self.add("PRIVACY-MANIFEST-MISSING", "high",
                          "No PrivacyInfo.xcprivacy in the app target",
                          clause="apple:required-reason-api",
@@ -670,13 +700,15 @@ class Scan:
                      corpus="apple/required-reason-api.md",
                      itms="ITMS-91061")
 
-        if not app_manifest:
+        if not manifest_present:
             self.add("PRIVACY-MANIFEST-MISSING", "high",
                      "No PrivacyInfo.xcprivacy in the app target",
                      clause="apple:required-reason-api",
                      evidence="%d SDK manifest(s) found under node_modules, but the "
-                              "app target has none. An app manifest is also where "
-                              "NSPrivacyTracking and NSPrivacyCollectedDataTypes live."
+                              "app target has none, and app.json has no "
+                              "`expo.ios.privacyManifests` either. An app manifest is "
+                              "also where NSPrivacyTracking and "
+                              "NSPrivacyCollectedDataTypes live."
                               % len(sdk_manifests),
                      fix="Add `expo.ios.privacyManifests` to app.json (Expo SDK 50+) "
                          "or ios/<App>/PrivacyInfo.xcprivacy, declaring any "
@@ -685,13 +717,23 @@ class Scan:
                      confidence="medium",
                      corpus="apple/required-reason-api.md",
                      itms="ITMS-91053")
-        elif covered:
-            self.passes.append(dict(
-                title="Required-reason API declarations",
-                clause="apple:required-reason-api",
-                note="%d package(s) ship their own privacy manifest and declare their "
-                     "own API use (%s), so your app manifest does not need to repeat "
-                     "them." % (len(covered), ", ".join(sorted(covered)))))
+        else:
+            if app_manifest is None and app_manifest_declared_in_config:
+                self.passes.append(dict(
+                    title="App-level privacy manifest declared in config",
+                    clause="apple:required-reason-api",
+                    note="`expo.ios.privacyManifests` is set in app.json, which "
+                         "generates ios/<App>/PrivacyInfo.xcprivacy on every "
+                         "`expo prebuild` (the file itself isn't checked into this "
+                         "repo, which is expected for a managed Expo app)."))
+            if covered:
+                self.passes.append(dict(
+                    title="Required-reason API declarations",
+                    clause="apple:required-reason-api",
+                    note="%d package(s) ship their own privacy manifest and declare "
+                         "their own API use (%s), so your app manifest does not need "
+                         "to repeat them."
+                         % (len(covered), ", ".join(sorted(covered)))))
 
     def check_listed_sdks(self, deps, sdk_manifests):
         """SDKs on Apple's published list must ship a manifest and a signature.
@@ -1594,8 +1636,11 @@ class Scan:
                 self.facts["app_name"] = plist.get("CFBundleDisplayName") or plist.get("CFBundleName")
             if not self.facts["version"]:
                 self.facts["version"] = plist.get("CFBundleShortVersionString")
-            app_manifest, sdk_manifests = self.find_privacy_manifests()
+            app_manifest, sdk_manifests, app_manifest_declared_in_config = (
+                self.find_privacy_manifests(cfg))
             self.facts["app_privacy_manifest"] = app_manifest
+            self.facts["app_privacy_manifest_declared_in_config"] = (
+                app_manifest_declared_in_config)
             self.facts["sdk_privacy_manifest_count"] = len(sdk_manifests)
             if not self.facts["bundle_id"]:
                 self.add("BUNDLE-ID-MISSING", "high",
@@ -1605,7 +1650,8 @@ class Scan:
                              "produce a submittable binary without it.")
             self.check_icon(cfg)
             self.check_usage_descriptions(deps, plist)
-            self.check_required_reason(deps, app_manifest, sdk_manifests)
+            self.check_required_reason(deps, app_manifest, sdk_manifests,
+                                        app_manifest_declared_in_config)
             self.check_listed_sdks(deps, sdk_manifests)
             self.check_signin_with_apple(deps, cfg, plist)
             self.check_iap(deps, cfg)
