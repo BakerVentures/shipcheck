@@ -3,7 +3,7 @@ shipcheck_source_id: subscriptions
 title: "Auto-renewable subscriptions"
 url: https://developer.apple.com/app-store/subscriptions/
 final_url: https://developer.apple.com/app-store/subscriptions/
-fetched_at: 2026-09-21T12:53:48+00:00
+fetched_at: 2026-09-28T14:01:58+00:00
 sha256: feb8d840ea8fdc038046863e02908cf3849e451a24802b4021b05ff8e086a9f7
 vendor: apple
 ---

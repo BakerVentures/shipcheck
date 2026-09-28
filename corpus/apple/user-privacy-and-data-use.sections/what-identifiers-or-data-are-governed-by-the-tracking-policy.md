@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=what-identifiers-or-data-are-governed-by-the-tracking-policy url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-21T12:53:48+00:00 -->
+<!-- source=user-privacy-and-data-use clause=what-identifiers-or-data-are-governed-by-the-tracking-policy url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-28T14:01:57+00:00 -->
 
 ### What identifiers or data are governed by the "tracking" policy?
 

@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-to-android-5-api-level-21 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-21T12:54:09+00:00 -->
+<!-- source=target-sdk clause=migrate-to-android-5-api-level-21 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-28T14:03:33+00:00 -->
 
 ### Migrate to Android 5 (API level 21)
 

@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=attracting-subscribers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-21T12:53:48+00:00 -->
+<!-- source=subscriptions clause=attracting-subscribers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-28T14:01:58+00:00 -->
 
 ## Attracting subscribers
 

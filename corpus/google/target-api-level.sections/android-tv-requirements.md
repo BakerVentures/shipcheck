@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=android-tv-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-21T12:54:02+00:00 -->
+<!-- source=target-api-level clause=android-tv-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-28T14:03:12+00:00 -->
 
 ### Android TV requirements
 
