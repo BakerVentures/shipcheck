@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=republic-of-korea-regional-ratings url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-21T12:53:57+00:00 -->
+<!-- source=age-ratings clause=republic-of-korea-regional-ratings url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-28T14:02:08+00:00 -->
 
 ### Republic of Korea regional ratings
 

@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=turn-off-logging url=https://developer.android.com/studio/publish/preparing fetched=2026-09-21T12:54:07+00:00 -->
+<!-- source=prepare-for-release clause=turn-off-logging url=https://developer.android.com/studio/publish/preparing fetched=2026-09-28T14:03:30+00:00 -->
 
 ### Turn off logging
 

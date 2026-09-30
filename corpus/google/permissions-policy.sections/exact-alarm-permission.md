@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=exact-alarm-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-21T12:54:06+00:00 -->
+<!-- source=permissions-policy clause=exact-alarm-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-28T14:03:30+00:00 -->
 
 ## Exact Alarm Permission
 

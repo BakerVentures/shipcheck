@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=configure-a-submission-profile url=https://docs.expo.dev/submit/ios/ fetched=2026-09-21T12:53:58+00:00 -->
+<!-- source=expo-submit-ios clause=configure-a-submission-profile url=https://docs.expo.dev/submit/ios/ fetched=2026-09-28T14:02:10+00:00 -->
 
 ### Configure a submission profile
 

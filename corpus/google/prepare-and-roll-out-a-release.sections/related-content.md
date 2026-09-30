@@ -1,4 +1,4 @@
-<!-- source=prepare-and-roll-out-a-release clause=related-content url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-21T12:54:00+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=related-content url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-28T14:02:33+00:00 -->
 
 ## Related content
 

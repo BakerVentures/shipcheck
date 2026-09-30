@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=apply-for-production-access url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-21T12:54:05+00:00 -->
+<!-- source=testing-requirements clause=apply-for-production-access url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-28T14:03:29+00:00 -->
 
 ## Apply for production access
 

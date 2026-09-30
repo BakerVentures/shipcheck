@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-from-lower-than-android-11-api-level-30 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-21T12:54:09+00:00 -->
+<!-- source=target-sdk clause=migrate-from-lower-than-android-11-api-level-30 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-28T14:03:33+00:00 -->
 
 ## Migrate from lower than Android 11 (API level 30)
 

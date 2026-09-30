@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=completing-the-data-safety-form-in-play-console url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-21T12:54:01+00:00 -->
+<!-- source=data-safety clause=completing-the-data-safety-form-in-play-console url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-28T14:03:12+00:00 -->
 
 ## Completing the Data safety form in Play Console
 

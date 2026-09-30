@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=build-a-production-app url=https://docs.expo.dev/submit/android/ fetched=2026-09-21T12:54:09+00:00 -->
+<!-- source=expo-submit-android clause=build-a-production-app url=https://docs.expo.dev/submit/android/ fetched=2026-09-28T14:03:33+00:00 -->
 
 ## Build a production app
 

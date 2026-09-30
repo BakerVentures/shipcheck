@@ -3,7 +3,7 @@ shipcheck_source_id: target-sdk
 title: "Meet Google Play's target API level requirement (Android Developers)"
 url: https://developer.android.com/google/play/requirements/target-sdk
 final_url: https://developer.android.com/google/play/requirements/target-sdk?hl=en
-fetched_at: 2026-09-21T12:54:09+00:00
+fetched_at: 2026-09-28T14:03:33+00:00
 sha256: a222b2d30b3e2943e8f8b3c2f7833142d363e1c6ff1f93a365d02e2369b1d494
 vendor: google
 ---
