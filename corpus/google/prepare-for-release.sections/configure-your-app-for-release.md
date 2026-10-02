@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=configure-your-app-for-release url=https://developer.android.com/studio/publish/preparing fetched=2026-09-28T14:03:30+00:00 -->
+<!-- source=prepare-for-release clause=configure-your-app-for-release url=https://developer.android.com/studio/publish/preparing fetched=2026-10-02T03:31:50+00:00 -->
 
 ## Configure your app for release
 

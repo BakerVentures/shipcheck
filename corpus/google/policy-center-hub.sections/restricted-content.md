@@ -1,4 +1,4 @@
-<!-- source=policy-center-hub clause=restricted-content url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-09-28T14:02:33+00:00 -->
+<!-- source=policy-center-hub clause=restricted-content url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-10-02T03:31:43+00:00 -->
 
 ## Restricted Content
 

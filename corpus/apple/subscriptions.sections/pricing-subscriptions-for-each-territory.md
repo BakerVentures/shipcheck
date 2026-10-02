@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=pricing-subscriptions-for-each-territory url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-28T14:01:58+00:00 -->
+<!-- source=subscriptions clause=pricing-subscriptions-for-each-territory url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-10-02T03:31:28+00:00 -->
 
 ### Pricing subscriptions for each territory
 
