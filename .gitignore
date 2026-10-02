@@ -36,3 +36,19 @@ evals/results/
 # and its honesty about competitors is a credibility asset.
 marketing/*
 !marketing/competitive-analysis.md
+
+# --- credentials: never commit (added 2026-10-01 after the portfolio secrets sweep) ---
+# This repo is PUBLIC. It had no env/key ignore rules at all until now, which is the
+# only reason the sweep found it clean: nothing had been written yet, not that anything
+# was stopping it. Real values live in the macOS Keychain (`jarvis/<name>`) or
+# ~/.config/jarvis/keys/ per rules 6 and 7 — never in the tree.
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+*.pem
+*.jks
+*.keystore
+*.mobileprovision
+*service-account*.json
