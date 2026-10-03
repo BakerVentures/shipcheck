@@ -1,4 +1,4 @@
-<!-- source=required-reason-codes clause=possible-values url=https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons fetched=2026-09-28T14:01:57+00:00 -->
+<!-- source=required-reason-codes clause=possible-values url=https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons fetched=2026-10-02T03:31:26+00:00 -->
 
 ## Possible Values
 
