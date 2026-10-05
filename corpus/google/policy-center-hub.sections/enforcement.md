@@ -1,4 +1,4 @@
-<!-- source=policy-center-hub clause=enforcement url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-09-28T14:02:33+00:00 -->
+<!-- source=policy-center-hub clause=enforcement url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-10-05T14:47:17+00:00 -->
 
 ## Enforcement
 
@@ -6,4 +6,3 @@
 - [Enforcement Process](/googleplay/android-developer/answer/9899234?hl=en&ref_topic=9877468)
 - [Managing Policy Violations and Appeals](/googleplay/android-developer/answer/9899142?hl=en&ref_topic=9877468)
 - [Play Console Requirements](/googleplay/android-developer/answer/10788890?hl=en&ref_topic=9877468)
-- [Preview: Play Console Requirements](/googleplay/android-developer/answer/17125096?hl=en&ref_topic=9877468)

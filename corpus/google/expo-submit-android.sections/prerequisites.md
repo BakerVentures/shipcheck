@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=prerequisites url=https://docs.expo.dev/submit/android/ fetched=2026-09-28T14:03:33+00:00 -->
+<!-- source=expo-submit-android clause=prerequisites url=https://docs.expo.dev/submit/android/ fetched=2026-10-05T14:47:26+00:00 -->
 
 ## Prerequisites
 

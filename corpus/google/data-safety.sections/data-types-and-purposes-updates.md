@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=data-types-and-purposes-updates url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-09-28T14:03:12+00:00 -->
+<!-- source=data-safety clause=data-types-and-purposes-updates url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-10-05T14:47:18+00:00 -->
 
 ### Data types and purposes updates
 

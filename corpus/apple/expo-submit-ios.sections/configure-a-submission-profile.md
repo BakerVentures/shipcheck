@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=configure-a-submission-profile url=https://docs.expo.dev/submit/ios/ fetched=2026-09-28T14:02:10+00:00 -->
+<!-- source=expo-submit-ios clause=configure-a-submission-profile url=https://docs.expo.dev/submit/ios/ fetched=2026-10-05T14:47:17+00:00 -->
 
 ### Configure a submission profile
 
@@ -19,4 +19,4 @@ How to find `ascAppId`
 5. On the left pane, under General, select App Information.
 6. Your `ascAppId` is listed under General Information as Apple ID.
 
-See the [eas.json reference](/eas/json#ios-specific-options-1) for every available option.
+See the [eas.json reference](/eas/json/#ios-specific-options-1) for every available option.

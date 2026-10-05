@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-to-android-8-api-level-26 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-28T14:03:33+00:00 -->
+<!-- source=target-sdk clause=migrate-to-android-8-api-level-26 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-10-05T14:47:26+00:00 -->
 
 ### Migrate to Android 8 (API level 26)
 

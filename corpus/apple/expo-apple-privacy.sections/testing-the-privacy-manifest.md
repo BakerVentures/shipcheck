@@ -1,4 +1,4 @@
-<!-- source=expo-apple-privacy clause=testing-the-privacy-manifest url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-09-28T14:02:10+00:00 -->
+<!-- source=expo-apple-privacy clause=testing-the-privacy-manifest url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-10-05T14:47:16+00:00 -->
 
 ## Testing the privacy manifest
 

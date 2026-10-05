@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=getting-ready url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-09-28T14:01:58+00:00 -->
+<!-- source=subscriptions clause=getting-ready url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-10-05T14:47:05+00:00 -->
 
 ### Getting ready
 

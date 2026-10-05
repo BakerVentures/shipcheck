@@ -1,4 +1,4 @@
-<!-- source=tn3183 clause=select-an-accessed-api-category url=https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest fetched=2026-09-28T14:01:57+00:00 -->
+<!-- source=tn3183 clause=select-an-accessed-api-category url=https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest fetched=2026-10-05T14:47:03+00:00 -->
 
 ## Select an accessed API category
 

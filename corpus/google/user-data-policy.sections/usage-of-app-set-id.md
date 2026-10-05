@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=usage-of-app-set-id url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-09-28T14:03:12+00:00 -->
+<!-- source=user-data-policy clause=usage-of-app-set-id url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-10-05T14:47:19+00:00 -->
 
 ## Usage of App Set ID
 

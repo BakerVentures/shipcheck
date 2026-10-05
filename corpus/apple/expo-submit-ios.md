@@ -3,8 +3,8 @@ shipcheck_source_id: expo-submit-ios
 title: "Expo: Submit to the App Store"
 url: https://docs.expo.dev/submit/ios/
 final_url: https://docs.expo.dev/submit/ios/
-fetched_at: 2026-09-28T14:02:10+00:00
-sha256: 348d91ea3264018b38f78b093f9c4f3aa5b84f2745157c7f5e391b18eaf05a4e
+fetched_at: 2026-10-05T14:47:17+00:00
+sha256: d75824c797e0eac07e137634e27eae105ea01e792fc3889fa7f408d57f1b36a6
 vendor: apple
 ---
 
@@ -18,7 +18,7 @@ Learn how to submit your iOS app to the Apple App Store with EAS Submit.
 
 ---
 
-[EAS Submit](/deploy/submit-to-app-stores) is the recommended way to upload your iOS app to the Apple App Store. The `eas submit` command works the same way on your machine and inside CI/CD. [EAS Workflows](/eas/workflows/introduction) is the simplest way to run it automatically after a build. EAS Submit works on macOS, Linux, and Windows, so you don't need a Mac to ship iOS builds.
+[EAS Submit](/deploy/submit-to-app-stores/) is the recommended way to upload your iOS app to the Apple App Store. The `eas submit` command works the same way on your machine and inside CI/CD. [EAS Workflows](/eas/workflows/introduction/) is the simplest way to run it automatically after a build. EAS Submit works on macOS, Linux, and Windows, so you don't need a Mac to ship iOS builds.
 
 ## Prerequisites
 
@@ -62,7 +62,7 @@ Terminal
 
 ## Build a production app
 
-You need a production .ipa to submit. Create one with [EAS Build](/build/introduction):
+You need a production .ipa to submit. Create one with [EAS Build](/build/introduction/):
 
 Terminal
 
@@ -78,7 +78,7 @@ Terminal
 
 `-` `eas submit --platform ios`
 
-The command will walk you through selecting a build, prompt for your Apple ID on first run, and upload the binary to App Store Connect. The build appears in [TestFlight](/submit/testflight) after processing (usually 10-15 minutes). To release to production, log in to [App Store Connect](https://appstoreconnect.apple.com/) and submit the build for App Review.
+The command will walk you through selecting a build, prompt for your Apple ID on first run, and upload the binary to App Store Connect. The build appears in [TestFlight](/submit/testflight/) after processing (usually 10-15 minutes). To release to production, log in to [App Store Connect](https://appstoreconnect.apple.com/) and submit the build for App Review.
 
 ### Configure a submission profile
 
@@ -99,7 +99,7 @@ How to find `ascAppId`
 5. On the left pane, under General, select App Information.
 6. Your `ascAppId` is listed under General Information as Apple ID.
 
-See the [eas.json reference](/eas/json#ios-specific-options-1) for every available option.
+See the [eas.json reference](/eas/json/#ios-specific-options-1) for every available option.
 
 ### Build and submit in one step
 
@@ -109,11 +109,11 @@ Terminal
 
 `-` `eas build --platform ios --auto-submit`
 
-See [Automate submissions](/build/automate-submissions) for details.
+See [Automate submissions](/build/automate-submissions/) for details.
 
 ## Automate with EAS Workflows
 
-[EAS Workflows](/eas/workflows/introduction) runs the same submit step on EAS infrastructure, triggered by a git push or run manually from the CLI. First, configure an App Store Connect API Key so workflows can authenticate with Apple non-interactively:
+[EAS Workflows](/eas/workflows/introduction/) runs the same submit step on EAS infrastructure, triggered by a git push or run manually from the CLI. First, configure an App Store Connect API Key so workflows can authenticate with Apple non-interactively:
 
 Terminal
 
@@ -147,13 +147,13 @@ needs: [build_ios] type: testflight
 params: build_id: ${{ needs.build_ios.outputs.build_id }}
 ```
 
-This builds an iOS app on every push to `main` and submits it to TestFlight. The [pre-packaged `testflight` job](/eas/workflows/pre-packaged-jobs#testflight) can also share the build with internal and external testing groups. Trigger the workflow manually with:
+This builds an iOS app on every push to `main` and submits it to TestFlight. The [pre-packaged `testflight` job](/eas/workflows/pre-packaged-jobs/#testflight) can also share the build with internal and external testing groups. Trigger the workflow manually with:
 
 Terminal
 
 `-` `eas workflow:run submit-ios.yml`
 
-See the [workflow examples guide](/eas/workflows/examples/introduction) for more patterns.
+See the [workflow examples guide](/eas/workflows/examples/introduction/) for more patterns.
 
 ## Use other CI/CD services
 
@@ -163,10 +163,10 @@ Terminal
 
 `-` `eas submit --platform ios --profile production`
 
-This requires a [personal access token](/accounts/programmatic-access#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.
+This requires a [personal access token](/accounts/programmatic-access/#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.
 
 ## Manual fallback
 
 If EAS Submit is temporarily unavailable, you can upload to the Apple App Store manually from a Mac with Xcode.
 
-[Manually submit an iOS app with XcodeArchive and upload an iOS app to App Store Connect using Xcode on macOS.](/submit/ios-manual)
+[Manually submit an iOS app with XcodeArchive and upload an iOS app to App Store Connect using Xcode on macOS.](/submit/ios-manual/)

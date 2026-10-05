@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-28T14:03:33+00:00",
+  "generated_at": "2026-10-05T14:47:26+00:00",
   "generator": "shipcheck/fetch_corpus.py",
   "source_count": 36,
   "failure_count": 1,
@@ -21,9 +21,9 @@
       "requested_url": "https://developer.apple.com/support/offering-account-deletion-in-your-app/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:02:09+00:00",
-      "sha256": "e7ab95a2627113127a31a415b3930a3bf8f1543350481e19d9a0b726140b5176",
-      "chars": 7680,
+      "fetched_at": "2026-10-05T14:47:16+00:00",
+      "sha256": "9172687ca53ef8942df4b49351ed05ad923fe87c3d7b92c7105244168fef246a",
+      "chars": 7671,
       "path": "apple/account-deletion.md",
       "sections_dir": "apple/account-deletion.sections",
       "section_count": 3,
@@ -32,22 +32,22 @@
           "anchor": "account-deletion-guidance",
           "title": "Account deletion guidance",
           "deep_link": null,
-          "chars": 1291,
-          "sha256": "bf0d51a24072a46a"
+          "chars": 1279,
+          "sha256": "0485b91a0ba17381"
         },
         {
           "anchor": "frequently-asked-questions",
           "title": "Frequently asked questions",
           "deep_link": null,
-          "chars": 5370,
-          "sha256": "433b08554cff976a"
+          "chars": 5409,
+          "sha256": "0711a0fd3cb09abb"
         },
         {
           "anchor": "resources",
           "title": "Resources",
           "deep_link": null,
-          "chars": 421,
-          "sha256": "7c8821dff2ba7454"
+          "chars": 385,
+          "sha256": "1f4ebedd71353d78"
         }
       ],
       "warnings": [],
@@ -63,7 +63,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/reference/age-ratings",
       "substituted_from": "https://developer.apple.com/help/app-store-connect/reference/age-ratings-definitions",
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:02:08+00:00",
+      "fetched_at": "2026-10-05T14:47:15+00:00",
       "sha256": "20d6e65811ae8ee3b1294ccfb41f89ea5b2fdcaa62ad6576a7c49953501773c9",
       "chars": 14923,
       "path": "apple/age-ratings.md",
@@ -168,7 +168,7 @@
       "requested_url": "https://developer.apple.com/app-store/app-privacy-details/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:04+00:00",
       "sha256": "6e6d5c34ea496d8d8da8faf2ba74747156384e130969788608b314da6ee96786",
       "chars": 18631,
       "path": "apple/app-privacy-details.md",
@@ -259,7 +259,7 @@
       "requested_url": "https://developer.apple.com/distribute/app-review/",
       "substituted_from": "https://developer.apple.com/app-store/review/",
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:03+00:00",
       "sha256": "26692832f43c5832d7a5560a5bed49213954292a857fec2cf3dbf092c8aa3f98",
       "chars": 15138,
       "path": "apple/app-review-overview.md",
@@ -490,7 +490,7 @@
       "requested_url": "https://developer.apple.com/app-store/review/guidelines/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:01:56+00:00",
+      "fetched_at": "2026-10-05T14:47:02+00:00",
       "sha256": "de61b18aa23656e77ffd393b2fd0f1e5c153a19ed97bff111208018eccddc601",
       "chars": 96580,
       "path": "apple/asrg.md",
@@ -1470,7 +1470,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:04+00:00",
       "sha256": "0d100d5ed30f2c3343f01d47445e477dc2b9258a1795d2328e816ffb5f53ef4b",
       "chars": 4423,
       "path": "apple/describing-data-use.md",
@@ -1519,9 +1519,9 @@
       "requested_url": "https://docs.expo.dev/guides/apple-privacy/",
       "substituted_from": null,
       "strategy": "generic",
-      "fetched_at": "2026-09-28T14:02:10+00:00",
-      "sha256": "b38f66fcab445b40096c19b65b7bfa61bddf3a8752f868cb00cef488a604fd47",
-      "chars": 4307,
+      "fetched_at": "2026-10-05T14:47:16+00:00",
+      "sha256": "db5c6a3746817e2ecacb34d4247a3ef28832913cf9de69f08144d22da75377aa",
+      "chars": 4309,
       "path": "apple/expo-apple-privacy.md",
       "sections_dir": "apple/expo-apple-privacy.sections",
       "section_count": 4,
@@ -1537,15 +1537,15 @@
           "anchor": "configuration-in-app-config",
           "title": "Configuration in app config",
           "deep_link": null,
-          "chars": 1261,
-          "sha256": "3e08554971a69ad2"
+          "chars": 1262,
+          "sha256": "77e933681cd7292e"
         },
         {
           "anchor": "including-required-reasons-for-expo-sdk-packages-and-other-t",
           "title": "Including required reasons for Expo SDK packages and other third-party libraries",
           "deep_link": null,
-          "chars": 1483,
-          "sha256": "5b045338f95d16d6"
+          "chars": 1484,
+          "sha256": "a679d816973b2a8b"
         },
         {
           "anchor": "testing-the-privacy-manifest",
@@ -1568,9 +1568,9 @@
       "requested_url": "https://docs.expo.dev/submit/ios/",
       "substituted_from": null,
       "strategy": "generic",
-      "fetched_at": "2026-09-28T14:02:10+00:00",
-      "sha256": "348d91ea3264018b38f78b093f9c4f3aa5b84f2745157c7f5e391b18eaf05a4e",
-      "chars": 5657,
+      "fetched_at": "2026-10-05T14:47:17+00:00",
+      "sha256": "d75824c797e0eac07e137634e27eae105ea01e792fc3889fa7f408d57f1b36a6",
+      "chars": 5668,
       "path": "apple/expo-submit-ios.md",
       "sections_dir": "apple/expo-submit-ios.sections",
       "section_count": 8,
@@ -1586,50 +1586,50 @@
           "anchor": "build-a-production-app",
           "title": "Build a production app",
           "deep_link": null,
-          "chars": 296,
-          "sha256": "4a2e3b3f51c61f3b"
+          "chars": 297,
+          "sha256": "2ea0ba6437e04f96"
         },
         {
           "anchor": "submit-with-eas-submit",
           "title": "Submit with `eas submit`",
           "deep_link": null,
-          "chars": 492,
-          "sha256": "179c9609d7b60829"
+          "chars": 493,
+          "sha256": "cf7e19439141e725"
         },
         {
           "anchor": "configure-a-submission-profile",
           "title": "Configure a submission profile",
           "deep_link": null,
-          "chars": 676,
-          "sha256": "0c5e7352a462da9d"
+          "chars": 677,
+          "sha256": "597a100fed59adf9"
         },
         {
           "anchor": "build-and-submit-in-one-step",
           "title": "Build and submit in one step",
           "deep_link": null,
-          "chars": 255,
-          "sha256": "021ee646f80ee93c"
+          "chars": 256,
+          "sha256": "97e7d341bf07e495"
         },
         {
           "anchor": "automate-with-eas-workflows",
           "title": "Automate with EAS Workflows",
           "deep_link": null,
-          "chars": 1822,
-          "sha256": "4335abe49decafa2"
+          "chars": 1825,
+          "sha256": "e13aa1b66ea4f191"
         },
         {
           "anchor": "use-other-ci-cd-services",
           "title": "Use other CI/CD services",
           "deep_link": null,
-          "chars": 427,
-          "sha256": "939dd392796cf9dc"
+          "chars": 428,
+          "sha256": "f501316bb59ca44d"
         },
         {
           "anchor": "manual-fallback",
           "title": "Manual fallback",
           "deep_link": null,
-          "chars": 264,
-          "sha256": "3b21caddff571c1f"
+          "chars": 265,
+          "sha256": "006620852890b596"
         }
       ],
       "warnings": [],
@@ -1645,7 +1645,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:02:09+00:00",
+      "fetched_at": "2026-10-05T14:47:16+00:00",
       "sha256": "73fae2f638150e31f0d3d70b892355914155e30a6c9409f7333b5f6fba7b65ef",
       "chars": 3257,
       "path": "apple/export-compliance.md",
@@ -1673,7 +1673,7 @@
       "requested_url": "https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-09-28T14:02:07+00:00",
+      "fetched_at": "2026-10-05T14:47:14+00:00",
       "sha256": "ad0ade9cc5dc33202f5c7b4e6ac61f1b3e44ba185f5872bfc4a6796f88addbde",
       "chars": 21020,
       "path": "apple/hig-sign-in-with-apple.md",
@@ -1750,7 +1750,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/privacy-manifest-files",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:03+00:00",
       "sha256": "3f2f6900668f9465623b9838614d8db3d43d453514951642cfb36c512d0905fa",
       "chars": 5735,
       "path": "apple/privacy-manifest-files.md",
@@ -1799,7 +1799,7 @@
       "requested_url": "https://developer.apple.com/app-store/product-page/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:02:07+00:00",
+      "fetched_at": "2026-10-05T14:47:14+00:00",
       "sha256": "d3c7b246624fd2d216b17ee9611eabfc055a8fc05ec25d406baff6f62deccf37",
       "chars": 12193,
       "path": "apple/product-page.md",
@@ -1932,7 +1932,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api",
       "substituted_from": "https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api",
       "strategy": "apple_docc",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:03+00:00",
       "sha256": "cde18246923f3ea0fd62f73f4cd3451d7be75e12c2e11cb27e69c1bb0e37e2bb",
       "chars": 4786,
       "path": "apple/required-reason-api.md",
@@ -1967,7 +1967,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:03+00:00",
       "sha256": "42fb691d1c118f98ad593779a52ff01ea918bc80ab5fb9361998f2d1deb6bfd5",
       "chars": 8122,
       "path": "apple/required-reason-codes.md",
@@ -2009,7 +2009,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
       "substituted_from": "https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications",
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:02:07+00:00",
+      "fetched_at": "2026-10-05T14:47:14+00:00",
       "sha256": "054b4843be076f9f30888aded967ebae667a1e1a05de933b3163da5ea36835c9",
       "chars": 7222,
       "path": "apple/screenshot-specifications.md",
@@ -2072,7 +2072,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:02:08+00:00",
+      "fetched_at": "2026-10-05T14:47:15+00:00",
       "sha256": "9b2daf59d953b20e51c590722ea6538d20d2017de8eb9449d97ac41296cbd739",
       "chars": 10204,
       "path": "apple/set-age-rating.md",
@@ -2107,7 +2107,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review",
       "substituted_from": "https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/submit-for-review",
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:02:09+00:00",
+      "fetched_at": "2026-10-05T14:47:16+00:00",
       "sha256": "dedb0f60d360ee80c2ece8120b094d8da62c96101acdd5efc3b58f4af3934599",
       "chars": 5097,
       "path": "apple/submit-for-review.md",
@@ -2142,7 +2142,7 @@
       "requested_url": "https://developer.apple.com/app-store/subscriptions/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:01:58+00:00",
+      "fetched_at": "2026-10-05T14:47:05+00:00",
       "sha256": "feb8d840ea8fdc038046863e02908cf3849e451a24802b4021b05ff8e086a9f7",
       "chars": 45445,
       "path": "apple/subscriptions.md",
@@ -2345,7 +2345,7 @@
       "requested_url": "https://developer.apple.com/support/third-party-SDK-requirements/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:04+00:00",
       "sha256": "4a1bf5a97f798b146f07773088bd0c342b103177592b0e1ae8a04fb3095dd313",
       "chars": 3460,
       "path": "apple/third-party-sdk-requirements.md",
@@ -2365,7 +2365,7 @@
       "requested_url": "https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:03+00:00",
       "sha256": "de26ae6705fef5b4642eeb2762a5a6ef8aeac7304941f262cbdc39cef65f3560",
       "chars": 9639,
       "path": "apple/tn3183.md",
@@ -2442,7 +2442,7 @@
       "requested_url": "https://developer.apple.com/app-store/user-privacy-and-data-use/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-09-28T14:01:57+00:00",
+      "fetched_at": "2026-10-05T14:47:04+00:00",
       "sha256": "0f45e6a663185bb9ca612a65b1834f89d981da7749da228c6d5f985404184aeb",
       "chars": 20434,
       "path": "apple/user-privacy-and-data-use.md",
@@ -2582,7 +2582,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/13327111",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:29+00:00",
+      "fetched_at": "2026-10-05T14:47:21+00:00",
       "sha256": "6b2c2c7bca8eaaebd394db6c2bbbe9e251c0c029a039ee6b4dbc9122f15b1666",
       "chars": 11946,
       "path": "google/account-deletion-play.md",
@@ -2631,7 +2631,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/10787469",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:12+00:00",
+      "fetched_at": "2026-10-05T14:47:18+00:00",
       "sha256": "1e4ef95efda8f30ef756201cbf50ab8d6f15b1037559a518db8a2f25f6d4f695",
       "chars": 68487,
       "path": "google/data-safety.md",
@@ -2806,9 +2806,9 @@
       "requested_url": "https://docs.expo.dev/submit/android/",
       "substituted_from": null,
       "strategy": "generic",
-      "fetched_at": "2026-09-28T14:03:33+00:00",
-      "sha256": "57a8113bd50136a7ce85336009b84634b4dbd72c7d9c4c0d3fac4cdac4d902d4",
-      "chars": 6208,
+      "fetched_at": "2026-10-05T14:47:26+00:00",
+      "sha256": "7b1579111c27d841e91c741c74e3b81b6a9004b58a15e71c8840b45577918629",
+      "chars": 6223,
       "path": "google/expo-submit-android.md",
       "sections_dir": "google/expo-submit-android.sections",
       "section_count": 7,
@@ -2824,43 +2824,43 @@
           "anchor": "build-a-production-app",
           "title": "Build a production app",
           "deep_link": null,
-          "chars": 764,
-          "sha256": "b12f7315b709c85f"
+          "chars": 767,
+          "sha256": "5c0808df2d771a46"
         },
         {
           "anchor": "first-time-submission",
           "title": "First-time submission",
           "deep_link": null,
-          "chars": 944,
-          "sha256": "8e573d156d9b8f87"
+          "chars": 948,
+          "sha256": "de56cd56128c218c"
         },
         {
           "anchor": "submit-with-eas-submit",
           "title": "Submit with `eas submit`",
           "deep_link": null,
-          "chars": 379,
-          "sha256": "b9cf329125fb502d"
+          "chars": 380,
+          "sha256": "b594bd21a08f88f1"
         },
         {
           "anchor": "build-and-submit-in-one-step",
           "title": "Build and submit in one step",
           "deep_link": null,
-          "chars": 259,
-          "sha256": "7fbfc848a0405af3"
+          "chars": 260,
+          "sha256": "88593bfca639a12d"
         },
         {
           "anchor": "automate-with-eas-workflows",
           "title": "Automate with EAS Workflows",
           "deep_link": null,
-          "chars": 1043,
-          "sha256": "7d35cb2faaa70324"
+          "chars": 1046,
+          "sha256": "76a67e6a4d6a792d"
         },
         {
           "anchor": "use-other-ci-cd-services",
           "title": "Use other CI/CD services",
           "deep_link": null,
-          "chars": 431,
-          "sha256": "30376e00a49d877f"
+          "chars": 432,
+          "sha256": "6588046ba5bd08ab"
         }
       ],
       "warnings": [],
@@ -2876,7 +2876,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/9858738",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:29+00:00",
+      "fetched_at": "2026-10-05T14:47:20+00:00",
       "sha256": "e1b40e8ddf996849ca26a2719bf8ce67253d5b9993090533cbae95bd1a3db786",
       "chars": 4338,
       "path": "google/payments-policy.md",
@@ -2904,8 +2904,8 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/16558241",
       "substituted_from": "https://support.google.com/googleplay/android-developer/answer/9888170",
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:30+00:00",
-      "sha256": "5a49a32917c4048c20eb756e62de7bde95aa8f79b93459649bd2eb3e58f31884",
+      "fetched_at": "2026-10-05T14:47:22+00:00",
+      "sha256": "a47aed7c2a5f86464e009e6484200867928786315bb7f386d834eaf70bbb516e",
       "chars": 57631,
       "path": "google/permissions-policy.md",
       "sections_dir": "google/permissions-policy.sections",
@@ -2916,7 +2916,7 @@
           "title": "Restricted Permissions",
           "deep_link": null,
           "chars": 3672,
-          "sha256": "ecff1b45da79fc07"
+          "sha256": "3acff2a7a06ed964"
         },
         {
           "anchor": "restricted-permissions-with-minimum-scope-alternatives",
@@ -2930,7 +2930,7 @@
           "title": "SMS and Call Log Permissions",
           "deep_link": null,
           "chars": 3460,
-          "sha256": "443f661b5d9162ea"
+          "sha256": "f949f7a54b7f114b"
         },
         {
           "anchor": "location-permissions",
@@ -3030,9 +3030,9 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/topic/9858052",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:02:33+00:00",
-      "sha256": "ef43cccb5485b4cdea40a0d69d91e8a18be890cc9397ac359513a3671fbf295e",
-      "chars": 6961,
+      "fetched_at": "2026-10-05T14:47:17+00:00",
+      "sha256": "cf980c78b16521d1fc54e23877c203e3c320273071066c4567944224e5372734",
+      "chars": 6851,
       "path": "google/policy-center-hub.md",
       "sections_dir": "google/policy-center-hub.sections",
       "section_count": 17,
@@ -3139,15 +3139,15 @@
           "anchor": "enforcement",
           "title": "Enforcement",
           "deep_link": null,
-          "chars": 524,
-          "sha256": "5c02f71de82165d6"
+          "chars": 414,
+          "sha256": "b9b6fb5ccc24ffef"
         },
         {
           "anchor": "updates-and-other-resources",
           "title": "Updates and Other Resources",
           "deep_link": null,
           "chars": 590,
-          "sha256": "b7984f72cbf585f8"
+          "sha256": "04c20de5426b5776"
         },
         {
           "anchor": "how-google-play-works-for-developers",
@@ -3170,7 +3170,7 @@
       "requested_url": "https://play.google/developer-content-policy/",
       "substituted_from": null,
       "strategy": "index_only",
-      "fetched_at": "2026-09-28T14:02:10+00:00",
+      "fetched_at": "2026-10-05T14:47:17+00:00",
       "sha256": "364837ab809cb900ba4d45a1f442666433cb45e687cd819705fdedf34c53c398",
       "chars": 15584,
       "path": "google/policy-center-index.md",
@@ -3207,7 +3207,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/9859348",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:02:33+00:00",
+      "fetched_at": "2026-10-05T14:47:18+00:00",
       "sha256": "3e0303cf06a9d2731f1e1775e0de18b3d80614fad58bc386aac1c674ff48908f",
       "chars": 13808,
       "path": "google/prepare-and-roll-out-a-release.md",
@@ -3291,7 +3291,7 @@
       "requested_url": "https://developer.android.com/studio/publish/preparing",
       "substituted_from": "https://developer.android.com/distribute/best-practices/launch/launch-checklist",
       "strategy": "android_dev",
-      "fetched_at": "2026-09-28T14:03:30+00:00",
+      "fetched_at": "2026-10-05T14:47:23+00:00",
       "sha256": "65bc4db71169facae8bd877c697b5c8967837580b7ec83adc37c32319a2791ff",
       "chars": 15070,
       "path": "google/prepare-for-release.md",
@@ -3466,7 +3466,7 @@
       "requested_url": "https://developer.android.com/studio/publish",
       "substituted_from": null,
       "strategy": "android_dev",
-      "fetched_at": "2026-09-28T14:03:32+00:00",
+      "fetched_at": "2026-10-05T14:47:24+00:00",
       "sha256": "9c61acb6fa71afd7d342465f37209acfd43fe96802482f486500bd7ef66395db",
       "chars": 7048,
       "path": "google/publish-your-app.md",
@@ -3486,7 +3486,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/10281818",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:28+00:00",
+      "fetched_at": "2026-10-05T14:47:20+00:00",
       "sha256": "a70dbe0e4e43072578984fd4b8b9e0f862123b4fe2c75bd0af0f491111c43722",
       "chars": 17732,
       "path": "google/subscriptions-policy.md",
@@ -3535,7 +3535,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/11926878",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:12+00:00",
+      "fetched_at": "2026-10-05T14:47:19+00:00",
       "sha256": "75acee404deaba5da032e3887d8aaf33b60f52c9bd9c0950ccedd84f2ea1c4cf",
       "chars": 11778,
       "path": "google/target-api-level.md",
@@ -3689,8 +3689,8 @@
       "requested_url": "https://developer.android.com/google/play/requirements/target-sdk",
       "substituted_from": null,
       "strategy": "android_dev",
-      "fetched_at": "2026-09-28T14:03:33+00:00",
-      "sha256": "a222b2d30b3e2943e8f8b3c2f7833142d363e1c6ff1f93a365d02e2369b1d494",
+      "fetched_at": "2026-10-05T14:47:26+00:00",
+      "sha256": "884638e3aba6504234b9f271e564eff6dc4af956b5ace1d6a756c730cbb38a98",
       "chars": 18786,
       "path": "google/target-sdk.md",
       "sections_dir": "google/target-sdk.sections",
@@ -3799,7 +3799,7 @@
           "title": "Further information",
           "deep_link": null,
           "chars": 464,
-          "sha256": "d8a83dfa0a123e71"
+          "sha256": "9c48d05c425621f0"
         }
       ],
       "warnings": [],
@@ -3815,7 +3815,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/14151465",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:29+00:00",
+      "fetched_at": "2026-10-05T14:47:21+00:00",
       "sha256": "d5681f48d897412b37dc8a4139d5f2736f9b0784389d5382f433d97046747f0b",
       "chars": 15317,
       "path": "google/testing-requirements.md",
@@ -3934,7 +3934,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/10144311",
       "substituted_from": "https://support.google.com/googleplay/android-developer/answer/16810878",
       "strategy": "google_help",
-      "fetched_at": "2026-09-28T14:03:12+00:00",
+      "fetched_at": "2026-10-05T14:47:19+00:00",
       "sha256": "0698db17c1e1a5b627fe0fef334d403b13f0b7d95538998cdc577db11985b342",
       "chars": 30789,
       "path": "google/user-data-policy.md",

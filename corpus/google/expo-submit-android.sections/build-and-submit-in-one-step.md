@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=build-and-submit-in-one-step url=https://docs.expo.dev/submit/android/ fetched=2026-09-28T14:03:33+00:00 -->
+<!-- source=expo-submit-android clause=build-and-submit-in-one-step url=https://docs.expo.dev/submit/android/ fetched=2026-10-05T14:47:26+00:00 -->
 
 ### Build and submit in one step
 
@@ -8,4 +8,4 @@ Terminal
 
 `-` `eas build --platform android --auto-submit`
 
-See [Automate submissions](/build/automate-submissions) for details.
+See [Automate submissions](/build/automate-submissions/) for details.

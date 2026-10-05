@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=submit-with-eas-submit url=https://docs.expo.dev/submit/ios/ fetched=2026-09-28T14:02:10+00:00 -->
+<!-- source=expo-submit-ios clause=submit-with-eas-submit url=https://docs.expo.dev/submit/ios/ fetched=2026-10-05T14:47:17+00:00 -->
 
 ## Submit with `eas submit`
 
@@ -8,4 +8,4 @@ Terminal
 
 `-` `eas submit --platform ios`
 
-The command will walk you through selecting a build, prompt for your Apple ID on first run, and upload the binary to App Store Connect. The build appears in [TestFlight](/submit/testflight) after processing (usually 10-15 minutes). To release to production, log in to [App Store Connect](https://appstoreconnect.apple.com/) and submit the build for App Review.
+The command will walk you through selecting a build, prompt for your Apple ID on first run, and upload the binary to App Store Connect. The build appears in [TestFlight](/submit/testflight/) after processing (usually 10-15 minutes). To release to production, log in to [App Store Connect](https://appstoreconnect.apple.com/) and submit the build for App Review.

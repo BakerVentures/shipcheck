@@ -3,8 +3,8 @@ shipcheck_source_id: expo-apple-privacy
 title: "Expo: Apple privacy manifests"
 url: https://docs.expo.dev/guides/apple-privacy/
 final_url: https://docs.expo.dev/guides/apple-privacy/
-fetched_at: 2026-09-28T14:02:10+00:00
-sha256: b38f66fcab445b40096c19b65b7bfa61bddf3a8752f868cb00cef488a604fd47
+fetched_at: 2026-10-05T14:47:16+00:00
+sha256: db5c6a3746817e2ecacb34d4247a3ef28832913cf9de69f08144d22da75377aa
 vendor: apple
 ---
 
@@ -44,7 +44,7 @@ Make sure you have updated your Expo SDK libraries to the latest versions for yo
 
 Are you using this library in an existing React Native app?
 
-You can include an iOS privacy manifest in an [existing React Native project](/bare/overview) by creating a PrivacyInfo.xcprivacy file using Xcode and adding it to your iOS app target.
+You can include an iOS privacy manifest in an [existing React Native project](/bare/overview/) by creating a PrivacyInfo.xcprivacy file using Xcode and adding it to your iOS app target.
 Follow [Apple's Privacy manifest files](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files) guide to create a PrivacyInfo.xcprivacy file.
 
 You can identify the `NSPrivacyAccessedAPITypes` and `NSPrivacyAccessedAPITypeReasons` values by looking at the [Apple Developer documentation](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api).
@@ -57,7 +57,7 @@ All Expo SDK packages that use "required reason" APIs file have a PrivacyInfo fi
 
 You can usually identify the required reasons for the APIs used by other third-party libraries by checking if the library you intend to use has a PrivacyInfo.xcprivacy file in the node_modules/package_name/ios directory. If it does, you can check the `NSPrivacyAccessedAPITypes` and `NSPrivacyAccessedAPITypeReasons` values in that file and copy those values to your configuration.
 
-As an alternative, Apple notifies developers after they submit a build with missing privacy manifest files or specific reasons. You can wait until you receive a notification email from Apple and then include the required reasons listed in the email in your app's PrivacyInfo.xcprivacy file (if you don't use [CNG](/workflow/continuous-native-generation)) or the configuration in your app.json file.
+As an alternative, Apple notifies developers after they submit a build with missing privacy manifest files or specific reasons. You can wait until you receive a notification email from Apple and then include the required reasons listed in the email in your app's PrivacyInfo.xcprivacy file (if you don't use [CNG](/workflow/continuous-native-generation/)) or the configuration in your app.json file.
 
 ## Testing the privacy manifest
 

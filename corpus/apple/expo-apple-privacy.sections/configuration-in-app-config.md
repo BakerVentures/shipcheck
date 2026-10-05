@@ -1,4 +1,4 @@
-<!-- source=expo-apple-privacy clause=configuration-in-app-config url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-09-28T14:02:10+00:00 -->
+<!-- source=expo-apple-privacy clause=configuration-in-app-config url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-10-05T14:47:16+00:00 -->
 
 ## Configuration in app config
 
@@ -14,7 +14,7 @@ Make sure you have updated your Expo SDK libraries to the latest versions for yo
 
 Are you using this library in an existing React Native app?
 
-You can include an iOS privacy manifest in an [existing React Native project](/bare/overview) by creating a PrivacyInfo.xcprivacy file using Xcode and adding it to your iOS app target.
+You can include an iOS privacy manifest in an [existing React Native project](/bare/overview/) by creating a PrivacyInfo.xcprivacy file using Xcode and adding it to your iOS app target.
 Follow [Apple's Privacy manifest files](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files) guide to create a PrivacyInfo.xcprivacy file.
 
 You can identify the `NSPrivacyAccessedAPITypes` and `NSPrivacyAccessedAPITypeReasons` values by looking at the [Apple Developer documentation](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api).

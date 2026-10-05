@@ -1,4 +1,4 @@
-<!-- source=prepare-and-roll-out-a-release clause=optional-discard-a-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-09-28T14:02:33+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=optional-discard-a-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-10-05T14:47:18+00:00 -->
 
 ## Optional: Discard a release
 

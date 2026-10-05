@@ -1,4 +1,4 @@
-<!-- source=policy-center-index clause=latest-information url=https://play.google/developer-content-policy/ fetched=2026-09-28T14:02:10+00:00 -->
+<!-- source=policy-center-index clause=latest-information url=https://play.google/developer-content-policy/ fetched=2026-10-05T14:47:17+00:00 -->
 
 ### Latest Information
 

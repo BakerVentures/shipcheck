@@ -3,8 +3,8 @@ shipcheck_source_id: policy-center-hub
 title: "Play Console Help: Policy Center hub"
 url: https://support.google.com/googleplay/android-developer/topic/9858052
 final_url: https://support.google.com/googleplay/android-developer/topic/9858052?hl=en
-fetched_at: 2026-09-28T14:02:33+00:00
-sha256: ef43cccb5485b4cdea40a0d69d91e8a18be890cc9397ac359513a3671fbf295e
+fetched_at: 2026-10-05T14:47:17+00:00
+sha256: cf980c78b16521d1fc54e23877c203e3c320273071066c4567944224e5372734
 vendor: google
 note: "Added in Phase 0: navigable, server-rendered index of the Developer Program Policies."
 ---
@@ -105,7 +105,6 @@ Your innovation is what drives our shared success, but with it comes responsibil
 - [Enforcement Process](/googleplay/android-developer/answer/9899234?hl=en&ref_topic=9877468)
 - [Managing Policy Violations and Appeals](/googleplay/android-developer/answer/9899142?hl=en&ref_topic=9877468)
 - [Play Console Requirements](/googleplay/android-developer/answer/10788890?hl=en&ref_topic=9877468)
-- [Preview: Play Console Requirements](/googleplay/android-developer/answer/17125096?hl=en&ref_topic=9877468)
 
 ## Updates and Other Resources
 
@@ -114,7 +113,7 @@ Your innovation is what drives our shared success, but with it comes responsibil
 - [Get Developer Support](/googleplay/android-developer/answer/10357403?hl=en&ref_topic=9877065)
 - [Policy Archive](/googleplay/android-developer/answer/13386702?hl=en&ref_topic=9877065)
 - [PolicyBytes Hub](/googleplay/android-developer/answer/16373081?hl=en&ref_topic=9877065)
-- [Developer Program Policy](/googleplay/android-developer/answer/17517561?hl=en&ref_topic=9877065)
+- [Developer Program Policy](/googleplay/android-developer/answer/18258653?hl=en&ref_topic=9877065)
 
 ## How Google Play Works for Developers
 

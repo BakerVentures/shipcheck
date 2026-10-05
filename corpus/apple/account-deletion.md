@@ -3,8 +3,8 @@ shipcheck_source_id: account-deletion
 title: "Offering account deletion in your app"
 url: https://developer.apple.com/support/offering-account-deletion-in-your-app/
 final_url: https://developer.apple.com/support/offering-account-deletion-in-your-app/
-fetched_at: 2026-09-28T14:02:09+00:00
-sha256: e7ab95a2627113127a31a415b3930a3bf8f1543350481e19d9a0b726140b5176
+fetched_at: 2026-10-05T14:47:16+00:00
+sha256: 9172687ca53ef8942df4b49351ed05ad923fe87c3d7b92c7105244168fef246a
 vendor: apple
 ---
 
@@ -19,7 +19,7 @@ Account deletion is a significant decision for the user, and the process for ini
 - Make the account deletion option easy to find in your app. Typically, it’s included in the app’s account settings.
 - Offer to delete the entire account record, along with associated personal data. You may include additional options, but only offering to temporarily deactivate or disable an account is insufficient.
 - If people need to visit a website to finish deleting their account, include a link directly to the page on your website where they can complete the process.
-- Keep users informed. If the deletion request will take additional time to complete, let them know. If your app supports in-app purchases, help people understand how billing and cancellations will be handled. For additional guidance, read the [Human Interface Guidelines](/design/human-interface-guidelines/ios/user-interaction/accounts/).
+- Keep users informed. If the deletion request will take additional time to complete, let them know. If your app supports in-app purchases, help people understand how billing and cancellations will be handled. For additional guidance, read the [Human Interface Guidelines](/design/human-interface-guidelines/managing-accounts/).
 
 Note: Follow applicable legal requirements for storing and retaining user account information and for handling account deletion. This includes complying with local laws where your apps are available. If you have questions regarding your legal obligations, check with your legal counsel.
 
@@ -35,7 +35,7 @@ Yes. It is appropriate to ensure that the deletion is intentional and desired by
 
 ##### My app uses Sign in with Apple to provide account creation and authentication to users. What changes are necessary to support users who delete their accounts?
 
-Apps that support Sign in with Apple should use the Sign in with Apple REST API to revoke user tokens. To learn more, [review the documentation](/documentation/sign_in_with_apple/revoke_tokens/) and [design recommendations](/design/human-interface-guidelines/ios/user-interaction/accounts/).
+Apps that support Sign in with Apple should use the Sign in with Apple REST API to revoke user tokens. To learn more, [review the documentation](/documentation/technotes/tn3194-handling-account-deletions-and-revoking-tokens-for-sign-in-with-apple) and [design recommendations](/design/human-interface-guidelines/managing-accounts/).
 
 ##### If my app links out to the default web browser for account creation, does it still need to offer account deletion within the app?
 
@@ -59,17 +59,17 @@ No. All users should be allowed to delete their accounts, regardless of where th
 
 ##### How do I handle users with auto-renewable subscriptions? I don’t want to accidentally charge someone after they’ve deleted their account.
 
-If the user has auto-renewable subscriptions, notify them that their billing will continue through Apple and request that they cancel their subscription before continuing. If you’re using [App Store Server Notifications](/documentation/appstoreservernotifications/) for auto-renewable subscriptions, you can verify the status of the user’s subscription in real time, or use the [Subscription Status API](/documentation/appstoreserverapi/get_all_subscription_statuses/) to identify subscription status.
+If the user has auto-renewable subscriptions, notify them that their billing will continue through Apple and request that they cancel their subscription before continuing. If you’re using [App Store Server Notifications](/documentation/appstoreservernotifications/) for auto-renewable subscriptions, you can verify the status of the user’s subscription in real time, or use the [Subscription Status API](/documentation/appstoreserverapi/get-all-subscription-statuses/) to identify subscription status.
 
-Use [showManageSubscription](/documentation/storekit/appstore/3803198-showmanagesubscriptions/) in iOS 15 and iPadOS 15, or later, or provide the following link to let users manage their subscriptions: [https://apps.apple.com/account/subscriptions](https://apps.apple.com/account/subscriptions/). For tvOS, provide onscreen instructions to change or cancel a subscription, as described in the [Apple TV User Guide](https://support.apple.com/guide/tv/subscriptions-atvb0d233668/tvos/).
+Use [showManageSubscription](/documentation/storekit/appstore/showmanagesubscriptions(in:)) in iOS 15 and iPadOS 15, or later, or provide the following link to let users manage their subscriptions: [https://apps.apple.com/account/subscriptions](https://apps.apple.com/account/subscriptions/). For tvOS, provide onscreen instructions to change or cancel a subscription, as described in the [Apple TV User Guide](https://support.apple.com/guide/tv/subscriptions-atvb0d233668/tvos/).
 
-In addition, you can use [beginRefundRequest](/documentation/storekit/transaction/3803220-beginrefundrequest/) in iOS 15 and iPadOS 15, or later, or provide the following Apple Support link to allow customers to submit refund requests: [https://support.apple.com/en-us/HT204084](https://support.apple.com/HT204084/).
+In addition, you can use [beginRefundRequest](/documentation/storekit/transaction/beginrefundrequest(in:)-9k0pj) in iOS 15 and iPadOS 15, or later, or provide the following Apple Support link to allow customers to submit refund requests: [https://support.apple.com/en-us/HT204084](https://support.apple.com/HT204084/).
 
 You can also provide an option to schedule account deletion at a later time to align with the subscription’s expiration date, as long as there is also an option to delete the account immediately.
 
 ### Resources
 
 - [App Review Guidelines](/app-store/review/guidelines/)
-- [Human Interface Guidelines for iOS and iPadOS apps](/design/human-interface-guidelines/ios/user-interaction/accounts/)
-- [Human Interface Guidelines for macOS apps](/design/human-interface-guidelines/macos/user-interaction/accounts/)
-- [Human Interface Guidelines for tvOS apps](/design/human-interface-guidelines/tvos/app-architecture/accounts/)
+- [Human Interface Guidelines for iOS and iPadOS apps](/design/human-interface-guidelines/designing-for-ios/)
+- [Human Interface Guidelines for macOS apps](/design/human-interface-guidelines/designing-for-macos/)
+- [Human Interface Guidelines for tvOS apps](/design/human-interface-guidelines/designing-for-tvos/)

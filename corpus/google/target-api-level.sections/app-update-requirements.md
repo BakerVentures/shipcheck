@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=app-update-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-28T14:03:12+00:00 -->
+<!-- source=target-api-level clause=app-update-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-10-05T14:47:19+00:00 -->
 
 ## App update requirements
 

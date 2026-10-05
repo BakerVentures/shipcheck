@@ -3,7 +3,7 @@ shipcheck_source_id: asrg
 title: "App Store Review Guidelines"
 url: https://developer.apple.com/app-store/review/guidelines/
 final_url: https://developer.apple.com/app-store/review/guidelines/
-fetched_at: 2026-09-28T14:01:56+00:00
+fetched_at: 2026-10-05T14:47:02+00:00
 sha256: de61b18aa23656e77ffd393b2fd0f1e5c153a19ed97bff111208018eccddc601
 vendor: apple
 note: "Primary citation source. Chunked by clause number (1.1, 2.3.1, 3.1.2...)."

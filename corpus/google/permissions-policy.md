@@ -3,8 +3,8 @@ shipcheck_source_id: permissions-policy
 title: "Permissions and APIs that Access Sensitive Information"
 url: https://support.google.com/googleplay/android-developer/answer/16558241
 final_url: https://support.google.com/googleplay/android-developer/answer/16558241?hl=en
-fetched_at: 2026-09-28T14:03:30+00:00
-sha256: 5a49a32917c4048c20eb756e62de7bde95aa8f79b93459649bd2eb3e58f31884
+fetched_at: 2026-10-05T14:47:22+00:00
+sha256: a47aed7c2a5f86464e009e6484200867928786315bb7f386d834eaf70bbb516e
 vendor: google
 substituted_from: https://support.google.com/googleplay/android-developer/answer/9888170
 note: "Google redirected the old permissions answer ID here."
@@ -44,9 +44,9 @@ To safeguard user privacy, Google Play defines restricted permissions, subjectin
 
 In addition to the above, restricted permissions are permissions that are designated as [Dangerous](https://developer.android.com/guide/topics/permissions/overview#dangerous_permissions), [Special](https://developer.android.com/guide/topics/permissions/overview#special_permissions), [Signature](https://developer.android.com/guide/topics/permissions/overview#signature_permissions), or as documented below. These permissions are subject to the following additional requirements and restrictions:
 
-- User or device data accessed through Restricted Permissions is considered as personal and sensitive user data. The requirements of the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?) apply.
+- User or device data accessed through Restricted Permissions is considered as personal and sensitive user data. The requirements of the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?) policy apply.
 - Respect users’ decisions if they decline a request for a Restricted Permission, and users may not be manipulated or forced into consenting to any non-critical permission. You must make a reasonable effort to accommodate users who do not grant access to sensitive permissions (for example, allowing a user to manually enter a phone number if they’ve restricted access to Call Logs).
-- Use of permissions in violation of Google Play [malware policies](https://support.google.com/googleplay/android-developer/answer/9888380) (including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380)) is expressly prohibited.
+- Use of permissions in violation of Google Play [Malware](https://support.google.com/googleplay/android-developer/answer/9888380) policies (including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380)) is expressly prohibited.
 
 Certain Restricted Permissions may be subject to additional requirements as detailed below. The objective of these restrictions is to safeguard user privacy. We may make limited exceptions to the requirements below in very rare cases where apps provide a highly compelling or critical feature and where there is no alternative method available to provide the feature. We evaluate proposed exceptions against the potential privacy or security impacts on users.
 
@@ -89,9 +89,9 @@ SMS and Call Log Permissions are regarded as personal and sensitive user data su
 | Call Log permission group (for example, `READ_CALL_LOG`, `WRITE_CALL_LOG`, `PROCESS_OUTGOING_CALLS`) | It must be actively registered as the default Phone or Assistant handler on the device. |
 | SMS permission group (for example, `READ_SMS`, `SEND_SMS`, `WRITE_SMS`, `RECEIVE_SMS`, `RECEIVE_WAP_PUSH`, `RECEIVE_MMS`) | It must be actively registered as the default SMS or Assistant handler on the device. |
 
-Apps lacking default SMS, Phone, or Assistant handler capability may not declare use of the above permissions in the manifest. This includes placeholder text in the manifest. Additionally, apps must be actively registered as the default SMS, Phone, or Assistant handler before prompting users to accept any of the above permissions and must immediately stop using the permission when they’re no longer the default handler. The permitted uses and exceptions are available on [this Help Center page](https://support.google.com/googleplay/android-developer/answer/9047303).
+Apps lacking default SMS, Phone, or Assistant handler capability may not declare use of the above permissions in the manifest. This includes placeholder text in the manifest. Additionally, apps must be actively registered as the default SMS, Phone, or Assistant handler before prompting users to accept any of the above permissions and must immediately stop using the permission when they're no longer the default handler. The permitted uses and exceptions are available on [this Help Center page](https://support.google.com/googleplay/android-developer/answer/9047303).
 
-Apps may only use the permission (and any data derived from the permission) to provide approved core app functionality Core functionality is defined as the main purpose of the app. This may include a set of core features, which must all be prominently documented and promoted in the app’s description. Without the core feature(s), the app is “broken” or rendered unusable. The transfer, sharing, or licensed use of this data must only be for providing core features or services within the app, and its use may not be extended for any other purpose (for example, improving other apps or services, advertising, or marketing purposes). You may not use alternative methods (including other permissions, APIs, or third-party sources) to derive data attributed to Call Log or SMS related permissions.
+Apps may only use the permission (and any data derived from the permission) to provide approved core app functionality Core functionality is defined as the main purpose of the app. This may include a set of core features, which must all be prominently documented and promoted in the app's description. Without the core feature(s), the app is “broken” or rendered unusable. The transfer, sharing, or licensed use of this data must only be for providing core features or services within the app, and its use may not be extended for any other purpose (for example, improving other apps or services, advertising, or marketing purposes). You may not use alternative methods (including other permissions, APIs, or third-party sources) to derive data attributed to Call Log or SMS related permissions.
 
 **Key Considerations**
 

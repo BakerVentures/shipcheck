@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=att-in-the-european-union url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-28T14:01:57+00:00 -->
+<!-- source=user-privacy-and-data-use clause=att-in-the-european-union url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-10-05T14:47:04+00:00 -->
 
 ## ATT in the European Union
 

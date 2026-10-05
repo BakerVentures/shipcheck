@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=restricted-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-28T14:03:30+00:00 -->
+<!-- source=permissions-policy clause=restricted-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-10-05T14:47:22+00:00 -->
 
 ## Restricted Permissions
 
@@ -10,9 +10,9 @@ To safeguard user privacy, Google Play defines restricted permissions, subjectin
 
 In addition to the above, restricted permissions are permissions that are designated as [Dangerous](https://developer.android.com/guide/topics/permissions/overview#dangerous_permissions), [Special](https://developer.android.com/guide/topics/permissions/overview#special_permissions), [Signature](https://developer.android.com/guide/topics/permissions/overview#signature_permissions), or as documented below. These permissions are subject to the following additional requirements and restrictions:
 
-- User or device data accessed through Restricted Permissions is considered as personal and sensitive user data. The requirements of the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?) apply.
+- User or device data accessed through Restricted Permissions is considered as personal and sensitive user data. The requirements of the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?) policy apply.
 - Respect users’ decisions if they decline a request for a Restricted Permission, and users may not be manipulated or forced into consenting to any non-critical permission. You must make a reasonable effort to accommodate users who do not grant access to sensitive permissions (for example, allowing a user to manually enter a phone number if they’ve restricted access to Call Logs).
-- Use of permissions in violation of Google Play [malware policies](https://support.google.com/googleplay/android-developer/answer/9888380) (including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380)) is expressly prohibited.
+- Use of permissions in violation of Google Play [Malware](https://support.google.com/googleplay/android-developer/answer/9888380) policies (including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380)) is expressly prohibited.
 
 Certain Restricted Permissions may be subject to additional requirements as detailed below. The objective of these restrictions is to safeguard user privacy. We may make limited exceptions to the requirements below in very rare cases where apps provide a highly compelling or critical feature and where there is no alternative method available to provide the feature. We evaluate proposed exceptions against the potential privacy or security impacts on users.
 

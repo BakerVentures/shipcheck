@@ -1,8 +1,8 @@
-<!-- source=expo-submit-ios clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-09-28T14:02:10+00:00 -->
+<!-- source=expo-submit-ios clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-10-05T14:47:17+00:00 -->
 
 ## Automate with EAS Workflows
 
-[EAS Workflows](/eas/workflows/introduction) runs the same submit step on EAS infrastructure, triggered by a git push or run manually from the CLI. First, configure an App Store Connect API Key so workflows can authenticate with Apple non-interactively:
+[EAS Workflows](/eas/workflows/introduction/) runs the same submit step on EAS infrastructure, triggered by a git push or run manually from the CLI. First, configure an App Store Connect API Key so workflows can authenticate with Apple non-interactively:
 
 Terminal
 
@@ -36,10 +36,10 @@ needs: [build_ios] type: testflight
 params: build_id: ${{ needs.build_ios.outputs.build_id }}
 ```
 
-This builds an iOS app on every push to `main` and submits it to TestFlight. The [pre-packaged `testflight` job](/eas/workflows/pre-packaged-jobs#testflight) can also share the build with internal and external testing groups. Trigger the workflow manually with:
+This builds an iOS app on every push to `main` and submits it to TestFlight. The [pre-packaged `testflight` job](/eas/workflows/pre-packaged-jobs/#testflight) can also share the build with internal and external testing groups. Trigger the workflow manually with:
 
 Terminal
 
 `-` `eas workflow:run submit-ios.yml`
 
-See the [workflow examples guide](/eas/workflows/examples/introduction) for more patterns.
+See the [workflow examples guide](/eas/workflows/examples/introduction/) for more patterns.

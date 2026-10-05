@@ -1,4 +1,4 @@
-<!-- source=policy-center-hub clause=spam-functionality-and-user-experience url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-09-28T14:02:33+00:00 -->
+<!-- source=policy-center-hub clause=spam-functionality-and-user-experience url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-10-05T14:47:17+00:00 -->
 
 ## Spam, Functionality, and User Experience
 

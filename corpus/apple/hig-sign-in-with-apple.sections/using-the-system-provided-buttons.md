@@ -1,4 +1,4 @@
-<!-- source=hig-sign-in-with-apple clause=using-the-system-provided-buttons url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-09-28T14:02:07+00:00 -->
+<!-- source=hig-sign-in-with-apple clause=using-the-system-provided-buttons url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-10-05T14:47:14+00:00 -->
 
 ### Using the system-provided buttons
 

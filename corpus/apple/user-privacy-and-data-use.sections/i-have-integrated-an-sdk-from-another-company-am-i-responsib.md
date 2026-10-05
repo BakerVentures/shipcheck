@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=i-have-integrated-an-sdk-from-another-company-am-i-responsib url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-09-28T14:01:57+00:00 -->
+<!-- source=user-privacy-and-data-use clause=i-have-integrated-an-sdk-from-another-company-am-i-responsib url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-10-05T14:47:04+00:00 -->
 
 ### I have integrated an SDK from another company. Am I responsible for the data collection and tracking of users of my app by that company?
 

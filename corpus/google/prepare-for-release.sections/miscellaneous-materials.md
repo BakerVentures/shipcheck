@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=miscellaneous-materials url=https://developer.android.com/studio/publish/preparing fetched=2026-09-28T14:03:30+00:00 -->
+<!-- source=prepare-for-release clause=miscellaneous-materials url=https://developer.android.com/studio/publish/preparing fetched=2026-10-05T14:47:23+00:00 -->
 
 ### Miscellaneous materials
 

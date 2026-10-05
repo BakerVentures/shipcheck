@@ -1,8 +1,8 @@
-<!-- source=expo-submit-android clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/android/ fetched=2026-09-28T14:03:33+00:00 -->
+<!-- source=expo-submit-android clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/android/ fetched=2026-10-05T14:47:26+00:00 -->
 
 ## Automate with EAS Workflows
 
-[EAS Workflows](/eas/workflows/introduction) runs the same `eas submit` command on EAS infrastructure, triggered by a git push or run manually from CLI. Workflows authenticate with Google Play using the Google Service Account key you uploaded in the [prerequisites](/submit/android#prerequisites).
+[EAS Workflows](/eas/workflows/introduction/) runs the same `eas submit` command on EAS infrastructure, triggered by a git push or run manually from CLI. Workflows authenticate with Google Play using the Google Service Account key you uploaded in the [prerequisites](/submit/android/#prerequisites).
 
 Create a workflow file named .eas/workflows/submit-android.yml with the following contents:
 
@@ -28,4 +28,4 @@ Terminal
 
 `-` `eas workflow:run submit-android.yml`
 
-See the [workflow examples guide](/eas/workflows/examples/introduction) for more patterns.
+See the [workflow examples guide](/eas/workflows/examples/introduction/) for more patterns.

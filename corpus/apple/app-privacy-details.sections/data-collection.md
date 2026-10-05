@@ -1,4 +1,4 @@
-<!-- source=app-privacy-details clause=data-collection url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-09-28T14:01:57+00:00 -->
+<!-- source=app-privacy-details clause=data-collection url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-10-05T14:47:04+00:00 -->
 
 ## Data collection
 

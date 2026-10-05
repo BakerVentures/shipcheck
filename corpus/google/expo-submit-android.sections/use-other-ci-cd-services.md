@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/android/ fetched=2026-09-28T14:03:33+00:00 -->
+<!-- source=expo-submit-android clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/android/ fetched=2026-10-05T14:47:26+00:00 -->
 
 ## Use other CI/CD services
 
@@ -8,4 +8,4 @@ Terminal
 
 `-` `eas submit --platform android --profile production`
 
-This requires a [personal access token](/accounts/programmatic-access#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.
+This requires a [personal access token](/accounts/programmatic-access/#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.

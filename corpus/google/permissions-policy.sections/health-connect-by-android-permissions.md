@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=health-connect-by-android-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-09-28T14:03:30+00:00 -->
+<!-- source=permissions-policy clause=health-connect-by-android-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-10-05T14:47:22+00:00 -->
 
 ## Health Connect by Android Permissions
 

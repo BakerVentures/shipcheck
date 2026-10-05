@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=france-regional-rating url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-09-28T14:02:08+00:00 -->
+<!-- source=age-ratings clause=france-regional-rating url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-10-05T14:47:15+00:00 -->
 
 ### France regional rating
 

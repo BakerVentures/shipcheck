@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=modernize-your-apps url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-09-28T14:03:33+00:00 -->
+<!-- source=target-sdk clause=modernize-your-apps url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-10-05T14:47:26+00:00 -->
 
 ## Modernize your apps
 

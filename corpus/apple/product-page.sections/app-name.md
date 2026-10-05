@@ -1,4 +1,4 @@
-<!-- source=product-page clause=app-name url=https://developer.apple.com/app-store/product-page/ fetched=2026-09-28T14:02:07+00:00 -->
+<!-- source=product-page clause=app-name url=https://developer.apple.com/app-store/product-page/ fetched=2026-10-05T14:47:14+00:00 -->
 
 ## App name
 
