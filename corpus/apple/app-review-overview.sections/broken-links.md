@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=broken-links url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-02T03:31:25+00:00 -->
+<!-- source=app-review-overview clause=broken-links url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-12T15:33:26+00:00 -->
 
 ### Broken links
 

@@ -1,4 +1,4 @@
-<!-- source=app-privacy-details clause=additional-guidance url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-10-02T03:31:27+00:00 -->
+<!-- source=app-privacy-details clause=additional-guidance url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-10-12T15:33:27+00:00 -->
 
 ## Additional guidance
 
@@ -41,3 +41,9 @@ Mark "Other User Content" to represent generic free form text fields and "Audio 
 #### You collect data to service a request but do not retain it after servicing the request.
 
 "Collect" refers to transmitting data off the device and storing it in a readable form for longer than the time it takes you and/or your third-party partners to service the request. For example, if an authentication token or IP address is sent on a server call and not retained, or if data is sent to your servers then immediately discarded after servicing the request, you do not need to disclose this in your answers in App Store Connect.
+
+#### You’d like your app to reference consent requests so you can comply with local privacy laws in its App Tracking Transparency prompt.
+
+If you’ve already shown the user a required government data-privacy consent prompt that is also covered by App Tracking Transparency (for example, through a third-party Consent Management Platform), you can reference that in your app’s App Tracking Transparency purpose string. Here’s an example of a purpose string that clearly explains the user’s choice:
+
+“[App] indicates you allowed it to use your data for advertising purposes in its legal prompt. Would you like your Apple device to provide [App] access to the advertising ID or otherwise allow it to use other means for the data processing described above?”

@@ -1,4 +1,4 @@
-<!-- source=product-page clause=icon url=https://developer.apple.com/app-store/product-page/ fetched=2026-10-02T03:31:38+00:00 -->
+<!-- source=product-page clause=icon url=https://developer.apple.com/app-store/product-page/ fetched=2026-10-12T15:33:38+00:00 -->
 
 ## Icon
 

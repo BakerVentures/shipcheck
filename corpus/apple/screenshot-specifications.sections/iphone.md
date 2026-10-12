@@ -1,6 +1,6 @@
-<!-- source=screenshot-specifications clause=iphone url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-02T03:31:38+00:00 -->
+<!-- source=screenshot-specifications clause=iphone url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-12T15:33:38+00:00 -->
 
-## iPhone
+### iPhone
 
 iPhone Duo
 
@@ -20,9 +20,9 @@ iPhone Duo
 
 **Note**
 
-Support for uploading assets for this device in App Store Connect will be available later this year.
+Starting in April 2027, screenshots will be required for any app using the iOS 27.1 SDK or later. [Learn more](/iphone-duo/)
 
-6.9" Display
+iPhone with Dynamic Island (large display)
 
 iPhone Air
 
@@ -66,7 +66,11 @@ iPhone 14 Pro Max
 
 (landscape)
 
-6.5" Display
+**Note**
+
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Face ID (large display) are used.
+
+iPhone with Face ID (large display)
 
 iPhone 14 Plus
 
@@ -102,13 +106,13 @@ iPhone XR
 
 **Requirement**
 
-Required if app runs on iPhone and screenshots for 6.9" display aren't provided
+Required if app runs on iPhone and screenshots for iPhone with Dynamic Island (large display) aren't provided
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.9" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Dynamic Island (large display) are used.
 
-6.3" Display
+iPhone with Dynamic Island (medium display)
 
 iPhone 18 Pro
 
@@ -146,9 +150,9 @@ iPhone 14 Pro
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.5" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Face ID (large display) are used.
 
-6.1" Display
+iPhone with Face ID (medium display)
 
 iPhone 17e
 
@@ -202,9 +206,9 @@ iPhone X
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.5" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Dynamic Island (medium display) are used.
 
-5.5" Display
+iPhone with Home Button (large display)
 
 iPhone 8 Plus
 
@@ -226,9 +230,9 @@ iPhone 6 Plus
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.1" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Face ID (medium display) are used.
 
-4.7" Display
+iPhone with Home Button (medium display)
 
 iPhone SE (3rd generation, 2nd generation)
 
@@ -252,9 +256,9 @@ iPhone 6
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 5.5" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Home Button (large display) are used.
 
-4" Display
+iPhone with Home Button (4" display)
 
 iPhone SE (1st generation)
 
@@ -284,9 +288,9 @@ iPhone 5
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 4.7" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Home Button (medium display) are used.
 
-3.5" Display
+iPhone with Home Button (3.5" display)
 
 iPhone 4S
 
@@ -312,4 +316,4 @@ iPhone 4
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 4" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Home Button (4" display) are used.
