@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=next-steps-after-applying-for-production-access url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-28T14:03:29+00:00 -->
+<!-- source=testing-requirements clause=next-steps-after-applying-for-production-access url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-12T15:33:45+00:00 -->
 
 ## Next steps after applying for production access
 

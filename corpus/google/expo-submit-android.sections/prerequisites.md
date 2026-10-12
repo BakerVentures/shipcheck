@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=prerequisites url=https://docs.expo.dev/submit/android/ fetched=2026-09-28T14:03:33+00:00 -->
+<!-- source=expo-submit-android clause=prerequisites url=https://docs.expo.dev/submit/android/ fetched=2026-10-12T15:33:49+00:00 -->
 
 ## Prerequisites
 
@@ -22,16 +22,18 @@ Create an app by clicking Create app in the [Google Play Console](https://play.g
 
 Create a Google Service Account key and upload it to EAS
 
-EAS requires a Google Service Account key to submit on your behalf. Follow the [Creating a Google Service Account key](https://expo.fyi/creating-google-service-account) guide to create one. Then, upload the key to your project's credentials with the EAS dashboard or EAS CLI:
+EAS requires a Google Service Account key to submit on your behalf. Follow the [Creating a Google Service Account key](https://expo.fyi/creating-google-service-account) guide to create one. Then, upload the key and assign it to your app with the EAS dashboard or EAS CLI:
 
 - Go to your project's EAS dashboard, click Credentials, and under Android, click your app's Application identifier.
-- Under Service Credentials, click Add a Google Service Account Key.
-- Ensure Upload new key is selected and upload the downloaded JSON key.
+- Under Service credentials, in Google service account key for EAS Submit, click Add a Google service account key.
+- Ensure Upload new key is selected, upload the downloaded JSON key, and click Save.
 
 - Run `eas credentials --platform android`
 - When prompted Which build profile do you want to configure?, select production
-- When prompted What do you want to do?, select Google Service Account > Upload a Google Service Account Key
-- Enter the path to the JSON key file
+- When prompted What do you want to do?, select Google Service Account > Manage your Google Service Account Key for Play Store Submissions > Set up a Google Service Account Key for Play Store Submissions
+- Enter the path to the JSON key file, or choose a key that you already uploaded
+
+EAS stores the key on your Expo account. You assign a key to each Android application identifier. To use the same key for another app in your account, select Choose saved key in the EAS dashboard. In EAS CLI, select Select an existing Google Service Account Key for Play Store Submissions.
 
 4.
 

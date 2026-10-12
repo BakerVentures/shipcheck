@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=appeals url=https://developer.apple.com/distribute/app-review/ fetched=2026-09-28T14:01:57+00:00 -->
+<!-- source=app-review-overview clause=appeals url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-12T15:33:26+00:00 -->
 
 ### Appeals
 
@@ -8,4 +8,4 @@ If your app didn’t pass review and you feel we misunderstood your app’s conc
 - Submit only one appeal per submission that didn’t pass review.
 - Respond to any requests for additional information before submitting an appeal.
 
-[Submit an appeal](/contact/app-store/?topic=appeal)
+Learn more about [submitting complete appeals](/help/app-review/after-submitting-for-review/appeal-to-the-app-review-board).

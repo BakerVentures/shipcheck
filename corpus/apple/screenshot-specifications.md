@@ -3,8 +3,8 @@ shipcheck_source_id: screenshot-specifications
 title: "Screenshot specifications"
 url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
-fetched_at: 2026-09-28T14:02:07+00:00
-sha256: 054b4843be076f9f30888aded967ebae667a1e1a05de933b3163da5ea36835c9
+fetched_at: 2026-10-12T15:33:38+00:00
+sha256: 19da243781af97d82dc1010dd7be45fe11bdebda35a60c4b80eb3e9064e18f1d
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications
 note: "Moved under /reference/app-information/."
@@ -18,11 +18,28 @@ Reference
 
 # Screenshot specifications
 
-You can upload one to 10 screenshots in `.jpeg`, `.jpg`, and `.png` formats, with the following specifications.
+You must include at least one screenshot and can upload up to 10 screenshots per device size in `.jpeg`, `.jpg`, or `.png` formats, with the following specifications. All screenshots must adhere to the [App Store Review Guidelines](/app-store/review/guidelines/) before you submit them for review.
+
+## Required device sizes
+
+To submit your app, you must provide screenshots for the following required display sizes:
+
+- **iPhone:** At least one screenshot for iPhone with Dynamic Island (medium display).
+- **iPad (if your app supports iPadOS):** At least one screenshot for iPad 13-inch display.
+
+[Learn best practices for creating screenshots.](/app-store/asset-best-practices/#screenshots)
+
+## Display scaling
+
+If your app’s user interface is consistent across multiple device sizes and localizations, you only need to provide screenshots for the highest required resolution. App Store Connect automatically scales them down for smaller device sizes.
+
+If you prefer not to use scaled screenshots, you can upload specific screenshots and app previews tailored to each device size and [localization](/help/app-store-connect/manage-app-information/localize-app-information). If an app preview is not provided for a specific language, the preview in the next best available language appears on your App Store product page.
 
 **Note:** Images can’t include alpha channels or transparencies.
 
-## iPhone
+## Specifications
+
+### iPhone
 
 iPhone Duo
 
@@ -42,9 +59,9 @@ iPhone Duo
 
 **Note**
 
-Support for uploading assets for this device in App Store Connect will be available later this year.
+Starting in April 2027, screenshots will be required for any app using the iOS 27.1 SDK or later. [Learn more](/iphone-duo/)
 
-6.9" Display
+iPhone with Dynamic Island (large display)
 
 iPhone Air
 
@@ -88,7 +105,11 @@ iPhone 14 Pro Max
 
 (landscape)
 
-6.5" Display
+**Note**
+
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Face ID (large display) are used.
+
+iPhone with Face ID (large display)
 
 iPhone 14 Plus
 
@@ -124,13 +145,13 @@ iPhone XR
 
 **Requirement**
 
-Required if app runs on iPhone and screenshots for 6.9" display aren't provided
+Required if app runs on iPhone and screenshots for iPhone with Dynamic Island (large display) aren't provided
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.9" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Dynamic Island (large display) are used.
 
-6.3" Display
+iPhone with Dynamic Island (medium display)
 
 iPhone 18 Pro
 
@@ -168,9 +189,9 @@ iPhone 14 Pro
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.5" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Face ID (large display) are used.
 
-6.1" Display
+iPhone with Face ID (medium display)
 
 iPhone 17e
 
@@ -224,9 +245,9 @@ iPhone X
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.5" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Dynamic Island (medium display) are used.
 
-5.5" Display
+iPhone with Home Button (large display)
 
 iPhone 8 Plus
 
@@ -248,9 +269,9 @@ iPhone 6 Plus
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 6.1" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Face ID (medium display) are used.
 
-4.7" Display
+iPhone with Home Button (medium display)
 
 iPhone SE (3rd generation, 2nd generation)
 
@@ -274,9 +295,9 @@ iPhone 6
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 5.5" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Home Button (large display) are used.
 
-4" Display
+iPhone with Home Button (4" display)
 
 iPhone SE (1st generation)
 
@@ -306,9 +327,9 @@ iPhone 5
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 4.7" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Home Button (medium display) are used.
 
-3.5" Display
+iPhone with Home Button (3.5" display)
 
 iPhone 4S
 
@@ -334,11 +355,11 @@ iPhone 4
 
 **Note**
 
-If screenshots with the accepted sizes aren't provided, scaled screenshots for 4" displays are used.
+If screenshots with the accepted sizes aren't provided, scaled screenshots for iPhone with Home Button (4" display) are used.
 
 ### iPad
 
-13" Display
+13" display
 
 iPad Pro (M5, M4)
 
@@ -368,7 +389,7 @@ iPad Air (M4, M3, M2)
 
 Required if app runs on iPad
 
-12.9" Display
+12.9" display
 
 iPad Pro (2nd generation)
 
@@ -386,7 +407,7 @@ iPad Pro (2nd generation)
 
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 13" displays are used.
 
-11" Display
+11" display
 
 iPad Pro (M5, M4)
 
@@ -442,7 +463,7 @@ iPad mini (6th generation)
 
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 13" displays are used.
 
-10.5" Display
+10.5" display
 
 iPad Pro
 
@@ -464,7 +485,7 @@ iPad (9th generation, 8th generation, 7th generation)
 
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 12.9" displays are used.
 
-9.7" Display
+9.7" display
 
 iPad Pro
 
@@ -564,7 +585,7 @@ Apple Vision Pro
 
 **Screenshot size**
 
-3840 X 2160 pixels
+3840 x 2160 pixels
 
 **Requirement**
 
@@ -580,29 +601,17 @@ Ultra 4, Ultra 3, Ultra 2, Ultra, Series 12, Series 11, Series 10, Series 9, Ser
 
 One of the following:
 
-422 x 514 pixels
+422 x 514 pixels (Ultra 4, Ultra 3)
 
-(Ultra 4, Ultra 3)
+410 x 502 pixels (Ultra 2, Ultra)
 
-410 x 502 pixels
+416 x 496 pixels (Series 12, Series 11, Series 10)
 
-(Ultra 2, Ultra)
+396 x 484 pixels (Series 9, Series 8, Series 7)
 
-416 x 496 pixels
+368 x 448 pixels (Series 6, Series 5, Series 4, SE 3, SE 2, SE)
 
-(Series 12, Series 11, Series 10)
-
-396 x 484 pixels
-
-(Series 9, Series 8, Series 7)
-
-368 x 448 pixels
-
-(Series 6, Series 5, Series 4, SE 3, SE 2, and SE)
-
-312 x 390 pixels
-
-(Series 3, Series 2, Series 1)
+312 x 390 pixels (Series 3, Series 2, Series 1)
 
 **Requirement**
 
@@ -611,3 +620,5 @@ Required for Apple Watch apps
 **Note**
 
 You must use the same screenshot size for Apple Watch consistently across all localizations for the app
+
+**Related** [Manage your App Store assets](/help/app-store-connect/manage-app-information/manage-your-app-store-assets) [App Store asset best practices and resources](/app-store/asset-best-practices/#format)

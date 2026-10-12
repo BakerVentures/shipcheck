@@ -1,8 +1,8 @@
-<!-- source=screenshot-specifications clause=ipad url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-09-28T14:02:07+00:00 -->
+<!-- source=screenshot-specifications clause=ipad url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-12T15:33:38+00:00 -->
 
 ### iPad
 
-13" Display
+13" display
 
 iPad Pro (M5, M4)
 
@@ -32,7 +32,7 @@ iPad Air (M4, M3, M2)
 
 Required if app runs on iPad
 
-12.9" Display
+12.9" display
 
 iPad Pro (2nd generation)
 
@@ -50,7 +50,7 @@ iPad Pro (2nd generation)
 
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 13" displays are used.
 
-11" Display
+11" display
 
 iPad Pro (M5, M4)
 
@@ -106,7 +106,7 @@ iPad mini (6th generation)
 
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 13" displays are used.
 
-10.5" Display
+10.5" display
 
 iPad Pro
 
@@ -128,7 +128,7 @@ iPad (9th generation, 8th generation, 7th generation)
 
 If screenshots with the accepted sizes aren't provided, scaled screenshots for 12.9" displays are used.
 
-9.7" Display
+9.7" display
 
 iPad Pro
 

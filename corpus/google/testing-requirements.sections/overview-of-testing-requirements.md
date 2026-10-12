@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=overview-of-testing-requirements url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-09-28T14:03:29+00:00 -->
+<!-- source=testing-requirements clause=overview-of-testing-requirements url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-12T15:33:45+00:00 -->
 
 ### Overview of testing requirements
 

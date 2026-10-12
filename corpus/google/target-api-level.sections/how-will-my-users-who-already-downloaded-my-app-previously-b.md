@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=how-will-my-users-who-already-downloaded-my-app-previously-b url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-09-28T14:03:12+00:00 -->
+<!-- source=target-api-level clause=how-will-my-users-who-already-downloaded-my-app-previously-b url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-10-12T15:33:43+00:00 -->
 
 ## How will my users who already downloaded my app previously be impacted?
 

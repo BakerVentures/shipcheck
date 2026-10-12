@@ -3,8 +3,8 @@ shipcheck_source_id: permissions-policy
 title: "Permissions and APIs that Access Sensitive Information"
 url: https://support.google.com/googleplay/android-developer/answer/16558241
 final_url: https://support.google.com/googleplay/android-developer/answer/16558241?hl=en
-fetched_at: 2026-09-28T14:03:30+00:00
-sha256: 5a49a32917c4048c20eb756e62de7bde95aa8f79b93459649bd2eb3e58f31884
+fetched_at: 2026-10-12T15:33:46+00:00
+sha256: 23980b11e53e0034a44dc579d6beb396350fff79b7f634b4927bd94dcd5753f2
 vendor: google
 substituted_from: https://support.google.com/googleplay/android-developer/answer/9888170
 note: "Google redirected the old permissions answer ID here."
@@ -22,7 +22,7 @@ This article will be updated with recently [announced](https://support.google.co
 
 - We're introducing the[Contacts Permissions](https://support.google.com/googleplay/android-developer/answer/16909972#contacts-permissions) policy to govern broad access of users' contacts. Apps that don't need broad access must use the [Android Contact Picker](https://developer.android.com/about/versions/17/features/contact-picker), a more secure, easy-to-integrate alternative that minimizes data collection and improves user safety.
 
-To preview the updated “Permissions and APIs that Access Sensitive Information” article, visit [this page](https://support.google.com/googleplay/android-developer/answer/16909972).
+To preview the updated "Permissions and APIs that Access Sensitive Information" article, visit [this page](https://support.google.com/googleplay/android-developer/answer/16909972).
 
 **Policy Summary**
 
@@ -44,9 +44,9 @@ To safeguard user privacy, Google Play defines restricted permissions, subjectin
 
 In addition to the above, restricted permissions are permissions that are designated as [Dangerous](https://developer.android.com/guide/topics/permissions/overview#dangerous_permissions), [Special](https://developer.android.com/guide/topics/permissions/overview#special_permissions), [Signature](https://developer.android.com/guide/topics/permissions/overview#signature_permissions), or as documented below. These permissions are subject to the following additional requirements and restrictions:
 
-- User or device data accessed through Restricted Permissions is considered as personal and sensitive user data. The requirements of the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?) apply.
+- User or device data accessed through Restricted Permissions is considered as personal and sensitive user data. The requirements of the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311?) policy apply.
 - Respect users’ decisions if they decline a request for a Restricted Permission, and users may not be manipulated or forced into consenting to any non-critical permission. You must make a reasonable effort to accommodate users who do not grant access to sensitive permissions (for example, allowing a user to manually enter a phone number if they’ve restricted access to Call Logs).
-- Use of permissions in violation of Google Play [malware policies](https://support.google.com/googleplay/android-developer/answer/9888380) (including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380)) is expressly prohibited.
+- Use of permissions in violation of Google Play [Malware](https://support.google.com/googleplay/android-developer/answer/9888380) policies (including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380)) is expressly prohibited.
 
 Certain Restricted Permissions may be subject to additional requirements as detailed below. The objective of these restrictions is to safeguard user privacy. We may make limited exceptions to the requirements below in very rare cases where apps provide a highly compelling or critical feature and where there is no alternative method available to provide the feature. We evaluate proposed exceptions against the potential privacy or security impacts on users.
 
@@ -57,8 +57,8 @@ Certain Restricted Permissions may be subject to additional requirements as deta
 | If a user denies a restricted permission, your app must honor that decision without manipulation. | Don't use permissions to violate Google Play's [Malware](https://support.google.com/googleplay/android-developer/answer/9888380) policy, including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380#elevated-privilege-abuse). |
 | Offer a different way to perform a function if a user denies a permission, such as allowing manual data entry. | Don't manipulate or deceive users. Never pressure or trick users into granting permissions. |
 | Follow the [User Data](https://support.google.com/googleplay/android-developer/answer) policy, because all data accessed through these permissions is sensitive. | Don't deny a user a reasonable alternative if they decline a Restricted Permission; ensure the app remains functional. |
-| Request dangerous permissions (for example,`READ_CALENDAR`) with a runtime request and a clear explanation. | Don't request without justification. Only request a restricted permission for a compelling, critical feature that has no alternative. |
-| Direct users to the system settings page for approval of special permissions (for example,`SYSTEM_ALERT_WINDOW`). |  |
+| Request dangerous permissions (for example, `READ_CALENDAR`) with a runtime request and a clear explanation. | Don't request without justification. Only request a restricted permission for a compelling, critical feature that has no alternative. |
+| Direct users to the system settings page for approval of special permissions (for example, `SYSTEM_ALERT_WINDOW`). |  |
 
 ---
 
@@ -70,7 +70,7 @@ System pickers and alternatives like [Sharesheet](https://developer.android.com/
 
 - All user Photos are personal and sensitive data subject to the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311) policy.
 
-- Apps that target Android 13 or later (API level 33+) may only request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions if system pickers (like the [Android Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker)) are not sufficient for your app to provide core functionality. Apps that still request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions must submit a Play Console declaration to demonstrate access needs for Photos and why Android Photo Picker (or alternatives) would not suffice.
+- Apps that target Android 13 or higher (API level 33+) may only request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions if system pickers (like the [Android Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker)) are not sufficient for your app to provide core functionality. Apps that still request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions must submit a Play Console declaration to demonstrate access needs for Photos and why Android Photo Picker (or alternatives) would not suffice.
 
 ---
 
@@ -89,9 +89,9 @@ SMS and Call Log Permissions are regarded as personal and sensitive user data su
 | Call Log permission group (for example, `READ_CALL_LOG`, `WRITE_CALL_LOG`, `PROCESS_OUTGOING_CALLS`) | It must be actively registered as the default Phone or Assistant handler on the device. |
 | SMS permission group (for example, `READ_SMS`, `SEND_SMS`, `WRITE_SMS`, `RECEIVE_SMS`, `RECEIVE_WAP_PUSH`, `RECEIVE_MMS`) | It must be actively registered as the default SMS or Assistant handler on the device. |
 
-Apps lacking default SMS, Phone, or Assistant handler capability may not declare use of the above permissions in the manifest. This includes placeholder text in the manifest. Additionally, apps must be actively registered as the default SMS, Phone, or Assistant handler before prompting users to accept any of the above permissions and must immediately stop using the permission when they’re no longer the default handler. The permitted uses and exceptions are available on [this Help Center page](https://support.google.com/googleplay/android-developer/answer/9047303).
+Apps lacking default SMS, Phone, or Assistant handler capability may not declare use of the above permissions in the manifest. This includes placeholder text in the manifest. Additionally, apps must be actively registered as the default SMS, Phone, or Assistant handler before prompting users to accept any of the above permissions and must immediately stop using the permission when they're no longer the default handler. The permitted uses and exceptions are available on [this Help Center page](https://support.google.com/googleplay/android-developer/answer/9047303).
 
-Apps may only use the permission (and any data derived from the permission) to provide approved core app functionality Core functionality is defined as the main purpose of the app. This may include a set of core features, which must all be prominently documented and promoted in the app’s description. Without the core feature(s), the app is “broken” or rendered unusable. The transfer, sharing, or licensed use of this data must only be for providing core features or services within the app, and its use may not be extended for any other purpose (for example, improving other apps or services, advertising, or marketing purposes). You may not use alternative methods (including other permissions, APIs, or third-party sources) to derive data attributed to Call Log or SMS related permissions.
+Apps may only use the permission (and any data derived from the permission) to provide approved core app functionality Core functionality is defined as the main purpose of the app. This may include a set of core features, which must all be prominently documented and promoted in the app's description. Without the core feature(s), the app is “broken” or rendered unusable. The transfer, sharing, or licensed use of this data must only be for providing core features or services within the app, and its use may not be extended for any other purpose (for example, improving other apps or services, advertising, or marketing purposes). You may not use alternative methods (including other permissions, APIs, or third-party sources) to derive data attributed to Call Log or SMS related permissions.
 
 **Key Considerations**
 
@@ -177,12 +177,12 @@ The inventory of installed apps queried from a device are regarded as personal a
 
 Apps that have a core purpose to launch, search, or interoperate with other apps on the device, may obtain scope-appropriate visibility to other installed apps on the device as outlined below:
 
-- **Broad app visibility:** Broad visibility is the capability of an app to have extensive (or “broad”) visibility of the installed apps (“packages”) on a device.
-  For apps targeting [API level 30 or later](https://developer.android.com/studio/releases/platforms), broad visibility to installed apps via the [``QUERY_ALL_PACKAGES``](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages) permission is restricted to specific use cases where awareness of and/or interoperability with any and all apps on the device are required for the app to function.
+- **Broad app visibility:** Broad visibility is the capability of an app to have extensive (or "broad") visibility of the installed apps ("packages") on a device.
+  For apps targeting [API level 30 or higher](https://developer.android.com/studio/releases/platforms), broad visibility to installed apps via the [``QUERY_ALL_PACKAGES``](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages) permission is restricted to specific use cases where awareness of and/or interoperability with any and all apps on the device are required for the app to function.
   - You may not use ``QUERY_ALL_PACKAGES`` if your app can operate with a more [targeted scoped package visibility declaration](https://developer.android.com/training/basics/intents/package-visibility#declare-other-apps)(for example, querying and interacting with specific packages instead of requesting broad visibility).
   Use of alternative methods to approximate the broad visibility level associated with ``QUERY_ALL_PACKAGES`` permission are also restricted to user-facing core app functionality and interoperability with any apps discovered via this method.
   Please see this [Help Center article](https://support.google.com/googleplay/android-developer/answer/10158779) for allowable use cases for the ``QUERY_ALL_PACKAGES`` permission.
-- **Limited app visibility**: Limited visibility is when an app minimizes access to data by querying for specific apps using more targeted (instead of “broad”) methods(for example, querying for specific apps that satisfy your app’s manifest declaration). You may use this method to query for apps in cases where your app has policy compliant interoperability, or management of these apps.
+- **Limited app visibility**: Limited visibility is when an app minimizes access to data by querying for specific apps using more targeted (instead of "broad") methods(for example, querying for specific apps that satisfy your app's manifest declaration). You may use this method to query for apps in cases where your app has policy compliant interoperability, or management of these apps.
 - Visibility to the inventory of installed apps on a device must be directly related to the core purpose or core functionality that users access within your app.
 
 App inventory data queried from Play-distributed apps may never be sold nor [shared](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en&sjid=9328586825007120077-NA#sharing&zippy=%2Cdata-types%2Cdata-sharing) for analytics or ads monetization purposes.
