@@ -831,6 +831,31 @@ class Scan:
         r"|\bcreateUserWithEmailAndPassword\s*\("
         r"|\buse(?:Auth|User|Session)\s*\(")
 
+    # check_signin_with_apple (2026-10-13, found pre-flighting Rigsheet): a
+    # package like supabase-js/Firebase/Amplify is general-purpose -- it can
+    # authenticate a user against a THIRD-PARTY social provider (which is what
+    # 4.8 is actually about) or against nothing but its own plain email/
+    # password, and AUTH_CALL_PATTERN matches both shapes identically
+    # (`.auth.signInWith...`, `resetPasswordForEmail`, etc. all match whether
+    # or not a social provider is involved). Rigsheet's only matched call site
+    # was `resetPasswordForEmail` -- plain email/password -- and 4.8 verbatim
+    # is about "a third-party or social login service (such as Facebook
+    # Login, Google Sign-In...)", not every account system a BaaS happens to
+    # host. Firing SIWA-MISSING from AUTH_CALL_PATTERN alone over-fires on
+    # exactly this shape. OAUTH_SOCIAL_PATTERN is the narrower, specific
+    # signal that a social/OAuth provider is actually in the flow: a
+    # provider-parameterized call, a dedicated social SDK's own API, or an
+    # OAuth-shaped method name AUTH_CALL_PATTERN also matches but that never
+    # appears in a plain-password-only app.
+    OAUTH_SOCIAL_PATTERN = (
+        r"\.auth\.signInWithOAuth\s*\(|\bsignInWithIdToken\s*\("
+        r"|\bsignInWith(?:Apple|Google|Facebook|Redirect|Popup|Credential)\s*\("
+        r"|provider\s*:\s*['\"](?:google|apple|facebook|twitter|x|linkedin|"
+        r"amazon|wechat)['\"]"
+        r"|\bGoogleSignin\.|\bLoginManager\.|\bAppleAuthentication\."
+        r"|@invertase/react-native-apple-authentication|expo-apple-authentication"
+        r"|react-native-fbsdk|@react-native-google-signin")
+
     # Same reasoning as AUTH_CALL_PATTERN: an IAP package in package.json does
     # not mean the app actually sells anything yet -- it can be installed and
     # configured with zero real purchase call sites (a "Go Pro" screen never
@@ -910,15 +935,17 @@ class Scan:
         self.facts["third_party_login_packages"] = third_party
         self.facts["apple_auth_packages"] = satisfied
         if third_party and not satisfied:
-            if self.grep_source(self.AUTH_CALL_PATTERN):
+            auth_hit = self.grep_source(self.AUTH_CALL_PATTERN)
+            oauth_hit = self.grep_source(self.OAUTH_SOCIAL_PATTERN) if auth_hit else None
+            if auth_hit and oauth_hit:
                 self.add("SIWA-MISSING", "critical",
                          "Third-party login present with no Sign in with Apple",
                          clause="4.8",
-                         evidence="Third-party login from: %s, and a real sign-in/"
-                                  "sign-up call site was found in source. No "
-                                  "expo-apple-authentication or "
+                         evidence="Third-party login from: %s, and a real "
+                                  "social/OAuth sign-in call site was found in "
+                                  "source (%s). No expo-apple-authentication or "
                                   "@invertase/react-native-apple-authentication in "
-                                  "dependencies." % ", ".join(third_party),
+                                  "dependencies." % (", ".join(third_party), oauth_hit),
                          fix="Add `expo-apple-authentication`, render an "
                              "`AppleAuthenticationButton` alongside your other login "
                              "buttons, and enable the Sign In with Apple capability "
@@ -926,6 +953,28 @@ class Scan:
                              "an equivalent privacy-preserving login option whenever a "
                              "third-party service sets up the primary account.",
                          corpus="apple/asrg.sections/4.8.md")
+            elif auth_hit:
+                # A real account system is wired up (auth_hit), but nothing
+                # found matches a social/OAuth provider shape specifically --
+                # e.g. plain email/password via a general-purpose backend
+                # (Supabase/Firebase/Amplify). 4.8 verbatim is about "a
+                # third-party or social login service," not every account
+                # system a BaaS happens to host, so this is a gap to verify
+                # by hand, not a confirmed obligation -- asserting SIWA-MISSING
+                # here would be exactly the false-CRITICAL-from-a-guess this
+                # file keeps getting fixed for.
+                self.gap("Sign in with Apple (4.8) could not be confirmed as "
+                         "required",
+                         "%s is a dependency and a real account call site "
+                         "exists (%s), but nothing matching a third-party/"
+                         "social login provider shape (OAuth, Google, "
+                         "Facebook, Apple, ...) was found -- this looks like "
+                         "plain email/password via a general-purpose backend, "
+                         "which 4.8 does not require Sign in with Apple for. "
+                         "If this app ALSO offers a social/OAuth login option "
+                         "anywhere, it needs Sign in with Apple alongside it; "
+                         "if it is genuinely email/password only, there is "
+                         "nothing to fix here." % (", ".join(third_party), auth_hit))
             else:
                 self.add("SIWA-UNCONFIRMED", "medium",
                          "Third-party login SDK present, but no sign-in call site "
@@ -1477,18 +1526,24 @@ class Scan:
         notes = re.sub(r"\s+", " ", notes)  # same reasoning as check_listing_claims
         if not notes.strip():
             return
+        backend_roots = ("supabase", "server", "scripts", "db", "migrations", "backend")
+        backend_exts = (".ts", ".tsx", ".js", ".jsx", ".sql", ".py")
         for c in (self.map.get("review_notes_claims", {}).get("claims") or []):
             m = re.search(c["claim"], notes, re.I)
             if not m:
                 continue
-            if self.grep_source(c["requires"]) is not None:
+            if self.grep_source(c["requires"], exts=backend_exts,
+                                 extra_roots=backend_roots) is not None:
                 continue
             self.add("CLAIM-PHANTOM-%s" % c["id"], c["severity"],
                      "App Review notes point the reviewer at %s that the "
                      "app never creates" % c["capability"],
                      clause=c.get("clause", "2.1"),
                      evidence='Review notes matched "%s" but ShipCheck found no '
-                              "seeding/creation call anywhere in app/src. %s"
+                              "seeding/creation call anywhere in app/src, or in a "
+                              "repo-level supabase/server/scripts/db/migrations/"
+                              "backend directory (a demo account is as often "
+                              "seeded server-side as client-side). %s"
                               % (m.group(0), c["seen_in"]),
                      fix=c["fix"],
                      corpus="apple/asrg.sections/2.1.md")
@@ -1710,7 +1765,7 @@ class Scan:
                      "the page. Run /shipcheck:refresh and check that section.")
 
     # ------------------------------------------------------------- shared
-    def grep_source(self, pattern, exts=(".ts", ".tsx", ".js", ".jsx")):
+    def grep_source(self, pattern, exts=(".ts", ".tsx", ".js", ".jsx"), extra_roots=()):
         # Returning bare None for both "searched everything, no match" and
         # "gave up at the file cap, don't know" would be the same false-pass
         # bug class this scanner has been fixed for repeatedly: a caller
@@ -1720,8 +1775,47 @@ class Scan:
         # (the return value itself stays path-or-None for every existing
         # caller -- see check_iap/check_account_deletion for the one shape
         # where the difference actually changes a verdict).
+        #
+        # extra_roots: additional top-level directories to search, beyond the
+        # default client-code roots. Added for check_review_notes_claims
+        # (2026-10-13): a demo account's seeding logic is just as often a
+        # server-side script against the real backend (found on Rigsheet:
+        # supabase/seed-demo-account.ts, 162 lines, written specifically for
+        # App Review) as it is client-side "first run" code, and the default
+        # roots below never look at a repo-level supabase/, server/, or
+        # scripts/ directory. Default stays empty so every other caller's
+        # search scope is unchanged.
         rx = re.compile(pattern, re.I)
-        roots = [self.p(d) for d in ("app", "src", "components", "screens", "lib", "features")]
+        roots = [self.p(d) for d in
+                 ("app", "src", "components", "screens", "lib", "features")]
+        if extra_roots:
+            # Checked inside self.root first (the common case: a single-package
+            # app with its own supabase/scripts/ directory). ALSO checked up to
+            # 2 directory levels above self.root, because every monorepo-
+            # structured app scanned today (MileTruth, HormoneLog, Rigsheet)
+            # puts the actual Expo project at apps/mobile/ -- two levels below
+            # the repo root -- with shared backend infra as a SIBLING of
+            # `apps/`, not a child of `mobile/`. self.root has to point at
+            # apps/mobile/ for app.json/package.json to resolve at all, so a
+            # plain child search, or even one level up, can never see it
+            # (verified: one level up from .../apps/mobile is .../apps, which
+            # has no supabase/ of its own). This is a fixed, hardcoded
+            # directory name list, never a config-derived path (contrast
+            # self.p()'s own docstring, which is about an attacker-controlled
+            # app.json field value escaping the project) -- there is nothing
+            # here for an adversarial PR to redirect, so walking a fixed two
+            # steps upward is safe. Bounded at 2: this does not recurse
+            # further, and stops early if it reaches the filesystem root.
+            ancestor = os.path.realpath(self.root)
+            for _ in range(2):
+                up = os.path.dirname(ancestor)
+                if not up or up == ancestor:
+                    break
+                ancestor = up
+                for d in extra_roots:
+                    roots.append(os.path.join(ancestor, d))
+            for d in extra_roots:
+                roots.append(self.p(d))
         roots = [r for r in roots if os.path.isdir(r)] or [self.root]
         checked = 0
         for r in roots:

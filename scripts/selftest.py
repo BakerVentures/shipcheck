@@ -203,18 +203,43 @@ export async function signIn(email, password) {
 }
 """
 
+# 2026-10-13, found pre-flighting Rigsheet: LIVE_AUTH_WRAPPER's
+# signInWithPassword is plain email/password, not a third-party/social login
+# -- Apple 4.8 verbatim is about "a third-party or social login service (such
+# as Facebook Login, Google Sign-In...)", and a BaaS used for your own
+# email/password system is neither. Rigsheet's actual deployed shape
+# (resetPasswordForEmail, no OAuth anywhere) was getting SIWA-MISSING
+# asserted as a false CRITICAL from AUTH_CALL_PATTERN alone. This fixture
+# is the true-positive control: an actual OAuth/social call through the
+# same SDK, which still must assert SIWA-MISSING.
+LIVE_OAUTH_WRAPPER = """\
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.EXPO_PUBLIC_SUPABASE_URL, process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY);
+
+export async function signInWithGoogle() {
+  return supabase.auth.signInWithOAuth({ provider: 'google' });
+}
+"""
+
 
 def run_auth_confirmation_checks():
     fails = []
     print("\nAuth call-site confirmation (regression for the MoveWitness "
-          "false-CRITICAL bug)")
+          "false-CRITICAL bug, and the Rigsheet plain-email/password "
+          "false-CRITICAL on SIWA-MISSING)")
     cases = [
         ("dead wrapper (MoveWitness's actual shape) must NOT assert CRITICAL",
          DEAD_AUTH_WRAPPER, {"SIWA-UNCONFIRMED", "ACCOUNT-DELETE-UNCONFIRMED"},
          {"SIWA-MISSING", "ACCOUNT-DELETE-MISSING"}),
-        ("live sign-in call site must still assert CRITICAL",
-         LIVE_AUTH_WRAPPER, {"SIWA-MISSING", "ACCOUNT-DELETE-MISSING"},
+        ("live OAuth/social sign-in call site must still assert SIWA-MISSING",
+         LIVE_OAUTH_WRAPPER, {"SIWA-MISSING", "ACCOUNT-DELETE-MISSING"},
          {"SIWA-UNCONFIRMED", "ACCOUNT-DELETE-UNCONFIRMED"}),
+        ("plain email/password (Rigsheet's real shape) must assert "
+         "ACCOUNT-DELETE-MISSING but NOT SIWA-MISSING -- 4.8 is about "
+         "third-party/social login, not every account system a BaaS hosts",
+         LIVE_AUTH_WRAPPER, {"ACCOUNT-DELETE-MISSING"},
+         {"SIWA-MISSING", "SIWA-UNCONFIRMED", "ACCOUNT-DELETE-UNCONFIRMED"}),
     ]
     for desc, wrapper_src, want_ids, forbid_ids in cases:
         with tempfile.TemporaryDirectory() as tmp:
@@ -1080,6 +1105,42 @@ def run_listing_claim_checks():
             s = scan.Scan(tmp)
             s.check_review_notes_claims(md)
             ids = {f["id"] for f in s.findings}
+        fired = fid in ids
+        if fired == must_fire:
+            print("  ok     %s" % desc)
+        else:
+            want = "to fire" if must_fire else "NOT to fire"
+            print("  FAIL   %s (expected %s -> %s, got ids=%s)"
+                  % (desc, fid, want, sorted(ids)))
+            fails.append("review-notes-claims: " + desc)
+
+    # Monorepo shape (2026-10-13, found on the real Rigsheet repo): the Expo
+    # project lives at apps/mobile/, two directory levels under the repo
+    # root, and the demo-account seeder is a SIBLING of apps/ (supabase/
+    # seed.sql), not a child of mobile/ -- grep_source's default roots can
+    # never see it, and neither could one level of extra_roots (one level up
+    # from apps/mobile is just apps/, which has no supabase/ of its own).
+    monorepo_md = {"review notes": "Demo account below has sample customers, "
+                                    "services, and jobs already seeded."}
+    monorepo_cases = [
+        ("Rigsheet's real shape: demo data seeded via a sibling supabase/ "
+         "directory two levels up from the Expo project root -- must NOT fire",
+         "insert into public.customer (id, business_id, first_name) values "
+         "(1, 1, 'Marcus');\n",
+         False),
+        ("same monorepo layout, but genuinely nothing seeds anywhere "
+         "(including the sibling supabase/ directory) -- must still fire",
+         "-- no seed data in this project\n",
+         True),
+    ]
+    for desc, seed_sql, must_fire in monorepo_cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, "apps/mobile/app.json", json.dumps({"expo": {"name": "x"}}))
+            _write(tmp, "supabase/seed.sql", seed_sql)
+            s = scan.Scan(os.path.join(tmp, "apps", "mobile"))
+            s.check_review_notes_claims(monorepo_md)
+            ids = {f["id"] for f in s.findings}
+        fid = "CLAIM-PHANTOM-seeded-data"
         fired = fid in ids
         if fired == must_fire:
             print("  ok     %s" % desc)
