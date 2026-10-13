@@ -1219,6 +1219,130 @@ class Scan:
                          confidence="medium",
                          corpus="apple/asrg.sections/5.1.1v.md")
 
+    # ---------------------------------------------- listing-vs-binary claims
+    # Derived directly from the 2026-10 rejection batch: 4 of 9 apps were
+    # rejected for a shape no earlier check here looked for at all -- the
+    # LISTING (description, promotional text, screenshot captions, or the
+    # App Review notes themselves) promises a behaviour that the reviewed
+    # binary's source does not actually perform. A metadata self-report is
+    # not evidence (see check_accounts_reconcile above, same reasoning): the
+    # developer's own claim about what the app does has to be checked
+    # against the code, not trusted.
+    #
+    # The claim table itself lives in data/rn_sdk_map.json ("listing_claims",
+    # "review_notes_claims", "listing_url_placeholder"), the same place
+    # package-to-obligation mappings already live, rather than as regex
+    # constants in this file -- a new rejection shape should be addable by
+    # editing data, with a real example and a tight "requires" pattern, not
+    # by shipping a code change. Every entry is required to name the real
+    # app it was derived from (its "seen_in" field) specifically so this
+    # table cannot grow by guessing what sounds misleading; see the
+    # "_comment" field on "listing_claims" in that file.
+    #
+    # Each check fires ONLY when a specific claim phrase is present AND the
+    # specific code shape that would back it up is absent anywhere in
+    # source -- the same "declared but not demonstrably reached" structure
+    # as AUTH_CALL_PATTERN/IAP_CALL_PATTERN above, applied to the listing
+    # instead of to package.json. A regex that tried to judge "does this
+    # copy sound misleading" in general would be exactly the kind of
+    # false-CRITICAL-from-a-guess this file has been fixed for repeatedly
+    # (see grep_source's docstring); these stay narrow and claim-specific.
+    #
+    # What this cannot do, and does not pretend to: tell "the capability is
+    # defined but has zero callers" (Nearvo's actual registerPushToken
+    # shape) apart from "the capability was never written at all" (no AST,
+    # same documented limitation as AUTH_CALL_PATTERN/IAP_CALL_PATTERN
+    # above). Both read the same way to a regex -- the call-shaped pattern
+    # in "requires" is absent either way -- so both raise the same
+    # CLAIM-UNBACKED-<id> finding rather than a false claim of precision
+    # this scanner cannot back up.
+    def check_listing_claims(self, md):
+        md = md or {}
+        listing_text = " ".join(md.get(f, "") for f in
+            ("subtitle", "short description", "description",
+             "promotional text", "what's new", "screenshot descriptions"))
+        if not listing_text.strip():
+            return
+        for c in (self.map.get("listing_claims", {}).get("claims") or []):
+            m = re.search(c["claim"], listing_text, re.I)
+            if not m:
+                continue
+            if self.grep_source(c["requires"]) is not None:
+                self.passes.append(dict(
+                    title="Listing claim (%s) is backed by matching source "
+                          "code" % c["capability"],
+                    clause="2.3.1",
+                    note='Listing matched "%s"; a corresponding code shape '
+                         "was found in source." % m.group(0)))
+                continue
+            self.add("CLAIM-UNBACKED-%s" % c["id"], c["severity"],
+                     "Listing promises %s, but no matching code was found "
+                     "anywhere in source" % c["capability"],
+                     clause="2.3.1",
+                     evidence='Listing text matched "%s" (capability: %s), but '
+                              "ShipCheck found no corresponding call/import "
+                              "shape anywhere in app/src. Same shape as "
+                              "%s." % (m.group(0), c["capability"], c["seen_in"]),
+                     fix=c["fix"],
+                     confidence="medium" if c["severity"] != "critical" else "high",
+                     corpus="apple/asrg.sections/2.3.1.md")
+
+    def check_review_notes_claims(self, md):
+        notes = (md or {}).get("review notes", "")
+        if not notes.strip():
+            return
+        for c in (self.map.get("review_notes_claims", {}).get("claims") or []):
+            m = re.search(c["claim"], notes, re.I)
+            if not m:
+                continue
+            if self.grep_source(c["requires"]) is not None:
+                continue
+            self.add("CLAIM-PHANTOM-%s" % c["id"], c["severity"],
+                     "App Review notes point the reviewer at %s that the "
+                     "app never creates" % c["capability"],
+                     clause=c.get("clause", "2.1"),
+                     evidence='Review notes matched "%s" but ShipCheck found no '
+                              "seeding/creation call anywhere in app/src. %s"
+                              % (m.group(0), c["seen_in"]),
+                     fix=c["fix"],
+                     corpus="apple/asrg.sections/2.1.md")
+
+    def check_listing_url_content(self, md):
+        """Apple 2.1(a): the pages the listing LINKS to, not just the
+        listing's own text fields (check_metadata's PLACEHOLDER regex
+        already covers those). DenialDesk's live privacy policy -- read by
+        the reviewer, linked from the App Store listing, still live weeks
+        later -- opened with "a working name; the final app name is not
+        yet chosen". Cheapest defect in the whole 2026-10 batch and the
+        hardest to argue with, and nothing that reads only shipcheck's own
+        metadata file could ever have seen it."""
+        if self.offline or not md:
+            return
+        patterns = self.map.get("listing_url_placeholder", {}).get("patterns")
+        if not patterns:
+            return
+        for field in ("privacy policy url", "support url", "marketing url"):
+            url = (md.get(field) or "").strip().split()[0] if md.get(field) else ""
+            if not url.startswith("http"):
+                continue
+            body = fetch_text(url)
+            if body is None:
+                continue
+            m = re.search(patterns, body, re.I)
+            if m:
+                self.add("LISTING-URL-PLACEHOLDER-%s" % field.replace(" ", "-"),
+                         "critical",
+                         "%s contains placeholder text" % field.title(),
+                         clause="2.1",
+                         evidence='%s -> page text contains "%s"'
+                                  % (url, m.group(0)),
+                         fix="Scrub the placeholder text from this page before "
+                             "submitting. Guideline 2.1(a): \"placeholder text, "
+                             "empty websites, and other temporary content should "
+                             "be scrubbed before submission.\" A reviewer opens "
+                             "every link in the listing and reads this page.",
+                         corpus="apple/asrg.sections/2.1.md")
+
     def check_export_compliance(self, plist):
         if "ITSAppUsesNonExemptEncryption" not in plist:
             self.add("EXPORT-COMPLIANCE", "medium",
@@ -1658,6 +1782,9 @@ class Scan:
             self.check_account_deletion(deps)
             self.check_submission_structure(deps, md)
             self.check_accounts_reconcile(md)
+            self.check_listing_claims(md)
+            self.check_review_notes_claims(md)
+            self.check_listing_url_content(md)
             self.check_export_compliance(plist)
             self.check_dev_artifacts(deps + devdeps, cfg)
 
@@ -1743,6 +1870,24 @@ def head_ok(url, timeout=12):
     if saw_blocked:
         return False, "%s (bot-blocked)" % last_err, True, True
     return False, last_err, False, False
+
+
+def fetch_text(url, timeout=12, cap=512 * 1024):
+    """GET a page's text for content inspection (check_listing_url_content),
+    as distinct from head_ok's status-only reachability check. Returns the
+    decoded body (capped, same reasoning as grep_source/self.read -- this
+    fetches a developer's own small marketing/privacy page, not an
+    arbitrary large file) or None on any failure, including a non-2xx
+    status: a dead or blocked page has nothing to read for placeholder
+    text, and that failure mode is already reported by check_urls."""
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": BROWSER_UA})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            if not (200 <= r.status < 300):
+                return None
+            return r.read(cap).decode("utf-8", errors="ignore")
+    except Exception:                                   # noqa: BLE001
+        return None
 
 
 def main():

@@ -1,6 +1,6 @@
 # ShipCheck Privacy Policy
 
-**Last updated: 29 September 2026.** Applies to ShipCheck v0.2.17.
+**Last updated: 13 October 2026.** Applies to ShipCheck v0.2.18.
 
 ShipCheck is operated by **Baker Ventures LLC**. Questions, deletion requests, or
 anything else about this page: **rsb.baker+shipcheck@gmail.com**.
@@ -50,23 +50,36 @@ for a report), and nothing else. `/shipcheck:refresh` additionally writes a poli
 corpus into the plugin's own data directory.
 
 **What it transmits: nothing about your project.** There is no "ShipCheck server" that
-receives a scan. The scanner contains exactly one network function, `head_ok()`, and it
-is used for one purpose, described next.
+receives a scan. The scanner contains exactly two network functions, `head_ok()` and
+`fetch_text()`, each used for one purpose, described next.
 
-### The one outbound request the scanner makes
+### The outbound requests the scanner makes
 
-If your `shipcheck.metadata.md` lists a **privacy policy URL, support URL, or marketing
-URL**, ShipCheck sends an HTTP `HEAD` (falling back to `GET`) to each one, to check it
-is reachable — because App Review opens every link in your listing and a dead privacy
-policy URL is a routine rejection.
+Both requests below go only to **the URLs you yourself put in `shipcheck.metadata.md`**
+— your own servers, not ours. We never learn the URLs, the result, or that a scan
+happened, and **`--offline` skips both entirely** (the scan still runs; it just cannot
+check reachability or linked-page content).
 
-- Those requests go to **your own servers**, not to ours. We never learn the URLs, the
-  result, or that a scan happened.
-- The request carries the User-Agent `ShipCheck/0.1 (link checker)` and nothing else
-  about you or your project.
+**Reachability (`head_ok`).** If your `shipcheck.metadata.md` lists a **privacy policy
+URL, support URL, or marketing URL**, ShipCheck sends an HTTP `HEAD` (falling back to
+`GET`) to each one, to check it is reachable — because App Review opens every link in
+your listing and a dead privacy policy URL is a routine rejection. This call reads only
+the HTTP status; it never reads the page body.
+
+**Linked-page content (`fetch_text`).** The same three URLs are also fetched with a real
+`GET` (capped at 512 KB) so ShipCheck can check the page text itself for leftover
+placeholder copy — e.g. "a working name, the final app name is not yet chosen" —
+against the same shape of defect that kept one developer's live privacy policy page
+un-scrubbed for weeks after a rejection. The page text is matched against a fixed regex
+**locally and immediately discarded**; nothing about the page's content, or that it was
+fetched, is sent anywhere.
+
+- `head_ok` identifies itself as `ShipCheck/0.1 (link checker)`, retrying with a
+  browser-shaped User-Agent only if that is blocked (some hosts 403 a bot UA and serve a
+  browser one fine). `fetch_text` always uses a browser-shaped User-Agent. Neither sends
+  anything else about you or your project.
 - Whoever hosts those URLs will see the request in their own logs, the same as any
   other visitor.
-- **`--offline` skips this entirely**, and the scan still runs.
 
 ---
 
@@ -104,7 +117,7 @@ to the validation endpoint. The complete request body is:
 | Field | Value |
 |---|---|
 | `license_key` | The key you bought. |
-| `plugin_version` | A version string, e.g. `0.2.17`. |
+| `plugin_version` | A version string, e.g. `0.2.18`. |
 | `app_token` | Optional. `sha256(license_key + ":" + bundle_id)`, truncated to 32 hex characters, computed **on your machine**. Omitted when the project has no bundle identifier. |
 
 That is the entire body. No project path, no repository name, no dependency list, no

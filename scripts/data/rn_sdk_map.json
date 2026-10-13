@@ -628,5 +628,128 @@
     "NSFaceIDUsageDescription": "authenticateAsync|LocalAuthentication",
     "NSUserTrackingUsageDescription": "requestTrackingPermissionsAsync|getTrackingPermissionsAsync|AppTrackingTransparency|setAdvertiserTrackingEnabled",
     "NSSpeechRecognitionUsageDescription": "SpeechRecognition|startSpeechRecognition"
+  },
+  "listing_claims": {
+    "_comment": "The listing-versus-binary table. Each entry pairs a phrase a store LISTING uses to promise a capability with the code evidence that capability actually exists in the project. A claim with no matching evidence anywhere in source is Apple 2.3.1 (accurate metadata) and, when the reviewer goes looking for the feature and cannot find it, 2.1 App Completeness. DERIVED FROM REAL REJECTIONS, not invented: every entry below cites the app in reports/rejections-2026-10-10-analysis.md whose listing tripped it. Do not add an entry without a real example and a 'requires' regex specific enough that a normal app implementing the feature matches it.",
+    "_schema": {
+      "id": "stable suffix of the finding id (CLAIM-UNBACKED-<id> / CLAIM-UNREACHABLE-<id>)",
+      "capability": "what the listing is promising, in the developer's words",
+      "claim": "regex matched against the listing text (description, subtitle, short description, promotional text, what's new, screenshot descriptions)",
+      "requires": "regex matched against project source; a match means the capability is at least present in code",
+      "severity": "severity when the claim is made and NO code evidence exists at all",
+      "fix": "what to do about it",
+      "seen_in": "the real rejected app this entry is derived from"
+    },
+    "claims": [
+      {
+        "id": "notifications",
+        "capability": "notifications or reminders the app sends to the user",
+        "claim": "push notification|push notifications|notifications? that land|notifications? which land|lands? (?:right )?on (?:your|their|his|her) phone|we.?ll remind you|reminds? you \\d|reminders? \\d+(?:,| and)|sends? you a reminder|daily reminder|notify you when|alerts? (?:on|to) your phone|get (?:a )?(?:reminder|notified)",
+        "requires": "scheduleNotificationAsync|setNotificationHandler|getExpoPushTokenAsync|getDevicePushTokenAsync|registerForPushNotifications|PushNotification(?:IOS)?\\.|notifee|FirebaseMessaging|messaging\\(\\)\\.|presentNotificationAsync|UNUserNotificationCenter",
+        "severity": "critical",
+        "fix": "Either ship the notification code or delete the promise from the listing. A reviewer who reads 'we'll remind you' and finds nothing that can send a notification cites 2.3.1, and 2.1 if they went looking for the feature.",
+        "seen_in": "MileTruth (an onboarding screen quoting a push the app could never send; nothing in src ever scheduled a notification) and Nearvo ('love notes that land on their phone' -- registerPushToken existed with zero callers)"
+      },
+      {
+        "id": "background-detection",
+        "capability": "automatic detection or tracking while the app is not open",
+        "claim": "automatic(?:ally)? (?:detect|track|log|record)|detects? your (?:trips|drives|rides|workouts|miles)|auto.?(?:detect|track|log)|in the background|while the app is closed|even when (?:the app is )?closed|without (?:you )?(?:having to )?(?:open|tap|touch|remember)|runs? in the background",
+        "requires": "startLocationUpdatesAsync|startGeofencingAsync|TaskManager\\.defineTask|registerTaskAsync|BackgroundFetch|BGTaskScheduler|BGAppRefresh|WorkManager|startForegroundService|HeadlessJsTaskService|react-native-background",
+        "severity": "critical",
+        "fix": "Automatic background behaviour needs a registered background task, not just a foreground permission. Ship it or remove the word 'automatic' from the listing and from the permission purpose strings.",
+        "seen_in": "MileTruth (Settings 'Auto-detect' with three sensitivity rows nothing read, and background-location purpose strings, with no startLocationUpdatesAsync or TaskManager registration anywhere)"
+      },
+      {
+        "id": "import-restore",
+        "capability": "opening, importing or restoring the user's own files",
+        "claim": "import (?:your|an|a|the) (?:own |existing )?(?:files?|pdfs?|epubs?|csvs?|books?|documents?|photos?|data)|restore (?:from )?(?:a |your )?backup|bring your own|add your own (?:books?|files?|documents?|photos?)|open your (?:own |existing )?(?:files?|documents?)|load your own",
+        "requires": "DocumentPicker|getDocumentAsync|pickDocument|launchImageLibraryAsync|react-native-document-picker|importBackup|restoreBackup|readAsStringAsync|readDirectoryAsync|fromJson|fromCsv",
+        "severity": "high",
+        "fix": "A listing that says 'import' or 'restore' has to have a picker or a reader behind it. If the feature was cut, cut the sentence with it.",
+        "seen_in": "Steadychart (the listing promised 'a full JSON backup' and the repo's only hit for DocumentPicker|importBackup|restoreBackup|fromCsv|fromJson was a comment saying there is none) and Foldbook (a reader with no way to add a fourteenth page)"
+      },
+      {
+        "id": "export-share",
+        "capability": "exporting, downloading or sharing a file out of the app",
+        "claim": "export (?:your |any |a )?(?:data|csv|pdf|report|range|log)|download (?:your|a) (?:data|csv|pdf|report)|share (?:a|your) (?:report|pdf|summary)|email (?:your|a) (?:report|summary)|send (?:it )?to your accountant",
+        "requires": "Sharing\\.shareAsync|Share\\.share|printToFileAsync|Print\\.print|writeAsStringAsync|StorageAccessFramework|MailComposer|react-native-share|react-native-fs|createDownloadResumable|toDataURL",
+        "severity": "high",
+        "fix": "Ship the export path or drop the claim. 'Export any date range' is also a scope claim -- fixed presets are not any range.",
+        "seen_in": "MileTruth ('Export any date range' against five fixed presets and no date picker)"
+      },
+      {
+        "id": "cloud-sync",
+        "capability": "syncing or backing up across devices",
+        "claim": "sync(?:s|ed|ing)? (?:across|between|to) (?:your |all your )?(?:devices|phones|iphone and ipad)|cloud backup|back(?:s|ed)? up to the cloud|access (?:it |them )?(?:from|on) any(?: of your)? device|available on all your devices",
+        "requires": "supabase|firebase|firestore|CloudKit|NSUbiquitous|iCloudContainer|AsyncStorage.*remote|amplify|appwrite|pouchdb|replicat|fetch\\(|axios|graphql",
+        "severity": "high",
+        "fix": "A sync claim needs a backend or CloudKit. An on-device-only app that advertises sync is 2.3.1, and it also contradicts an 'everything stays on your device' privacy claim if you make one.",
+        "seen_in": "DenialDesk (the inverse of this: the listing said 'keep everything on your device' while the config enabled remote updates) -- the check fires on whichever half the code does not support"
+      },
+      {
+        "id": "third-party-login",
+        "capability": "signing in with Apple, Google or another provider",
+        "claim": "sign in with (?:apple|google|facebook)|log ?in with (?:apple|google|facebook)|continue with (?:apple|google|facebook)|(?:apple|google) sign.?in",
+        "requires": "AppleAuthentication|expo-apple-authentication|GoogleSignin|@react-native-google-signin|signInWithIdToken|signInWithOAuth|expo-auth-session|LoginManager|AuthSession",
+        "severity": "high",
+        "fix": "Remove the claim or wire the provider. Offering third-party login also obliges Sign in with Apple under 4.8 -- see that check.",
+        "seen_in": "generalised from the same shape as the Nearvo and MileTruth claims; the listing names a provider the binary cannot reach"
+      },
+      {
+        "id": "health-integration",
+        "capability": "reading or writing Apple Health / Google Fit data",
+        "claim": "apple health|healthkit|health app|google fit|health connect|syncs? (?:with|to) health",
+        "requires": "HealthKit|react-native-health|expo-health|@kingstinct/react-native-healthkit|GoogleFit|HealthConnect|queryQuantitySamples|requestAuthorization\\(.*Health",
+        "severity": "high",
+        "fix": "HealthKit needs the entitlement and the SDK. A health-category listing that name-drops Apple Health without either is 2.3.1, and in a health app it invites 1.4.1 scrutiny too.",
+        "seen_in": "Steadychart (Health & Fitness, keyworded to four named conditions, no HealthKit of any kind -- its age-rating declaration was also all-defaults)"
+      },
+      {
+        "id": "widget-watch-siri",
+        "capability": "a widget, watch app, Live Activity or Siri shortcut",
+        "claim": "home.?screen widget|lock.?screen widget|\\bwidgets?\\b|apple watch|watchos|siri shortcut|siri|live activit(?:y|ies)|dynamic island|control cent(?:er|re) (?:tile|control)",
+        "requires": "WidgetKit|ActivityKit|expo-apple-targets|react-native-widgetkit|AppIntents|INIntent|SiriKit|watchOS|\\.widget\\b|WidgetCenter",
+        "severity": "high",
+        "fix": "These are separate app targets. If the listing or a screenshot shows one, the project has to contain one.",
+        "seen_in": "generalised: the batch's dominant shape was a listing naming a surface the binary did not contain, and widgets are the most common version of it in utility listings"
+      },
+      {
+        "id": "biometric-lock",
+        "capability": "locking the app with Face ID, Touch ID or a passcode",
+        "claim": "face ?id|touch ?id|biometric|fingerprint lock|passcode lock|locks? (?:it )?with your (?:face|fingerprint)|app lock",
+        "requires": "LocalAuthentication|authenticateAsync|expo-local-authentication|react-native-biometrics|TouchID|FingerprintScanner|BiometricPrompt",
+        "severity": "high",
+        "fix": "Ship the lock or remove the claim. Declaring NSFaceIDUsageDescription without calling LocalAuthentication is the related defect -- see the usage-description check.",
+        "seen_in": "Nearvo (NSFaceIDUsageDescription declared with no LocalAuthentication call anywhere in src)"
+      },
+      {
+        "id": "camera-capture",
+        "capability": "scanning or photographing something with the camera",
+        "claim": "scan (?:a|your|the|any) (?:receipt|document|bill|letter|barcode|qr|page|code)|take a (?:photo|picture) of|snap (?:a )?(?:photo|picture|pic)|point your camera|photograph (?:your|the)",
+        "requires": "launchCameraAsync|requestCameraPermissionsAsync|CameraView|<Camera\\b|VisionCamera|react-native-vision-camera|BarCodeScanner|scanFromURLAsync|launchCamera\\(|MLKit|TextRecognizer",
+        "severity": "high",
+        "fix": "A scan or capture claim needs a camera surface in the project, not just the permission string.",
+        "seen_in": "generalised from the same batch shape; the companion defect (a camera purpose string with no camera code) rejected Nearvo's sibling checks"
+      }
+    ]
+  },
+  "review_notes_claims": {
+    "_comment": "Claims made to the REVIEWER rather than to the buyer. A reviewer follows these literally, so a note describing something the binary does not contain is a 2.1 rejection caused by the note itself. IOLTAlign's notes told the reviewer to 'open the seeded/sample trust account', and the app had no seeder at all -- the only seeding in the repo was a SQL file used by the screenshot pipeline and not shipped. That is the sharpest kind of self-inflicted rejection: the note sent the reviewer looking for something that was never there.",
+    "claims": [
+      {
+        "id": "seeded-data",
+        "capability": "sample, seeded or pre-populated data the reviewer is told to open",
+        "claim": "seeded|sample (?:account|data|entries|records|client|matter|trip)|demo data|pre.?(?:loaded|populated|filled)|example (?:account|data|entries)|sample (?:is )?already",
+        "requires": "seedIfEmpty|seedDatabase|seedSampleData|SAMPLE_[A-Z_]+|DEMO_[A-Z_]+|onFirstLaunch|firstRun|hasSeeded|INSERT INTO|insertSample|bootstrapSampleData",
+        "severity": "critical",
+        "clause": "2.1",
+        "fix": "Either ship an in-app seeder that runs on first launch, or rewrite the review notes to describe the empty state and exactly what to tap to create a record. A reviewer who follows your notes and finds nothing files 2.1 App Completeness.",
+        "seen_in": "IOLTAlign (notes said 'open the seeded/sample trust account'; a grep for firstRun|onFirstLaunch|seedIfEmpty|INSERT INTO across src and app returned zero hits)"
+      }
+    ]
+  },
+  "listing_url_placeholder": {
+    "_comment": "Apple 2.1(a): 'placeholder text, empty websites, and other temporary content should be scrubbed before submission.' The metadata placeholder check already covers the listing FIELDS. This covers the PAGES the listing links to, which is where it actually bit us: DenialDesk's live privacy policy -- linked from the App Store listing, read by the reviewer, and still live weeks later -- opened with 'DenialDesk (a working name; the final app name is not yet chosen)'. Cheapest defect in the whole batch and the hardest to argue with.",
+    "patterns": "a working name|name is not (?:yet )?(?:chosen|final|decided)|final (?:app )?name is not|lorem ipsum|dolor sit amet|\\bTODO\\b|\\bFIXME\\b|\\bTBD\\b|coming soon|under construction|placeholder|example\\.com|insert (?:your )?(?:company|app|name) here|\\[your (?:app|company)|draft (?:only|copy)|do not ship|internal only"
   }
 }

@@ -689,6 +689,170 @@ def run_f3_metadata_reconcile_checks():
     return fails
 
 
+# ---------------------------------------------------------------------------
+# Listing-vs-binary claim checks (2026-10-13): derived from the 2026-10
+# rejection batch, where 4 of 9 apps were rejected for a shape no earlier
+# check here looked for -- the LISTING or the App Review notes promise a
+# behaviour the reviewed binary's source does not perform. Each fixture
+# below is modeled on one real labelled example (Nearvo's dead push-token
+# registration, MileTruth's never-scheduled notification permission,
+# Steadychart's backup with no restore path, IOLTAlign's review notes
+# pointing at a seeded account that was never seeded) and each has a
+# matching "must NOT fire" case so a real, wired-up feature never gets
+# flagged as a phantom one.
+# ---------------------------------------------------------------------------
+def run_listing_claim_checks():
+    fails = []
+    print("\nListing-vs-binary claims (2026-10 rejection batch: listing/review "
+          "notes promise a feature the binary does not have -- table-driven "
+          "from data/rn_sdk_map.json's listing_claims/review_notes_claims)")
+
+    # check_listing_claims(md) cases: (desc, metadata dict, source or None,
+    # finding id, must it fire).
+    listing_cases = [
+        ("notifications claim, no library at all, no call site "
+         "(Nearvo: 'love notes that land on their phone')",
+         {"description": "Love notes that land right on their phone, any time."},
+         None,
+         "CLAIM-UNBACKED-notifications", True),
+
+        ("notifications claim with the library present but never scheduled "
+         "(MileTruth: permission requested, nothing ever scheduled)",
+         {"description": "We'll remind you the moment a trip is detected."},
+         "import * as Notifications from 'expo-notifications';\n"
+         "export async function askForPermission() {\n"
+         "  await Notifications.requestPermissionsAsync();\n"
+         "}\n",
+         "CLAIM-UNBACKED-notifications", True),
+
+        ("notifications claim backed by a real schedule call -- must NOT fire",
+         {"description": "We'll remind you the moment a trip is detected."},
+         "import * as Notifications from 'expo-notifications';\n"
+         "export async function remind() {\n"
+         "  await Notifications.requestPermissionsAsync();\n"
+         "  await Notifications.scheduleNotificationAsync({\n"
+         "    content: { title: 'Trip detected' }, trigger: null });\n"
+         "}\n",
+         "CLAIM-UNBACKED-notifications", False),
+
+        ("import/restore claim with no picker/reader anywhere "
+         "(Steadychart: 'a full JSON backup' with no way back in)",
+         {"description": "Restore from a backup any time you switch phones."},
+         "export function exportJson() { return JSON.stringify({}); }\n"
+         "// there is no restore from a backup -- not implemented\n",
+         "CLAIM-UNBACKED-import-restore", True),
+
+        ("import/restore claim with a real DocumentPicker call -- must NOT fire",
+         {"description": "Restore from a backup any time you switch phones."},
+         "import * as DocumentPicker from 'expo-document-picker';\n"
+         "export async function restoreBackup() {\n"
+         "  const f = await DocumentPicker.getDocumentAsync();\n"
+         "  return JSON.parse(f.assets[0].text);\n"
+         "}\n",
+         "CLAIM-UNBACKED-import-restore", False),
+
+        ("biometric-lock claim with no LocalAuthentication call anywhere "
+         "(Nearvo: NSFaceIDUsageDescription declared, never called)",
+         {"description": "Lock the app behind Face ID so only you can open it."},
+         "export const config = { ios: { infoPlist: {\n"
+         "  NSFaceIDUsageDescription: 'Unlock the app' } } };\n",
+         "CLAIM-UNBACKED-biometric-lock", True),
+
+        ("biometric-lock claim with a real LocalAuthentication call -- "
+         "must NOT fire",
+         {"description": "Lock the app behind Face ID so only you can open it."},
+         "import * as LocalAuthentication from 'expo-local-authentication';\n"
+         "export async function unlock() {\n"
+         "  return LocalAuthentication.authenticateAsync();\n"
+         "}\n",
+         "CLAIM-UNBACKED-biometric-lock", False),
+    ]
+    for desc, md, src, fid, must_fire in listing_cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            if src is not None:
+                _write(tmp, "src/lib/feature.ts", src)
+            s = scan.Scan(tmp)
+            s.check_listing_claims(md)
+            ids = {f["id"] for f in s.findings}
+        fired = fid in ids
+        if fired == must_fire:
+            print("  ok     %s" % desc)
+        else:
+            want = "to fire" if must_fire else "NOT to fire"
+            print("  FAIL   %s (expected %s -> %s, got ids=%s)"
+                  % (desc, fid, want, sorted(ids)))
+            fails.append("listing-claims: " + desc)
+
+    # check_review_notes_claims(md) cases.
+    notes_cases = [
+        ("review notes point at a seeded account that is never seeded "
+         "(IOLTAlign: 'open the seeded/sample trust account')",
+         {"review notes": "To review: launch the app, open the seeded/sample "
+                          "trust account (or create one via Accounts > New)."},
+         "export function createAccount(name) { return { name }; }\n",
+         "CLAIM-PHANTOM-seeded-data", True),
+
+        ("review notes mention sample data, and the app really seeds it "
+         "-- must NOT fire",
+         {"review notes": "The app ships with sample data pre-loaded on first "
+                          "launch; no login required."},
+         "export function init() {\n"
+         "  if (count === 0) { seedDatabase(); }\n"
+         "}\n",
+         "CLAIM-PHANTOM-seeded-data", False),
+    ]
+    for desc, md, src, fid, must_fire in notes_cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, "src/lib/feature.ts", src)
+            s = scan.Scan(tmp)
+            s.check_review_notes_claims(md)
+            ids = {f["id"] for f in s.findings}
+        fired = fid in ids
+        if fired == must_fire:
+            print("  ok     %s" % desc)
+        else:
+            want = "to fire" if must_fire else "NOT to fire"
+            print("  FAIL   %s (expected %s -> %s, got ids=%s)"
+                  % (desc, fid, want, sorted(ids)))
+            fails.append("review-notes-claims: " + desc)
+
+    # check_listing_url_content(md): fetch_text is monkeypatched so this
+    # stays offline and deterministic -- it is exercising the regex-match
+    # path, not real network reachability (that's check_urls' job).
+    print("  (listing URL placeholder content: exercised via monkeypatch, below)")
+    real_fetch = scan.fetch_text
+    try:
+        scan.fetch_text = lambda url, **kw: (
+            "DenialDesk (a working name; the final app name is not yet "
+            "chosen) is an on-device assistant." if "denialdesk" in url else "")
+        with tempfile.TemporaryDirectory() as tmp:
+            s = scan.Scan(tmp, offline=False)
+            s.check_listing_url_content(
+                {"privacy policy url": "https://example.com/denialdesk/privacy/"})
+            ids = {f["id"] for f in s.findings}
+        if "LISTING-URL-PLACEHOLDER-privacy-policy-url" in ids:
+            print("  ok     linked privacy page still says the app name is "
+                  "not final (DenialDesk's actual, still-live defect)")
+        else:
+            print("  FAIL   LISTING-URL-PLACEHOLDER-privacy-policy-url not "
+                  "raised for a page with placeholder name text")
+            fails.append("listing-url-content: placeholder name text")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            s = scan.Scan(tmp, offline=False)
+            s.check_listing_url_content(
+                {"privacy policy url": "https://example.com/clean/privacy/"})
+            ids = {f["id"] for f in s.findings}
+        if not any(i.startswith("LISTING-URL-PLACEHOLDER") for i in ids):
+            print("  ok     a clean linked page raises nothing")
+        else:
+            print("  FAIL   clean linked page raised %s" % sorted(ids))
+            fails.append("listing-url-content: clean page false positive")
+    finally:
+        scan.fetch_text = real_fetch
+    return fails
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true")
@@ -750,6 +914,7 @@ def main():
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
     fails += run_privacy_manifest_config_checks()
+    fails += run_listing_claim_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))
