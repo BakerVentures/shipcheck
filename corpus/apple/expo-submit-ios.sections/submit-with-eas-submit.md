@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=submit-with-eas-submit url=https://docs.expo.dev/submit/ios/ fetched=2026-10-02T03:31:42+00:00 -->
+<!-- source=expo-submit-ios clause=submit-with-eas-submit url=https://docs.expo.dev/submit/ios/ fetched=2026-10-12T15:33:41+00:00 -->
 
 ## Submit with `eas submit`
 

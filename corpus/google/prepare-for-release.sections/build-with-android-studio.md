@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=build-with-android-studio url=https://developer.android.com/studio/publish/preparing fetched=2026-10-02T03:31:50+00:00 -->
+<!-- source=prepare-for-release clause=build-with-android-studio url=https://developer.android.com/studio/publish/preparing fetched=2026-10-12T15:33:47+00:00 -->
 
 ### Build with Android Studio
 

@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=tester-engagement url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-02T03:31:48+00:00 -->
+<!-- source=testing-requirements clause=tester-engagement url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-12T15:33:45+00:00 -->
 
 ### Tester engagement
 

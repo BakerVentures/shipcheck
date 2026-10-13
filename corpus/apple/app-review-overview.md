@@ -3,8 +3,8 @@ shipcheck_source_id: app-review-overview
 title: "App Review (overview and common rejections)"
 url: https://developer.apple.com/distribute/app-review/
 final_url: https://developer.apple.com/distribute/app-review/
-fetched_at: 2026-10-02T03:31:25+00:00
-sha256: 26692832f43c5832d7a5560a5bed49213954292a857fec2cf3dbf092c8aa3f98
+fetched_at: 2026-10-12T15:33:26+00:00
+sha256: 8e79ebdc061401bae09604be116d96b2908b056e3cb75da08c0944535677314b
 vendor: apple
 substituted_from: https://developer.apple.com/app-store/review/
 note: "Original URL is a meta-refresh stub that redirects here."
@@ -32,15 +32,11 @@ The Apple Developer Program License Agreement details your obligations and respo
 
 [Read the latest license agreement](/support/terms/)
 
-#### Alternative Terms Addendum for Apps in the EU
-
-To distribute your app from an alternative app marketplace or use alternative payment options on the App Store in the European Union, you'll need to review and sign an [addendum](/contact/request/download/alternate_eu_terms_addendum.pdf) to the Apple Developer Program License Agreement.
-
 ### App review information
 
 If your app requires specific settings, user account information, or special instructions, include these details in the App Review Information section of App Store Connect. If you don’t include this information, the app review process may be delayed and your app may not pass review.
 
-For more details, view [App Store Connect Help](/help/app-store-connect/reference/app-review-information/).
+Learn more about [providing information for a complete review](/help/app-review/before-submitting-for-review/complete-review) on App Review Help.
 
 ## Submitting for review
 
@@ -53,11 +49,14 @@ When you submit for review in App Store Connect, you can:
 - View a history of submissions created using the updated experience, including messages from App Review.
 - Decide whether your app is reviewed for the App Store or [Notarization only](/help/app-store-connect/distributing-apps-in-the-european-union/submit-for-notarization).
 
+Learn more about [submitting for review on App Store Connect Help](/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review).
+
 ### Review status
 
-**On average, 90% of submissions are reviewed in less than 24 hours.** You’ll be notified by email of status changes. You can also check the review status of your submission in the [Apps section](https://appstoreconnect.apple.com/apps/) of App Store Connect or on the [App Store Connect app](https://apps.apple.com/us/app/app-store-connect/id1234793120/) for iPhone and iPad. If your submission is incomplete, review times may be delayed or your submission may not pass.
+App Review works around the clock, typically reviewing at least 50% of submissions in less than 24 hours and 90% in less than 48 hours.
+You’ll be notified by email of status changes. You can also check the review status of your submission in the [Apps section](https://appstoreconnect.apple.com/apps/) of App Store Connect or on the [App Store Connect app](https://apps.apple.com/us/app/app-store-connect/id1234793120/) for iPhone and iPad. If your submission is incomplete, review times may be delayed or your submission may not pass.
 
-For status details, view [App Store Connect Help](/help/app-store-connect/reference/app-and-submission-statuses/).
+Learn more about [how to track a submission’s review status on App Review Help](/help/app-review/after-submitting-for-review/review-status).
 
 ## Avoiding common issues
 
@@ -100,17 +99,15 @@ Make sure your privacy policy adheres to [guideline 5.1](/app-store/review/guide
 
 ### Unclear data access requests
 
-When requesting permission to access user or usage data, you should clearly and completely describe how your app will use the data. Including an example can help users understand why your app is requesting access to their personal information. [View guideline 5.1.](/app-store/review/guidelines/#5.1)
+When requesting permission to access user or usage data, you should clearly and completely describe how your app will use the data. Including an example can help users understand why your app is requesting access to their personal information.
 
 If your app’s code references one or more APIs that access sensitive user data, the app’s Info.plist file should contain a `$!{infoPlistKey}` key with a user-facing purpose string explaining clearly and completely why your app needs the data. All apps submitted to App Store Connect that access user data are required to include a purpose string.
 
-[Learn about requesting permission](/design/human-interface-guidelines/privacy/)
-
-[Watch “Write clear purpose strings”](/videos/play/tech-talks/110152/)
+To learn more, visit [5.1.1(ii) - Write clear purpose strings](/help/app-review/guideline-reference/5-1-1-purpose-strings) on App Review Help and [view guideline 5.1.](/app-store/review/guidelines/#5.1)
 
 ### Inaccurate screenshots
 
-Screenshots should accurately communicate value and functionality. Use text and overlay images to highlight the user experience, not obscure it. Make sure your UI and product images match the corresponding device type in App Store Connect. [View guideline 2.3.](/app-store/review/guidelines/#accurate-metadata)
+Screenshots should accurately communicate value and functionality. Use text and overlay images to highlight the user experience, not obscure it. To learn more, visit [2.3.3 - Show your app in use with screenshots](/help/app-review/guideline-reference/2-3-3-screenshots) on App Review Help and [view guideline 2.3](/app-store/review/guidelines/#accurate-metadata).
 
 ### Substandard user interface
 
@@ -126,7 +123,7 @@ Submitting several apps that are essentially the same ties up the App Review pro
 
 ### Copycats
 
-When working on your app, focus on creating interesting, unique experiences that aren’t already available. Apps that actively try to copy other apps won’t pass review. To learn more, view [Preventing Copycat and Impersonation Rejections](https://developer.apple.com/forums/thread/782175) and [guideline 4.1.](/app-store/review/guidelines/#copycats)
+When working on your app, focus on creating interesting, unique experiences that aren’t already available. Apps that actively try to copy other apps won’t pass review. To learn more, visit [4.1 - Preventing copycat and impersonation rejections](/help/app-review/guideline-reference/4-1-prevent-copycat-rejection) on App Review Help and [view guideline 4.1.](/app-store/review/guidelines/#copycats)
 
 ### Misleading users
 
@@ -156,13 +153,13 @@ You can also visit the [Apple Developer Forums](/forums/) or request [code-level
 
 You can view your past and current submissions to App Review in App Store Connect. If your submission didn’t pass review, details are provided, including any specific App Review Guidelines that your submission didn’t follow. You can correspond with App Review to resolve the issues before resubmitting the build. Access the App Review section on the app’s page in App Store Connect.
 
-[Learn about corresponding with App Review](/help/app-store-connect/manage-submissions-to-app-review/reply-to-app-review-messages/)
+Learn more about [contacting App Review for help with a submission](/help/app-review/after-submitting-for-review/contact-app-review).
 
 ### Appointment
 
 Meet with App Review over Webex to discuss the App Review Guidelines and explore best practices for a smooth review process. In each 30-minute video appointment, you can ask for advice on what to expect during review, how your app can best align with guidelines, reasons for common rejections, and topics related to the process of reviewing your app.
 
-[View schedule](/events/view/upcoming-events?search=Review)
+Learn more about [appointment requests](/help/app-review/before-submitting-for-review/app-review-appointment).
 
 ### Appeals
 
@@ -172,7 +169,7 @@ If your app didn’t pass review and you feel we misunderstood your app’s conc
 - Submit only one appeal per submission that didn’t pass review.
 - Respond to any requests for additional information before submitting an appeal.
 
-[Submit an appeal](/contact/app-store/?topic=appeal)
+Learn more about [submitting complete appeals](/help/app-review/after-submitting-for-review/appeal-to-the-app-review-board).
 
 ### Expedited reviews
 
@@ -182,25 +179,25 @@ You can request the review of your app to be expedited if you face extenuating c
 
 **Event-related app.** For apps associated with an event, we recommend you plan and schedule the release of your app in App Store Connect. However, if your app is still in review and the launch of your event is quickly approaching, you can request to have your app review expedited. Make sure your request includes the event, date of the event, and your app’s association with the event.
 
-[Request an expedited review](/contact/app-store/?topic=expedite)
+Learn more about [expedite requests](/help/app-review/after-submitting-for-review/request-expedited-review).
 
 ### Bug fix submissions
 
 If you’re submitting a bug fix update for your app and we find additional issues during review, you have the option to resolve the additional issues with your next submission, as long as there are no legal or safety concerns. To accept, simply reply to the offer message in App Store Connect and indicate you would like the current submission to be approved.
 
-[View App Store Connect](https://appstoreconnect.apple.com/)
+Learn more about [bug fix submissions](/help/app-review/after-submitting-for-review/bug-fix-submissions).
 
 ### Suggestions
 
 Help improve the App Review Guidelines or identify a need for clarity in our policies by suggesting guideline changes. Your suggestions will be taken into consideration by App Review.
 
-[Make a suggestion](/contact/app-store/?topic=guideline)
+Learn more about [suggesting changes to the guidelines](/help/app-review/after-submitting-for-review/improve-guidelines).
 
 ### Report a concern
 
 If you believe that an app presents a trust or safety concern, or is in violation of the App Review Guidelines, you can share details with us to investigate.
 
-[File a report](/contact/app-store/?topic=report-an-app)
+Learn more about [reporting apps](/help/app-review/safe-and-trusted-store/report-an-app).
 
 ### Other questions
 

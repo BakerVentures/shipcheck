@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=understanding-subscription-guidelines url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-10-02T03:31:28+00:00 -->
+<!-- source=subscriptions clause=understanding-subscription-guidelines url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-10-12T15:33:28+00:00 -->
 
 ### Understanding subscription guidelines
 

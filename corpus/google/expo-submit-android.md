@@ -3,8 +3,8 @@ shipcheck_source_id: expo-submit-android
 title: "Expo: Submit to Google Play"
 url: https://docs.expo.dev/submit/android/
 final_url: https://docs.expo.dev/submit/android/
-fetched_at: 2026-10-02T03:31:53+00:00
-sha256: 7b1579111c27d841e91c741c74e3b81b6a9004b58a15e71c8840b45577918629
+fetched_at: 2026-10-12T15:33:49+00:00
+sha256: 81272c10ecfd55aa05fab36025b2537f8aefdab8e8e3816b8c6464add1594961
 vendor: google
 ---
 
@@ -42,16 +42,18 @@ Create an app by clicking Create app in the [Google Play Console](https://play.g
 
 Create a Google Service Account key and upload it to EAS
 
-EAS requires a Google Service Account key to submit on your behalf. Follow the [Creating a Google Service Account key](https://expo.fyi/creating-google-service-account) guide to create one. Then, upload the key to your project's credentials with the EAS dashboard or EAS CLI:
+EAS requires a Google Service Account key to submit on your behalf. Follow the [Creating a Google Service Account key](https://expo.fyi/creating-google-service-account) guide to create one. Then, upload the key and assign it to your app with the EAS dashboard or EAS CLI:
 
 - Go to your project's EAS dashboard, click Credentials, and under Android, click your app's Application identifier.
-- Under Service Credentials, click Add a Google Service Account Key.
-- Ensure Upload new key is selected and upload the downloaded JSON key.
+- Under Service credentials, in Google service account key for EAS Submit, click Add a Google service account key.
+- Ensure Upload new key is selected, upload the downloaded JSON key, and click Save.
 
 - Run `eas credentials --platform android`
 - When prompted Which build profile do you want to configure?, select production
-- When prompted What do you want to do?, select Google Service Account > Upload a Google Service Account Key
-- Enter the path to the JSON key file
+- When prompted What do you want to do?, select Google Service Account > Manage your Google Service Account Key for Play Store Submissions > Set up a Google Service Account Key for Play Store Submissions
+- Enter the path to the JSON key file, or choose a key that you already uploaded
+
+EAS stores the key on your Expo account. You assign a key to each Android application identifier. To use the same key for another app in your account, select Choose saved key in the EAS dashboard. In EAS CLI, select Select an existing Google Service Account Key for Play Store Submissions.
 
 4.
 
@@ -159,3 +161,11 @@ Terminal
 `-` `eas submit --platform android --profile production`
 
 This requires a [personal access token](/accounts/programmatic-access/#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.
+
+With `--non-interactive`, `eas submit` and `eas build --auto-submit` cannot prompt you for a Google Service Account key. Unless your submission profile sets [`serviceAccountKeyPath`](/eas/json/#serviceaccountkeypath), they use the key that is assigned to your app. If no key is assigned, they fail with the following error:
+
+```
+Google Service Account Keys cannot be set up in --non-interactive mode.
+```
+
+To fix this, assign a key to your app as described in [Prerequisites](/submit/android/#prerequisites). You can also set `serviceAccountKeyPath` to the path of a key file on the CI machine.

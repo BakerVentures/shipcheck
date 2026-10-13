@@ -3,8 +3,8 @@ shipcheck_source_id: expo-submit-ios
 title: "Expo: Submit to the App Store"
 url: https://docs.expo.dev/submit/ios/
 final_url: https://docs.expo.dev/submit/ios/
-fetched_at: 2026-10-02T03:31:42+00:00
-sha256: d75824c797e0eac07e137634e27eae105ea01e792fc3889fa7f408d57f1b36a6
+fetched_at: 2026-10-12T15:33:41+00:00
+sha256: ebcfda89e9b6f4de354f282a09d94593b3a94accbbf5a26a2ba84fa1c25d8d1a
 vendor: apple
 ---
 
@@ -164,6 +164,14 @@ Terminal
 `-` `eas submit --platform ios --profile production`
 
 This requires a [personal access token](/accounts/programmatic-access/#personal-access-tokens) to authenticate with your Expo account. Set the `EXPO_TOKEN` environment variable in your CI service so `eas submit` can run non-interactively.
+
+With `--non-interactive`, `eas submit` and `eas build --auto-submit` cannot prompt you for an App Store Connect API Key. Unless you bring your own credentials, they use the key assigned to your app. If your app has no key, they fail with the following error:
+
+```
+App Store Connect API Keys cannot be set up in --non-interactive mode.
+```
+
+To fix this, assign a key to your app or bring your own credentials, as described in [Automate with EAS Workflows](/submit/ios/#automate-with-eas-workflows). In non-interactive mode, your submission profile also needs [`ascAppId`](/submit/ios/#configure-a-submission-profile).
 
 ## Manual fallback
 
