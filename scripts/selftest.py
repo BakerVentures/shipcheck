@@ -757,6 +757,204 @@ def run_f3_metadata_reconcile_checks():
 
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Permission-request hygiene (2026-10-13): a worker diffed the one rejected
+# app in a review window against its sibling that passed 81 seconds later,
+# off the same scaffold, and found exactly one hard behavioural difference:
+# requesting a sensitive permission unconditionally on mount (TentClock)
+# versus from a tap handler with an explanation first (FlipStage). Fixtures
+# below are each modeled on the REAL code at the REAL commit -- not a
+# paraphrase -- verified directly against ~/iphone-duo/TentClock's actual
+# pre-fix commit (f9d11cf~1) and ~/iphone-duo/FlipStage's actual shipped
+# DeckSetup.tsx before writing these, so the regression fixture is provably
+# the same shape as the real rejection and the real pass.
+# ---------------------------------------------------------------------------
+TENTCLOCK_PREFIX_USEWEATHER = """\
+import * as Location from 'expo-location';
+import { useEffect, useState } from 'react';
+
+export function useWeather() {
+  const [status, setStatus] = useState('loading');
+  const [snapshot, setSnapshot] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchForCurrentPosition = async (lat, lon) => {
+      // ... bounded fetch against Open-Meteo, omitted ...
+    };
+
+    (async () => {
+      const permission = Location.requestForegroundPermissionsAsync();
+      let permStatus;
+      try {
+        ({ status: permStatus } = await permission);
+      } catch {
+        if (!cancelled) setStatus('error');
+        return;
+      }
+      if (permStatus !== 'granted') {
+        if (!cancelled) setStatus('denied');
+        return;
+      }
+      await fetchForCurrentPosition();
+    })();
+
+    return () => { cancelled = true; };
+  }, []);
+
+  return { status, snapshot };
+}
+"""
+
+FLIPSTAGE_DECKSETUP_IMPORT = """\
+import * as ImagePicker from 'expo-image-picker';
+import { Alert, Linking, Pressable } from 'react-native';
+
+export function DeckSetup({ onImport }) {
+  const importPhotos = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert(
+        'Photos access needed',
+        'FlipStage needs access to your photo library to import slides.',
+        [
+          { text: 'Not now', style: 'cancel' },
+          { text: 'Open Settings', onPress: () => Linking.openSettings() },
+        ]
+      );
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true });
+    onImport(result.assets);
+  };
+
+  return <Pressable onPress={importPhotos}><Text>Import</Text></Pressable>;
+}
+"""
+
+NEARVO_DECLARED_UNUSED_CONFIG = """\
+export const config = {
+  ios: {
+    infoPlist: {
+      // ITMS-90683 statically scans every transitive dependency for API
+      // usage; expo-image-picker and expo-secure-store reference the
+      // Camera/FaceID APIs even though this app's own code never calls
+      // them, and Apple's static scan does not know the difference.
+      // Removing these strings fails the upload, not the review.
+      NSCameraUsageDescription: 'Not used by this app directly.',
+      NSFaceIDUsageDescription: 'Not used by this app directly.',
+    },
+  },
+};
+"""
+
+MOUNT_EFFECT_WITH_REAL_DEPS = """\
+import { useEffect } from 'react';
+import * as Location from 'expo-location';
+
+export function useLocationOnRefresh(refreshToken) {
+  useEffect(() => {
+    Location.requestForegroundPermissionsAsync();
+  }, [refreshToken]);
+}
+"""
+
+NOTIF_PERMISSION_NO_SCHEDULE = """\
+import * as Notifications from 'expo-notifications';
+
+export async function askForPermission() {
+  await Notifications.requestPermissionsAsync();
+}
+"""
+
+NOTIF_PERMISSION_WITH_SCHEDULE = """\
+import * as Notifications from 'expo-notifications';
+
+export async function askForPermission() {
+  await Notifications.requestPermissionsAsync();
+}
+
+export async function remind() {
+  await Notifications.scheduleNotificationAsync({
+    content: { title: 'Reminder' }, trigger: null,
+  });
+}
+"""
+
+
+def run_permission_hygiene_checks():
+    fails = []
+    print("\nPermission-request hygiene (2026-10 rejection cause: a sensitive "
+          "permission requested unconditionally on mount, or requested and "
+          "never followed through)")
+
+    cases = [
+        ("real TentClock pre-fix code (commit f9d11cf~1): "
+         "requestForegroundPermissionsAsync inside a mount-only useEffect "
+         "-> must fire",
+         TENTCLOCK_PREFIX_USEWEATHER, "PERM-REQUEST-ON-MOUNT", True),
+
+        ("real FlipStage code: requestMediaLibraryPermissionsAsync inside a "
+         "plain async function wired to onPress -- must NOT fire",
+         FLIPSTAGE_DECKSETUP_IMPORT, "PERM-REQUEST-ON-MOUNT", False),
+
+        ("Nearvo's documented shape: a usage string declared for a library "
+         "that statically references the API, with NO call site at all -- "
+         "must NOT fire (nothing to find the timing of)",
+         NEARVO_DECLARED_UNUSED_CONFIG, "PERM-REQUEST-ON-MOUNT", False),
+
+        ("a permission request inside a useEffect with a REAL (non-empty) "
+         "dependency array -- not the unconditional-on-mount shape -- must "
+         "NOT fire",
+         MOUNT_EFFECT_WITH_REAL_DEPS, "PERM-REQUEST-ON-MOUNT", False),
+
+        ("notification permission requested, no scheduling call anywhere "
+         "(MileTruth's shape per claim-truth-2026-10-13.md) -> must fire",
+         NOTIF_PERMISSION_NO_SCHEDULE, "NOTIF-PERMISSION-NEVER-SCHEDULED", True),
+
+        ("notification permission requested AND a real scheduleNotificationAsync "
+         "call exists -- must NOT fire",
+         NOTIF_PERMISSION_WITH_SCHEDULE, "NOTIF-PERMISSION-NEVER-SCHEDULED", False),
+    ]
+    for desc, src, fid, must_fire in cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, "src/lib/feature.ts", src)
+            s = scan.Scan(tmp)
+            s.check_permission_request_hygiene()
+            ids = {f["id"] for f in s.findings}
+        fired = fid in ids
+        if fired == must_fire:
+            print("  ok     %s" % desc)
+        else:
+            want = "to fire" if must_fire else "NOT to fire"
+            print("  FAIL   %s (expected %s -> %s, got ids=%s)"
+                  % (desc, fid, want, sorted(ids)))
+            fails.append("permission-hygiene: " + desc)
+
+    # Real-world validation, not a synthetic fixture: run the actual checker
+    # against the actual repos at their actual commits, read-only.
+    real_cases = [
+        ("/Users/ryan/iphone-duo/TentClock", False, "TentClock, current (post-fix)"),
+        ("/Users/ryan/iphone-duo/FlipStage", False, "FlipStage, current (the control that passed)"),
+    ]
+    for path, want_hit, label in real_cases:
+        if not os.path.isdir(path):
+            print("  skip   %s (repo not present on this machine)" % label)
+            continue
+        s = scan.Scan(path)
+        hit = s._find_permission_request_in_mount_effect()
+        got_hit = hit is not None
+        if got_hit == want_hit:
+            print("  ok     %s: mount-effect permission check %s"
+                  % (label, "fired" if got_hit else "silent"))
+        else:
+            print("  FAIL   %s: expected %s, got %r"
+                  % (label, "a hit" if want_hit else "no hit", hit))
+            fails.append("permission-hygiene real-world: " + label)
+    return fails
+
+
 # Listing-vs-binary claim checks (2026-10-13): derived from the 2026-10
 # rejection batch, where 4 of 9 apps were rejected for a shape no earlier
 # check here looked for -- the LISTING or the App Review notes promise a
@@ -990,6 +1188,7 @@ def main():
     fails += run_bare_rn_checks()
     fails += run_clean_checks()
     fails += run_privacy_manifest_config_checks()
+    fails += run_permission_hygiene_checks()
     fails += run_listing_claim_checks()
 
     print("\n%d findings, %d passes, %d gaps"

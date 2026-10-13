@@ -1220,6 +1220,181 @@ class Scan:
                          confidence="medium",
                          corpus="apple/asrg.sections/5.1.1v.md")
 
+    # ------------------------------------------- permission-request hygiene
+    # 2026-10-13: a worker diffed the one rejected app against its sibling
+    # that passed in the same review window (FlipStage cleared review 81
+    # seconds after TentClock, off the same scaffold) and found exactly one
+    # hard behavioural difference between them: TentClock called
+    # `Location.requestForegroundPermissionsAsync()` unconditionally inside
+    # a mount-time `useEffect(() => {...}, [])`, so the first thing the app
+    # ever did was put up a system permission dialog before the user had
+    # touched anything, for an optional one-line temperature readout.
+    # FlipStage requests its own permission (photo library) from inside a
+    # tap handler and explains itself first. Guideline 5.1.1(ii)/(iii):
+    # purpose strings must describe the use, and apps "should only request
+    # access to data relevant to the core functionality" -- in context, not
+    # ambushed on first render. See `reports/rejections-2026-10-10-
+    # analysis.md` §2.2 and the fix at TentClock commit f9d11cf.
+    #
+    # PERMISSION_REQUEST_PATTERN matches the SDK-call shape regardless of
+    # which permission: expo-location's request(Foreground|Background)
+    # PermissionsAsync, expo-notifications'/most libraries' bare
+    # requestPermissionsAsync, expo-image-picker's requestCameraPermissionsAsync/
+    # requestMediaLibraryPermissionsAsync, expo-av's/expo-camera's
+    # microphone variants, expo-contacts, and
+    # requestTrackingPermissionsAsync (ATT) all share the same
+    # `request<Noun>PermissionsAsync(` shape.
+    PERMISSION_REQUEST_PATTERN = r"\brequest\w*Permissions?Async\s*\("
+
+    NOTIF_PERMISSION_REQUEST_PATTERN = (
+        r"Notifications\.requestPermissionsAsync\s*\("
+        r"|requestNotificationPermissionsAsync\s*\("
+        r"|PushNotificationIOS\.requestPermissions\s*\("
+        r"|messaging\(\)\.requestPermission\s*\(")
+
+    def _find_permission_request_in_mount_effect(self):
+        """Returns (relpath, line_number, matched_call) for the first
+        sensitive permission request found textually inside a `useEffect`
+        whose dependency array is the literal empty `[]` -- React's
+        "run once, unconditionally, on mount" shape -- or None.
+
+        No AST here (standard library only, same constraint as
+        grep_source), so this finds the matching close-paren of the
+        `useEffect(...)` call by counting ONLY parenthesis depth from the
+        opening `useEffect(`. That is exact for any well-formed JS/TS
+        *unless* a string literal, template literal or comment inside the
+        body contains an unbalanced '(' or ')' -- e.g. a purpose-string
+        comment reading "the user's location (approximate)" would not
+        break it (balanced), but a stray unmatched paren inside a string
+        could misplace the boundary. A miss in that direction is a false
+        negative, not a false positive: the worst case is this check stays
+        silent on a file it got confused by, never that it invents a
+        mount-time call that is not really there. Bounded to a generous
+        12000-character window per `useEffect(` so one huge minified file
+        cannot make this pathological.
+        """
+        rx_effect = re.compile(r"useEffect\s*\(")
+        rx_empty_deps = re.compile(r",\s*\[\s*\]\s*\)\s*;?\s*$")
+        rx_perm = re.compile(self.PERMISSION_REQUEST_PATTERN)
+        roots = [self.p(d) for d in ("app", "src", "components", "screens", "lib", "features")]
+        roots = [r for r in roots if os.path.isdir(r)] or [self.root]
+        checked = 0
+        for root in roots:
+            for dirpath, dirs, files in os.walk(root):
+                dirs[:] = [d for d in dirs if d not in
+                           ("node_modules", ".git", "ios", "android", ".expo", "build", "dist")]
+                for fn in files:
+                    if not fn.endswith((".ts", ".tsx", ".js", ".jsx")):
+                        continue
+                    checked += 1
+                    if checked > 4000:
+                        return None
+                    full = os.path.join(dirpath, fn)
+                    try:
+                        with open(full, encoding="utf-8", errors="ignore") as f:
+                            content = f.read(4 * 1024 * 1024)
+                    except OSError:
+                        continue
+                    for m in rx_effect.finditer(content):
+                        start = m.end() - 1          # the "(" of useEffect(
+                        depth, i, n = 0, start, min(len(content), start + 12000)
+                        end = None
+                        while i < n:
+                            ch = content[i]
+                            if ch == "(":
+                                depth += 1
+                            elif ch == ")":
+                                depth -= 1
+                                if depth == 0:
+                                    end = i
+                                    break
+                            i += 1
+                        if end is None:
+                            continue
+                        body = content[start:end + 1]
+                        if not rx_empty_deps.search(body):
+                            continue                  # has real deps, or not a literal []
+                        pm = rx_perm.search(body)
+                        if not pm:
+                            continue
+                        line = content.count("\n", 0, start) + 1
+                        return (os.path.relpath(full, self.root), line, pm.group(0))
+        return None
+
+    def check_permission_request_hygiene(self):
+        hit = self._find_permission_request_in_mount_effect()
+        if hit:
+            relpath, line, call = hit
+            self.add("PERM-REQUEST-ON-MOUNT", "high",
+                     "A sensitive permission is requested unconditionally on "
+                     "mount, before the user has done anything",
+                     clause="5.1.1",
+                     evidence="%s:%d calls %s inside a useEffect with an empty "
+                              "dependency array ([]) -- the 'run once, "
+                              "unconditionally, on mount' shape. That puts a "
+                              "system permission dialog up before the user has "
+                              "touched anything or been told why. This is the "
+                              "one confirmed hard behavioural difference "
+                              "between TentClock (rejected) and FlipStage "
+                              "(passed, same review window, 81 seconds apart): "
+                              "FlipStage requests its own permission from "
+                              "inside a tap handler and explains itself first."
+                              % (relpath, line, call),
+                     fix="Move the request behind a deliberate user action -- a "
+                         "tap on the control that needs it, with copy "
+                         "explaining why, same as a share-sheet or a picker "
+                         "would. On mount, only READ the permission state you "
+                         "already hold (getForegroundPermissionsAsync() or "
+                         "equivalent, which shows no dialog) so a returning "
+                         "user who already granted it needs no second tap.",
+                     confidence="medium",
+                     corpus="apple/asrg.sections/5.1.1.md")
+        else:
+            self.passes.append(dict(
+                title="No sensitive permission requested unconditionally on "
+                      "mount",
+                clause="5.1.1",
+                note="Checked every useEffect with an empty dependency array "
+                     "for a request<Noun>PermissionsAsync call -- none found."))
+
+        notif_req = self.grep_source(self.NOTIF_PERMISSION_REQUEST_PATTERN)
+        if notif_req:
+            notify_entry = next(
+                (c for c in (self.map.get("listing_claims", {}).get("claims") or [])
+                 if c.get("id") == "notifications"), None)
+            schedule_pattern = (notify_entry or {}).get("requires")
+            if schedule_pattern and self.grep_source(schedule_pattern) is None:
+                self.add("NOTIF-PERMISSION-NEVER-SCHEDULED", "high",
+                         "Notification permission is requested, but nothing in "
+                         "source ever schedules or sends one",
+                         clause="2.1",
+                         evidence="%s shows a notification permission request, "
+                                  "but ShipCheck found no "
+                                  "scheduleNotificationAsync/"
+                                  "sendPushNotificationsAsync/addNotification"
+                                  "ReceivedListener-style call anywhere in "
+                                  "app/src. Same shape MileTruth was rejected "
+                                  "for: a real OS permission prompt for a "
+                                  "feature that does not exist -- the "
+                                  "onboarding screen asks, and nothing ever "
+                                  "follows through." % notif_req,
+                         fix="Either wire up the actual scheduling/sending call "
+                             "the permission prompt implies, or remove the "
+                             "prompt. Asking a user to grant a permission the "
+                             "app never uses is dead weight at best and a "
+                             "2.1-shaped defect at worst -- a reviewer who "
+                             "grants it and waits for a notification that "
+                             "never comes has a concrete basis to reject.",
+                         confidence="medium",
+                         corpus="apple/asrg.sections/2.1.md")
+            elif schedule_pattern:
+                self.passes.append(dict(
+                    title="Notification permission request is backed by a "
+                          "real schedule/send call",
+                    clause="2.1",
+                    note="A notification permission request and a real "
+                         "scheduling/sending call were both found in source."))
+
     # ---------------------------------------------- listing-vs-binary claims
     # Derived directly from the 2026-10 rejection batch: 4 of 9 apps were
     # rejected for a shape no earlier check here looked for at all -- the
@@ -1793,6 +1968,7 @@ class Scan:
             self.check_account_deletion(deps)
             self.check_submission_structure(deps, md)
             self.check_accounts_reconcile(md)
+            self.check_permission_request_hygiene()
             self.check_listing_claims(md)
             self.check_review_notes_claims(md)
             self.check_listing_url_content(md)

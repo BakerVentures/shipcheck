@@ -1,6 +1,6 @@
 # ShipCheck Privacy Policy
 
-**Last updated: 13 October 2026.** Applies to ShipCheck v0.2.18.
+**Last updated: 13 October 2026.** Applies to ShipCheck v0.2.19.
 
 ShipCheck is operated by **Baker Ventures LLC**. Questions, deletion requests, or
 anything else about this page: **rsb.baker+shipcheck@gmail.com**.
@@ -117,7 +117,7 @@ to the validation endpoint. The complete request body is:
 | Field | Value |
 |---|---|
 | `license_key` | The key you bought. |
-| `plugin_version` | A version string, e.g. `0.2.18`. |
+| `plugin_version` | A version string, e.g. `0.2.19`. |
 | `app_token` | Optional. `sha256(license_key + ":" + bundle_id)`, truncated to 32 hex characters, computed **on your machine**. Omitted when the project has no bundle identifier. |
 
 That is the entire body. No project path, no repository name, no dependency list, no
