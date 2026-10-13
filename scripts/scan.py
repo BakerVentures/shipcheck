@@ -15,6 +15,7 @@ import argparse
 import json
 import os
 import plistlib
+import posixpath
 import re
 import subprocess
 import sys
@@ -1481,6 +1482,21 @@ class Scan:
     # in "requires" is absent either way -- so both raise the same
     # CLAIM-UNBACKED-<id> finding rather than a false claim of precision
     # this scanner cannot back up.
+    # "No location, camera or Apple Health access." is a statement that the
+    # capability is ABSENT; flagging it as an unbacked claim is a false
+    # positive (PlateRamp, Slowbend). Negation must sit in the same sentence
+    # and within ~12 words before the capability phrase.
+    _NEGATION = re.compile(
+        r"\b(?:no|never|without|not|none|nor|neither|zero|"
+        r"doesn't|does not|don't|do not|won't|will not|isn't|is not|aren't|are not|"
+        r"can't|cannot|can not|nothing)\b", re.I)
+
+    @classmethod
+    def _is_negated(cls, text, start):
+        sent = re.split(r"[.!?;\n]|\s[-\u2013\u2014]\s|\bbut\b", text[:start], flags=re.I)[-1]
+        sent = sent.replace("\u2019", "'")
+        return bool(cls._NEGATION.search(" ".join(sent.split()[-12:])))
+
     def check_listing_claims(self, md):
         md = md or {}
         listing_text = " ".join(md.get(f, "") for f in
@@ -1498,7 +1514,8 @@ class Scan:
         if not listing_text.strip():
             return
         for c in (self.map.get("listing_claims", {}).get("claims") or []):
-            m = re.search(c["claim"], listing_text, re.I)
+            m = next((x for x in re.finditer(c["claim"], listing_text, re.I)
+                      if not self._is_negated(listing_text, x.start())), None)
             if not m:
                 continue
             if self.grep_source(c["requires"]) is not None:
@@ -1563,6 +1580,24 @@ class Scan:
     _LISTING_FIELDS = ("subtitle", "short description", "description",
                        "promotional text", "what's new", "screenshot descriptions")
 
+    _JS_EXTS = (".ts", ".tsx", ".js", ".jsx")
+    # One pass: string literals are matched first (and kept verbatim) so a
+    # "//" or "/*" inside a string is not mistaken for a comment; otherwise
+    # block and line comments are dropped. "://" is skipped so a URL in
+    # unquoted JSX text is not cut off. Regex literals containing quotes can
+    # confuse this; the failure mode is a comment being left in (kept),
+    # never code being removed.
+    _COMMENT_RX = re.compile(
+        r"""("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`)"""
+        r"""|/\*.*?\*/|(?<!:)//[^\n]*""", re.S)
+
+    @classmethod
+    def strip_js_comments(cls, text):
+        """JS/TS source with // line and /* block */ comments removed, so a
+        word that only appears in a comment ("never behind a paywall") is
+        not treated as a code signal."""
+        return cls._COMMENT_RX.sub(lambda m: m.group(1) or " ", text)
+
     def _read_sources(self, exts=(".ts", ".tsx", ".js", ".jsx", ".json"),
                       extra_roots=()):
         """[(relpath, text)] for source files, cached. package-lock/app.json
@@ -1589,8 +1624,10 @@ class Scan:
                         break
                     try:
                         with open(full, encoding="utf-8", errors="ignore") as f:
-                            out.append((os.path.relpath(full, self.root),
-                                        f.read(1024 * 1024)))
+                            body = f.read(1024 * 1024)
+                        if fn.endswith(self._JS_EXTS):
+                            body = self.strip_js_comments(body)
+                        out.append((os.path.relpath(full, self.root), body))
                     except OSError:
                         pass
         cache[key] = out
@@ -1740,18 +1777,90 @@ class Scan:
                      fix="Either build the free tier or delete the free-tier wording.",
                      confidence="medium", corpus="apple/asrg.sections/2.3.1.md")
         elif strong:
-            sells = (self._find_in_sources(self.IAP_CALL_PATTERN, shipping_only=True)
-                     or self._find_in_sources(self.SOURCE_PURCHASE_SIGNAL, shipping_only=True))
-            if sells:
+            level, sells, why = self._purchase_reachability()
+            if level:
                 self.add("PROMISE-FREE-BUT-SELLS", "high",
                          "The listing says the app is free of purchases, but the "
                          "source sells something",
                          clause="3.1.2",
-                         evidence='Listing says "%s" but a purchase/paywall shape '
-                                  'exists in %s.' % (strong.group(0), sells),
+                         evidence='Listing says "%s" but %s (%s).'
+                                  % (strong.group(0), why, sells),
                          fix="Reword the listing to disclose the paid tier, or remove "
                              "the purchase code.",
-                         confidence="medium", corpus="apple/asrg.sections/3.1.2.md")
+                         confidence="medium" if level == "reachable" else "low",
+                         corpus="apple/asrg.sections/3.1.2.md")
+
+    # Purchase calls that mean something is actually being offered for sale.
+    # Deliberately excludes Purchases.configure(): configuring an SDK sells
+    # nothing, and a configure-only wrapper is the MileTruth false positive.
+    _SELL_CALL = re.compile(
+        r"\.purchasePackage\s*\(|\.purchaseProduct\s*\(|\.purchaseDiscountedPackage\s*\("
+        r"|\.getOfferings\s*\(|\brequestPurchase\s*\(|\brequestSubscription\s*\("
+        r"|\bpurchaseItemAsync\s*\(|\bgetProductsAsync\s*\(|\bpresentPaymentSheet\b"
+        r"|\bconfirmPayment\b|checkout\.stripe\.com|\bSKPaymentQueue\b", re.I)
+    _EXTRA_SELL_SDKS = ("@stripe/stripe-react-native", "react-native-purchases-ui",
+                        "react-native-adapty", "react-native-qonversion",
+                        "expo-iap", "react-native-iap")
+    _IMPORT_RX = re.compile(
+        r"""(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)['"]([^'"]+)['"]""")
+
+    def _resolve_import(self, from_rel, spec, known):
+        cands = []
+        if spec.startswith("."):
+            cands.append(posixpath.normpath(posixpath.join(posixpath.dirname(from_rel), spec)))
+        elif spec.startswith(("@/", "~/")):
+            cands += [posixpath.join("src", spec[2:]), spec[2:]]
+        else:
+            return None
+        for c in cands:
+            for suf in ("", ".ts", ".tsx", ".js", ".jsx",
+                        "/index.ts", "/index.tsx", "/index.js", "/index.jsx"):
+                if c + suf in known:
+                    return c + suf
+        return None
+
+    def _purchase_reachability(self):
+        """(level, path, why). level is "reachable" (an IAP/purchases SDK is a
+        dependency AND a purchase call is reachable from a routed screen),
+        "uncertain" (SDK and a purchase call exist but routing cannot be
+        established, e.g. not expo-router), or None (no SDK, no purchase call,
+        or the call is only in files no route imports -- dormant code)."""
+        try:
+            pkg = json.loads(self.read("package.json") or "{}")
+        except (ValueError, TypeError):
+            pkg = {}
+        deps = set((pkg.get("dependencies") or {}).keys())
+        sdks = {p for p in deps if "subscription-terms" in
+                ((self.map["packages"].get(p) or {}).get("triggers") or [])}
+        sdks |= deps & set(self._EXTRA_SELL_SDKS)
+        if not sdks:
+            return None, None, None
+        files = {rel: txt for rel, txt in self._read_sources(exts=self._JS_EXTS)
+                 if not self._NON_SHIPPING_PATH.search("/" + rel)}
+        callers = sorted(r for r, t in files.items() if self._SELL_CALL.search(t))
+        if not callers:
+            return None, None, None
+        route_dirs = [d for d in ("app/", "src/app/") if any(r.startswith(d) for r in files)]
+        if "expo-router" in deps and route_dirs:
+            seen = {r for r in files if r.startswith(tuple(route_dirs))}
+            todo = list(seen)
+            while todo:
+                cur = todo.pop()
+                for spec in self._IMPORT_RX.findall(files[cur]):
+                    nxt = self._resolve_import(cur, spec, files)
+                    if nxt and nxt not in seen:
+                        seen.add(nxt)
+                        todo.append(nxt)
+            hit = [r for r in callers if r in seen]
+            if hit:
+                return ("reachable", hit[0],
+                        "%s is a dependency and a purchase call is reachable from a routed screen"
+                        % ", ".join(sorted(sdks)))
+            return None, None, None
+        return ("uncertain", callers[0],
+                "%s is a dependency and a purchase call exists, but routing could not "
+                "be established (not expo-router), so reachability is unconfirmed"
+                % ", ".join(sorted(sdks)))
 
     # ---- lifetime / price (3.1.2, 2.3.1): Nearvo
     def _promise_price(self, listing, subs):
@@ -2246,7 +2355,10 @@ class Scan:
                             # than a few hundred KB; 4 MB is generous headroom
                             # for a real file and a hard stop for a maliciously
                             # huge one committed to a PR this scans in CI.
-                            if rx.search(f.read(4 * 1024 * 1024)):
+                            body = f.read(4 * 1024 * 1024)
+                            if fn.endswith(self._JS_EXTS):
+                                body = self.strip_js_comments(body)
+                            if rx.search(body):
                                 return os.path.relpath(os.path.join(dirpath, fn), self.root)
                     except OSError:
                         pass

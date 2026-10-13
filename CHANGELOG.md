@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.2.22: five false positives from the 27-app portfolio sweep (2026-10-13)
+
+The sweep found 0 true positives and 5 false positives; fixed at the cause.
+
+- Comments no longer count. JS/TS `//` and `/* */` comments are stripped before any
+  source search, so "never behind a paywall" in a comment is not a paywall signal
+  (Stillmoor; it also cleared a comment-driven `IAP-ATTACH-SUBMISSION`).
+- `PROMISE-FREE-BUT-SELLS` now needs an IAP/purchases SDK in `dependencies` AND a
+  purchase call (purchasePackage, getOfferings, requestPurchase, Stripe sheet, ...)
+  reachable from a routed screen: for expo-router, files under `app/` or `src/app/`
+  plus anything they import. `Purchases.configure()` alone is not a sale. A dormant
+  `pricing.ts` or unrouted `PaywallScreen` with no SDK (DenialDesk) or an unreached
+  wrapper (MileTruth) no longer fires. Where routing cannot be established (not
+  expo-router) it still fires but at `low` confidence instead of `medium`.
+- `CLAIM-UNBACKED-*` skips a capability phrase when no/never/without/not/doesn't
+  precedes it in the same sentence (PlateRamp, Slowbend). A separate un-negated
+  mention still fires.
+- Selftest: 104 -> 122 offline checks. The old MileTruth positive (a bare
+  `Purchases.configure` file, no package.json) was replaced by three reachable-paywall
+  positives, since that shape is exactly what is now suppressed.
+
 ## v0.2.21: specific promises, checked one at a time (2026-10-13)
 
 v0.2.18's `CLAIM-UNBACKED-*` asks "does the code contain any implementation of

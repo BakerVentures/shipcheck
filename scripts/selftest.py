@@ -1270,10 +1270,46 @@ def run_concrete_promise_checks():
          {"review notes": "Subscribe to Annual to start the 14-day free trial.",
           "subscriptions": "yes\n- Annual: $49.99/yr, 14-day free trial\n- Monthly: $7.99/mo, no trial"},
          "PROMISE-TRIAL-UNBACKED", False),
-        ("MileTruth (found by running this on the real repo): 'no in-app purchases' but a RevenueCat paywall ships",
-         {"src/lib/purchases.ts": "import Purchases from 'react-native-purchases';\nPurchases.configure({apiKey:'k'});\n"},
+        ("POS: 'no in-app purchases' listing but a REAL reachable paywall (expo-router screen imports a component that calls purchasePackage)",
+         {"package.json": '{"dependencies":{"expo-router":"*","react-native-purchases":"*"}}',
+          "src/app/paywall.tsx": "import {Buy} from '../components/Buy';\nexport default function P(){return <Buy/>;}\n",
+          "src/components/Buy.tsx": "import Purchases from 'react-native-purchases';\nexport const Buy=()=>{Purchases.purchasePackage(p);return null;};\n"},
          {"description": "Log your drives -- no in-app purchases, nothing to buy."},
          "PROMISE-FREE-BUT-SELLS", True),
+        ("POS: same, purchase call directly inside a routed file under app/",
+         {"package.json": '{"dependencies":{"expo-router":"*","react-native-purchases":"*"}}',
+          "app/upgrade.tsx": "import Purchases from 'react-native-purchases';\nexport default ()=>{Purchases.getOfferings();return null;};\n"},
+         {"description": "Completely free."},
+         "PROMISE-FREE-BUT-SELLS", True),
+        ("POS (low confidence): not expo-router, so reachability is uncertain but SDK + purchase call exist",
+         {"package.json": '{"dependencies":{"react-native-purchases":"*"}}',
+          "src/Paywall.tsx": "import Purchases from 'react-native-purchases';\nPurchases.purchasePackage(p);\n"},
+         {"description": "No in-app purchases."},
+         "PROMISE-FREE-BUT-SELLS", True),
+        ("NEG (DenialDesk): 'No subscription'; dormant pricing.ts + unrouted PaywallScreen, no IAP SDK",
+         {"package.json": '{"dependencies":{"expo-router":"*"}}',
+          "src/app/_layout.tsx": "export default function L(){return null;}\n",
+          "src/monetization/pricing.ts": "export const planned = {monthly: 9.99, label: 'Upgrade to Pro'};\n",
+          "src/screens/PaywallScreen.tsx": "import {planned} from '../monetization/pricing';\nexport const PaywallScreen=()=> <Text>Subscribe now - restore purchases</Text>;\n"},
+         {"description": "Free to use. No subscription."},
+         "PROMISE-FREE-BUT-SELLS", False),
+        ("NEG (Stillmoor): the word paywall appears only in comments of the crisis-support screen",
+         {"package.json": '{"dependencies":{"expo-router":"*","react-native-purchases":"*"}}',
+          "src/app/support.tsx": "// Crisis support is never behind a paywall.\n/* paywall: never. Upgrade to Pro does not apply here */\nexport default function S(){return null;}\n"},
+         {"description": "No subscription, no paywall. Crisis support is always free."},
+         "PROMISE-FREE-BUT-SELLS", False),
+        ("NEG (MileTruth): react-native-purchases wrapper that no routed screen reaches",
+         {"package.json": '{"dependencies":{"expo-router":"*","react-native-purchases":"*"}}',
+          "src/app/index.tsx": "export default function H(){return null;}\n",
+          "src/lib/purchases.ts": "import Purchases from 'react-native-purchases';\nexport function configurePurchases(){const k=process.env.KEY;if(!k)return;Purchases.configure({apiKey:k});}\nexport const buy=(p)=>Purchases.purchasePackage(p);\n"},
+         {"description": "Log your drives -- no in-app purchases, nothing to buy."},
+         "PROMISE-FREE-BUT-SELLS", False),
+        ("NEG (MileTruth): routed screen only configures the SDK (nothing is offered)",
+         {"package.json": '{"dependencies":{"expo-router":"*","react-native-purchases":"*"}}',
+          "src/app/_layout.tsx": "import {configurePurchases} from '../lib/purchases';\nconfigurePurchases();\nexport default function L(){return null;}\n",
+          "src/lib/purchases.ts": "import Purchases from 'react-native-purchases';\nexport function configurePurchases(){Purchases.configure({apiKey:'k'});}\n"},
+         {"description": "No in-app purchases."},
+         "PROMISE-FREE-BUT-SELLS", False),
         ("NEG: 'no free trial' wording and an honestly free app with no purchase code",
          {"src/app.ts": "export const x = 1;\n"},
          {"description": "Completely free. There is no free trial because nothing is paid."},
@@ -1295,6 +1331,75 @@ def run_concrete_promise_checks():
             print("  FAIL   %s (want %s %s, got ids=%s)"
                   % (desc, fid, "to fire" if must_fire else "NOT to fire", sorted(ids)))
             fails.append("concrete-promises: " + desc)
+    # confidence: reachable -> medium; uncertain routing -> low
+    for desc, files, want in (
+            ("confidence is medium when reachability is confirmed",
+             {"package.json": '{"dependencies":{"expo-router":"*","react-native-purchases":"*"}}', "app/u.tsx": "Purchases.getOfferings();\n"}, "medium"),
+            ("confidence is LOW when reachability is uncertain",
+             {"package.json": '{"dependencies":{"react-native-purchases":"*"}}',
+              "src/P.tsx": "Purchases.getOfferings();\n"}, "low")):
+        with tempfile.TemporaryDirectory() as tmp:
+            for rel, content in files.items():
+                _write(tmp, rel, content)
+            s = scan.Scan(tmp)
+            s.check_concrete_promises({"description": "No in-app purchases."})
+            got = [f["confidence"] for f in s.findings if f["id"] == "PROMISE-FREE-BUT-SELLS"]
+        if got == [want]:
+            print("  ok     " + desc)
+        else:
+            print("  FAIL   %s (got %s)" % (desc, got)); fails.append("concrete-promises: " + desc)
+    return fails
+
+
+def run_negated_claim_checks():
+    """CLAIM-UNBACKED-health-integration must not fire on a listing line that
+    says the app does NOT have the capability (PlateRamp, Slowbend)."""
+    fails = []
+    print("\nNegated capability claims (PlateRamp, Slowbend false positives)")
+    src = {"src/app.ts": "export const x = 1;\n"}
+    cases = [
+        ("NEG (PlateRamp): 'No location, camera, microphone, photo or Apple Health access.'",
+         "Private by design. No location, camera, microphone, photo or Apple Health access.", False),
+        ("NEG (Slowbend): 'no HealthKit entitlement' / 'does not read Apple Health'",
+         "Slowbend has no HealthKit entitlement and does not read Apple Health data.", False),
+        ("NEG: 'without Apple Health' / 'never syncs with Health'",
+         "Works without Apple Health. It never syncs to Health.", False),
+        ("POS: real unbacked claim still fires ('Syncs with Apple Health.')",
+         "Track your meals. Syncs with Apple Health.", True),
+        ("POS: negation in a DIFFERENT sentence does not suppress ('No ads. Syncs with Apple Health.')",
+         "No ads. Syncs with Apple Health.", True),
+        ("POS: one negated mention does not hide a separate positive one",
+         "No Apple Health access on the free tier. Pro syncs with Apple Health.", True),
+    ]
+    for desc, text, must_fire in cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            for rel, content in src.items():
+                _write(tmp, rel, content)
+            s = scan.Scan(tmp)
+            s.check_listing_claims({"description": text})
+            fired = any(f["id"] == "CLAIM-UNBACKED-health-integration" for f in s.findings)
+        if fired == must_fire:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s (fired=%s)" % (desc, fired)); fails.append("negated-claims: " + desc)
+    return fails
+
+
+def run_comment_strip_checks():
+    fails = []
+    print("\nJS comment stripping")
+    S = scan.Scan.strip_js_comments
+    cases = [
+        ("line comment removed", "a // paywall\nb", "paywall", False),
+        ("block comment removed", "a /* paywall\n more */ b", "paywall", False),
+        ("string containing // kept", "x = 'http://a//paywall'", "paywall", True),
+        ("code after a comment kept", "// c\nPurchases.purchasePackage(p)", "purchasePackage", True),
+    ]
+    for desc, src, needle, kept in cases:
+        if (needle in S(src)) == kept:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s" % desc); fails.append("comment-strip: " + desc)
     return fails
 
 
@@ -1363,6 +1468,8 @@ def main():
     fails += run_permission_hygiene_checks()
     fails += run_listing_claim_checks()
     fails += run_concrete_promise_checks()
+    fails += run_negated_claim_checks()
+    fails += run_comment_strip_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))
