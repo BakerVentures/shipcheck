@@ -1548,6 +1548,410 @@ class Scan:
                      fix=c["fix"],
                      corpus="apple/asrg.sections/2.1.md")
 
+    # ----------------------------------------------- concrete promises (v0.2.21)
+    # The capability table above answers "does the code contain ANY
+    # implementation of feature X". The 2026-10 batch also had promises that
+    # are specific enough to be checked against one named thing: a trial of
+    # N days, a lifetime price the app's own product allowlist refuses to
+    # sell, a button the review notes name, a list that is only populated
+    # for a developer who ran the screenshot seeder. Each detector below
+    # fires only when it can name the specific missing thing; a promise it
+    # cannot tie to one is left alone (no finding, no pass).
+    _NON_SHIPPING_PATH = re.compile(
+        r"screenshot|fixture|seed|mock|__tests__|\.test\.|\.spec\.|stories|"
+        r"storybook|e2e|/dev/|demo", re.I)
+    _LISTING_FIELDS = ("subtitle", "short description", "description",
+                       "promotional text", "what's new", "screenshot descriptions")
+
+    def _read_sources(self, exts=(".ts", ".tsx", ".js", ".jsx", ".json"),
+                      extra_roots=()):
+        """[(relpath, text)] for source files, cached. package-lock/app.json
+        style config is skipped for .json so only strings files remain."""
+        key = (tuple(exts), tuple(extra_roots))
+        cache = self.__dict__.setdefault("_src_cache", {})
+        if key in cache:
+            return cache[key]
+        out, seen = [], set()
+        for r in self._source_roots(extra_roots):
+            for dirpath, dirs, files in os.walk(r):
+                dirs[:] = [d for d in dirs if d not in
+                           ("node_modules", ".git", "ios", "android", ".expo",
+                            "build", "dist")]
+                for fn in files:
+                    if not fn.endswith(exts) or fn in ("package-lock.json",
+                                                       "package.json", "tsconfig.json"):
+                        continue
+                    full = os.path.join(dirpath, fn)
+                    if full in seen:
+                        continue
+                    seen.add(full)
+                    if len(out) >= 4000:
+                        break
+                    try:
+                        with open(full, encoding="utf-8", errors="ignore") as f:
+                            out.append((os.path.relpath(full, self.root),
+                                        f.read(1024 * 1024)))
+                    except OSError:
+                        pass
+        cache[key] = out
+        return out
+
+    @staticmethod
+    def _norm_text(t):
+        t = t.replace("’", "'").replace("‘", "'")
+        t = re.sub(r"[^a-z0-9]+", " ", t.lower())
+        return " " + t.strip() + " "
+
+    _TOOLING_PATH = re.compile(
+        r"screenshot|fixture|mock|__tests__|\.test\.|\.spec\.|stories|storybook|e2e", re.I)
+
+    def _find_in_sources(self, pattern, shipping_only=False, exts=None,
+                         extra_roots=(), skip=None):
+        rx = re.compile(pattern, re.I)
+        skip = self._NON_SHIPPING_PATH if shipping_only else skip
+        kw = {"extra_roots": extra_roots}
+        if exts:
+            kw["exts"] = exts
+        for rel, txt in self._read_sources(**kw):
+            if skip is not None and skip.search("/" + rel):
+                continue
+            if rx.search(txt):
+                return rel
+        return None
+
+    @staticmethod
+    def _days(n, unit):
+        return int(n) * {"day": 1, "week": 7, "month": 30}[unit.lower()]
+
+    TRIAL_CLAIM = re.compile(
+        r"(?<!no )(?<!without a )(?<!without )(?:"
+        r"(\d+)[- ]?(day|week|month)s?\s+(?:free\s+)?trial"
+        r"|(\d+)[- ]?(day|week|month)s?\s+free"
+        r"|free\s+(\d+)[- ]?(day|week|month)s?"
+        r"|try\s+(?:it\s+)?free\s+for\s+(\d+)[- ]?(day|week|month)s?"
+        r"|free\s+trial)", re.I)
+    TRIAL_NONE = re.compile(
+        r"no\s+(?:free\s+)?trial|without\s+a\s+(?:free\s+)?trial|trial\s*[:=-]\s*(?:none|no|n/a|0)\b"
+        r"|(?:free trial|introductory offers?)[^\n]{0,40}\b(?:none|zero|not offered|not configured)\b"
+        r"|\b(?:0|zero|no)\s+introductory\s+offers?", re.I)
+    TRIAL_CODE = (r"\bintro(?:ductory)?(?:Price|Offer|Period|Eligib)\w*|\bfree[_ ]?trial\b|\btrial(?:Period|Days|Duration|_days|_period)?\b"
+                  r"|PAYMENT_MODE_FREE_TRIAL|RevenueCatUI|PaywallView|presentPaywall")
+
+    def _claimed_trial(self, text):
+        """(days or None, matched text) for the first trial promise."""
+        for m in self.TRIAL_CLAIM.finditer(text):
+            g = m.groups()
+            for a, b in ((g[0], g[1]), (g[2], g[3]), (g[4], g[5]), (g[6], g[7])):
+                if a:
+                    return self._days(a, b), m.group(0)
+            return None, m.group(0)
+        return None, None
+
+    def check_concrete_promises(self, md):
+        md = md or {}
+        listing = re.sub(r"\s+", " ", " ".join(md.get(f, "") for f in self._LISTING_FIELDS))
+        notes = re.sub(r"\s+", " ", md.get("review notes", ""))
+        subs = re.sub(r"\s+", " ", " ".join((md.get("subscriptions", ""),
+                                             md.get("paywall", ""))))
+        promise_text = (listing + " " + notes).strip()
+        if not promise_text:
+            return
+        if not self._read_sources(extra_roots=("supabase", "server", "backend")):
+            return
+        self._promise_trial(listing, notes, subs)
+        self._promise_free(listing, subs)
+        self._promise_price(listing, subs)
+        self._promise_ui(listing, notes)
+        self._promise_populated(notes)
+        self._promise_persistence(listing)
+        self._promise_signin(notes, md.get("demo account", ""))
+
+    # ---- trials (3.1.2, 2.3.1): Rigsheet, FlirtGym
+    def _promise_trial(self, listing, notes, subs):
+        where = None
+        for label, txt in (("listing", listing), ("review notes", notes)):
+            days, quoted = self._claimed_trial(txt)
+            if quoted:
+                where = label
+                break
+        if not quoted:
+            return
+        sub_days, sub_quote = self._claimed_trial(subs) if subs else (None, None)
+        reason = None
+        if subs and self.TRIAL_NONE.search(subs) and not sub_days:
+            reason = ('shipcheck.metadata.md Subscriptions/Paywall says there is no '
+                      'trial / zero introductory offers')
+        elif days and sub_days and sub_days != days:
+            reason = ('Subscriptions/Paywall describes a %d-day trial ("%s"), not %d days'
+                      % (sub_days, sub_quote, days))
+        else:
+            src = self._find_in_sources(self.TRIAL_CODE, shipping_only=True)
+            if not src:
+                reason = ("no trial / introductory-offer / prebuilt-paywall shape "
+                          "anywhere in app source")
+            elif days:
+                lens = set()
+                for rel, txt in self._read_sources():
+                    if self._NON_SHIPPING_PATH.search("/" + rel):
+                        continue
+                    for m in re.finditer(
+                            r"(\d+)[- ]?(day|week|month)s?[- ]?(?:free[- ])?trial|"
+                            r"trial(?:Days|_days|Period\w*|Duration)\W{1,6}(\d+)|"
+                            r"\bP(\d+)D\b", txt, re.I):
+                        if m.group(1):
+                            lens.add(self._days(m.group(1), m.group(2)))
+                        elif m.group(3):
+                            lens.add(int(m.group(3)))
+                        elif m.group(4):
+                            lens.add(int(m.group(4)))
+                if lens and days not in lens:
+                    reason = ("source only ever states trial length(s) of %s day(s), "
+                              "not %d" % (", ".join(map(str, sorted(lens))), days))
+        if reason:
+            self.add("PROMISE-TRIAL-UNBACKED", "critical",
+                     'The %s promises a free trial the app does not offer' % where,
+                     clause="3.1.2",
+                     evidence='%s says "%s"; %s. A trial shown in copy but not '
+                              'configured as an introductory offer is a 3.1.2 / '
+                              '2.3.1 rejection (seen in Rigsheet: a 14-day trial in '
+                              'the listing, zero introductory offers; FlirtGym: '
+                              'trial lengths that did not exist).'
+                              % (where.capitalize(), quoted, reason),
+                     fix="Create the introductory offer in App Store Connect with "
+                         "the stated length, or remove the trial wording from the "
+                         "listing, notes and paywall.",
+                     confidence="medium", corpus="apple/asrg.sections/3.1.2.md")
+
+    # ---- "free" claims (2.3.1, 3.1.2): FlirtGym
+    def _promise_free(self, listing, subs):
+        strong = re.search(r"\b(?:completely|totally|100%|entirely)\s+free\b|\bfree forever\b|"
+                           r"\bno\s+(?:in-app\s+purchases|subscriptions?|paywall)\b", listing, re.I)
+        tier = re.search(r"\bfree\s+(?:plan|tier|version|access)\b|\b\d+\s+free\s+\w+(?:\s+\w+)?\s+"
+                         r"(?:per|a|each|every)\s+(?:day|week|month)\b", listing, re.I)
+        hard = re.search(r"hard\s+paywall|no\s+free\s+(?:tier|plan|version|access|usage)|"
+                         r"subscription\s+(?:is\s+)?required|must\s+subscribe", subs, re.I)
+        if tier and hard:
+            self.add("PROMISE-FREE-TIER-UNBACKED", "high",
+                     "The listing advertises a free tier the paywall does not have",
+                     clause="2.3.1",
+                     evidence='Listing says "%s"; shipcheck.metadata.md '
+                              'Subscriptions/Paywall says "%s".'
+                              % (tier.group(0), hard.group(0)),
+                     fix="Either build the free tier or delete the free-tier wording.",
+                     confidence="medium", corpus="apple/asrg.sections/2.3.1.md")
+        elif strong:
+            sells = (self._find_in_sources(self.IAP_CALL_PATTERN, shipping_only=True)
+                     or self._find_in_sources(self.SOURCE_PURCHASE_SIGNAL, shipping_only=True))
+            if sells:
+                self.add("PROMISE-FREE-BUT-SELLS", "high",
+                         "The listing says the app is free of purchases, but the "
+                         "source sells something",
+                         clause="3.1.2",
+                         evidence='Listing says "%s" but a purchase/paywall shape '
+                                  'exists in %s.' % (strong.group(0), sells),
+                         fix="Reword the listing to disclose the paid tier, or remove "
+                             "the purchase code.",
+                         confidence="medium", corpus="apple/asrg.sections/3.1.2.md")
+
+    # ---- lifetime / price (3.1.2, 2.3.1): Nearvo
+    def _promise_price(self, listing, subs):
+        life = re.search(r"\blifetime\s+(?:access|purchase|unlock|license|plan|pass|deal|"
+                         r"membership|price|upgrade)\b|\$\s?\d[\d.,]*\s*(?:one[- ]time|lifetime)"
+                         r"|\blifetime\s+\$\s?\d|\bone[- ]time\s+purchase\b|\bpay\s+once\b",
+                         listing, re.I)
+        if life:
+            ids = set()
+            for rel, txt in self._read_sources():
+                if self._NON_SHIPPING_PATH.search("/" + rel):
+                    continue
+                ids.update(re.findall(r"""['"]([\w.\-]*(?:lifetime|forever|one[_.-]?time)[\w.\-]*)['"]""",
+                                      txt, re.I))
+            allow_hits, allow_decl = set(), None
+            for rel, txt in self._read_sources():
+                if self._NON_SHIPPING_PATH.search("/" + rel):
+                    continue
+                for m in re.finditer(
+                        r"(?:allow(?:ed|list)\w*|sellable\w*|supported_(?:product|sku)\w*|"
+                        r"product_?ids|skus)\b[^=\n;]*=\s*(?:new\s+Set\(\s*)?\[(.*?)\]",
+                        txt, re.I | re.S):
+                    lits = re.findall(r"""['"]([^'"]+)['"]""", m.group(1))
+                    if lits:
+                        allow_decl = allow_decl or rel
+                        allow_hits.update(lits)
+            lifetime_re = re.compile(r"lifetime|forever|one[_.-]?time", re.I)
+            in_allow = any(lifetime_re.search(x) for x in allow_hits)
+            any_token = self._find_in_sources(r"lifetime", shipping_only=True)
+            why = None
+            if not any_token and not ids:
+                why = "no lifetime product / entitlement appears anywhere in source"
+            elif allow_decl and not in_allow:
+                why = ("the product allowlist in %s (%s) contains no lifetime product"
+                       % (allow_decl, ", ".join(sorted(allow_hits)[:6])))
+            if why:
+                self.add("PROMISE-LIFETIME-UNBACKED", "critical",
+                         "The listing advertises a lifetime / one-time purchase the "
+                         "app will not sell",
+                         clause="3.1.2",
+                         evidence='Listing says "%s", but %s. Same shape as Nearvo '
+                                  '(a $129.99 lifetime in the listing that the '
+                                  "app's own allowlist refuses to sell)." % (life.group(0), why),
+                         fix="Add the lifetime product to the allowlist and the paywall, "
+                             "or delete it from the listing.",
+                         confidence="medium", corpus="apple/asrg.sections/3.1.2.md")
+        if subs:
+            listed = {float(x.replace(",", "")) for x in re.findall(r"\$\s?(\d[\d,]*(?:\.\d{1,2})?)", subs)}
+            if listed:
+                for m in re.finditer(r"\$\s?(\d[\d,]*(?:\.\d{1,2})?)", listing):
+                    ctx = listing[max(0, m.start() - 40): m.end() + 40]
+                    if not re.search(r"lifetime|one[- ]time|forever|per\s+(?:month|year|week)|/\s*(?:mo|yr|month|year|week)|"
+                                     r"monthly|annual|yearly|weekly", ctx, re.I):
+                        continue
+                    if float(m.group(1).replace(",", "")) not in listed:
+                        self.add("PROMISE-PRICE-MISMATCH", "high",
+                                 "A price in the listing matches no product in the Subscriptions section",
+                                 clause="3.1.2",
+                                 evidence='Listing says "%s"; the Subscriptions/Paywall '
+                                          'section lists only %s.'
+                                          % (ctx.strip(), ", ".join("$%g" % x for x in sorted(listed))),
+                                 fix="Make the listing price match the product's actual price.",
+                                 confidence="medium", corpus="apple/asrg.sections/3.1.2.md")
+                        break
+
+    # ---- named buttons / screens in review notes (2.1): DenialDesk
+    _UI_VERBS = r"(?:tap|taps|press|click|select|choose|open|hit|go to|navigate to|switch to|toggle|enable|use|see|find|look for)\s+(?:on\s+)?(?:the\s+)?$"
+    _UI_NOUNS = r"^\s*(?:button|tab|screen|toggle|menu|link|option|section|page|switch|icon|card|field)\b"
+    def _promise_ui(self, listing, notes):
+        text = notes
+        if not text:
+            return
+        names = []
+        for m in re.finditer(r"""(?<![\w])(?:"([^"\n]{2,40})"|“([^”\n]{2,40})”|`([^`\n]{2,40})`|\*\*([^*\n]{2,40})\*\*|'([^'\n]{2,40})'(?![\w]))""", text):
+            name = next(g for g in m.groups() if g)
+            before, after = text[max(0, m.start() - 40): m.start()], text[m.end(): m.end() + 25]
+            if not (re.search(self._UI_VERBS, before, re.I) or re.search(self._UI_NOUNS, after, re.I)):
+                continue
+            if re.search(r"ios settings|settings app|app store|testflight", before + after, re.I):
+                continue
+            for part in re.split(r"\s*(?:>|→|›|/)\s*", name):
+                part = part.strip()
+                if len(part) >= 2 and len(part.split()) <= 6 and "@" not in part \
+                        and not re.search(r"https?:|password|\d{4,}", part, re.I):
+                    names.append(part)
+        if not names:
+            return
+        blob = []
+        for rel, txt in self._read_sources(exts=(".ts", ".tsx", ".js", ".jsx", ".json", ".strings", ".xml")):
+            if re.search(r"(?i)screenshot|fixture|mock|__tests__|\.test\.|\.spec\.", rel):
+                continue
+            blob.append(self._norm_text(re.sub(r"([a-z])([A-Z])", r"\1 \2", rel)))
+            blob.append(self._norm_text(txt))
+            blob.append(self._norm_text(re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", txt)))
+        blob = " ".join(blob)
+        missing, seen = [], set()
+        for n in names:
+            k = self._norm_text(n)
+            if k.strip() and k not in blob and k not in seen:
+                seen.add(k)
+                missing.append(n)
+        for n in missing:
+            slug = re.sub(r"[^a-z0-9]+", "-", n.lower()).strip("-")
+            self.add("PROMISE-UI-MISSING-%s" % slug, "high",
+                     'Review notes tell the reviewer to use "%s", which appears nowhere in the app' % n,
+                     clause="2.1",
+                     evidence='App Review notes name "%s" as a button/screen/option, but '
+                              "that text is not a string, label, route or filename "
+                              "anywhere in the shipping source (same shape as DenialDesk: "
+                              "notes named two buttons that do not exist)." % n,
+                     fix="Rewrite the notes to use the labels the build actually shows, "
+                         "or add the control. A reviewer who cannot find it files 2.1.",
+                     confidence="medium", corpus="apple/asrg.sections/2.1.md")
+
+    # ---- populated state the new user never sees (2.1): TentClock
+    def _promise_populated(self, notes):
+        if not notes:
+            return
+        m = re.search(r"already\s+(?:contains?|has|shows?|lists?|populated)|\bis\s+(?:already\s+)?populated"
+                      r"|\bpre-?existing\b|\bwill\s+(?:see|find)\s+(?:\d+|several|a\s+few|some|three|two|four|five)\s+\w+"
+                      r"|you(?:'|’)ll\s+(?:see|find)\s+(?:\d+|several|a\s+few|some|three|two|four|five)\s+\w+"
+                      r"|already\s+(?:set\s+up|created|there|listed)", notes, re.I)
+        if not m:
+            return
+        # the sample-data check above owns "seeded/sample" wording
+        for c in (self.map.get("review_notes_claims", {}).get("claims") or []):
+            if re.search(c["claim"], notes, re.I):
+                return
+        empty = self._find_in_sources(
+            r"ListEmptyComponent|\bno\s+\w+(?:\s+\w+)?\s+yet\b|empty[_ ]?state|nothing here yet|get started by adding|tap\s+\+?\s*to\s+add",
+            shipping_only=True)
+        if not empty:
+            return
+        seeded = (self._find_in_sources(
+            r"seedIfEmpty|seedDatabase|seedSampleData|SAMPLE_[A-Z_]+|DEMO_[A-Z_]+|onFirstLaunch|"
+            r"firstRun|hasSeeded|INSERT INTO|insertSample|bootstrapSampleData|defaultAlarms|DEFAULT_[A-Z_]+S\b",
+            skip=self._TOOLING_PATH, exts=(".ts", ".tsx", ".js", ".jsx", ".sql", ".py"),
+            extra_roots=("supabase", "server", "scripts", "db", "migrations", "backend")))
+        if seeded:
+            return
+        self.add("PROMISE-POPULATED-STATE", "high",
+                 "Review notes describe a populated screen, but a new user sees the empty state",
+                 clause="2.1",
+                 evidence='Review notes say "%s", yet %s renders an empty state and no '
+                          "first-run seeding exists anywhere (same shape as TentClock: "
+                          "notes promised a populated alarm list, a new user saw none)."
+                          % (notes[max(0, m.start() - 30): m.end() + 30].strip(), empty),
+                 fix="Seed first-run data the reviewer will see, or rewrite the notes to "
+                     "say the list starts empty and what to tap to add the first item.",
+                 confidence="medium", corpus="apple/asrg.sections/2.1.md")
+
+    # ---- saved-progress claims whose only writer is a dev/screenshot tool (2.3.1): Foldbook
+    def _promise_persistence(self, listing):
+        m = re.search(r"\b(?:saved?|remembers?|keeps?)\s+(?:your\s+)?(?:reading\s+)?(?:progress|place|position|bookmarks?)\b"
+                      r"|\bpick\s+up\s+where\s+you\s+left\s+off\b|\bresume\s+where\s+you\s+left\b"
+                      r"|\breading\s+progress\b", listing, re.I)
+        if not m:
+            return
+        write = (r"AsyncStorage\.(?:setItem|multiSet|mergeItem)|\bstorage\.set\w*\(|SecureStore\.setItemAsync|"
+                 r"\bMMKV\b|\.runAsync\(|\.execAsync\(|\.insert\(|\.upsert\(|\bpersist\(|createJSONStorage|"
+                 r"writeAsStringAsync|setDoc\(|addDoc\(|localStorage\.setItem|realm\.write|\.create\(\s*['\"]")
+        shipping = self._find_in_sources(write, shipping_only=True,
+                                         extra_roots=("supabase", "server", "backend"))
+        anywhere = self._find_in_sources(write)
+        if shipping:
+            return
+        if anywhere is None and self._find_in_sources(r"\bprogress\b", shipping_only=True) is None:
+            return  # nothing to tie it to; leave it to the capability table
+        self.add("PROMISE-PROGRESS-NO-WRITER", "high",
+                 "The listing promises saved progress, but no shipping code writes it",
+                 clause="2.3.1",
+                 evidence='Listing says "%s"; %s.' % (m.group(0), (
+                     "the only persistence writes are in %s, a screenshot/seed/dev file that "
+                     "is not part of the user flow (same shape as Foldbook)" % anywhere)
+                     if anywhere else "no storage/database write exists in shipping source"),
+                 fix="Write progress from the reader screen itself, or remove the promise.",
+                 confidence="medium", corpus="apple/asrg.sections/2.3.1.md")
+
+    # ---- sign in with a demo account when the app has no sign-in (2.1)
+    def _promise_signin(self, notes, demo):
+        txt = (notes + " " + re.sub(r"\s+", " ", demo or "")).strip()
+        if not txt or re.search(r"\bno\s+(?:login|log-in|sign[- ]?in|account)|not\s+required|n/a\b|"
+                                r"without\s+(?:an\s+)?(?:account|signing|login)", txt, re.I):
+            return
+        m = re.search(r"(?:sign|log)[ -]?in\s+(?:with|using|as)\b[^.]{0,60}|"
+                      r"(?:demo|test|sample|review)\s+(?:account|credentials|login)[^.]{0,60}?(?:password|@|username)",
+                      txt, re.I)
+        if not m or self.source_shows_auth():
+            return
+        if self._find_in_sources(self.SOURCE_AUTH_SIGNAL, extra_roots=("supabase", "server", "backend")):
+            return
+        self.add("PROMISE-SIGNIN-NO-AUTH", "high",
+                 "Review notes tell the reviewer to sign in, but the app has no sign-in",
+                 clause="2.1",
+                 evidence='Notes say "%s" but no sign-in/sign-up/auth shape exists in source.'
+                          % m.group(0).strip(),
+                 fix="Remove the sign-in instructions from the notes, or ship the account flow.",
+                 confidence="medium", corpus="apple/asrg.sections/2.1.md")
+
+
     def check_listing_url_content(self, md):
         """Apple 2.1(a): the pages the listing LINKS to, not just the
         listing's own text fields (check_metadata's PLACEHOLDER regex
@@ -1765,27 +2169,9 @@ class Scan:
                      "the page. Run /shipcheck:refresh and check that section.")
 
     # ------------------------------------------------------------- shared
-    def grep_source(self, pattern, exts=(".ts", ".tsx", ".js", ".jsx"), extra_roots=()):
-        # Returning bare None for both "searched everything, no match" and
-        # "gave up at the file cap, don't know" would be the same false-pass
-        # bug class this scanner has been fixed for repeatedly: a caller
-        # that treats None as a confirmed absence can end up asserting a
-        # CRITICAL from an incomplete search. Callers that need to tell the
-        # two apart check self.facts["grep_truncated"] for this pattern
-        # (the return value itself stays path-or-None for every existing
-        # caller -- see check_iap/check_account_deletion for the one shape
-        # where the difference actually changes a verdict).
-        #
-        # extra_roots: additional top-level directories to search, beyond the
-        # default client-code roots. Added for check_review_notes_claims
-        # (2026-10-13): a demo account's seeding logic is just as often a
-        # server-side script against the real backend (found on Rigsheet:
-        # supabase/seed-demo-account.ts, 162 lines, written specifically for
-        # App Review) as it is client-side "first run" code, and the default
-        # roots below never look at a repo-level supabase/, server/, or
-        # scripts/ directory. Default stays empty so every other caller's
-        # search scope is unchanged.
-        rx = re.compile(pattern, re.I)
+    def _source_roots(self, extra_roots=()):
+        """Directories searched for source (shared by grep_source and the
+        concrete-promise checks)."""
         roots = [self.p(d) for d in
                  ("app", "src", "components", "screens", "lib", "features")]
         if extra_roots:
@@ -1817,6 +2203,30 @@ class Scan:
             for d in extra_roots:
                 roots.append(self.p(d))
         roots = [r for r in roots if os.path.isdir(r)] or [self.root]
+        return roots
+
+    def grep_source(self, pattern, exts=(".ts", ".tsx", ".js", ".jsx"), extra_roots=()):
+        # Returning bare None for both "searched everything, no match" and
+        # "gave up at the file cap, don't know" would be the same false-pass
+        # bug class this scanner has been fixed for repeatedly: a caller
+        # that treats None as a confirmed absence can end up asserting a
+        # CRITICAL from an incomplete search. Callers that need to tell the
+        # two apart check self.facts["grep_truncated"] for this pattern
+        # (the return value itself stays path-or-None for every existing
+        # caller -- see check_iap/check_account_deletion for the one shape
+        # where the difference actually changes a verdict).
+        #
+        # extra_roots: additional top-level directories to search, beyond the
+        # default client-code roots. Added for check_review_notes_claims
+        # (2026-10-13): a demo account's seeding logic is just as often a
+        # server-side script against the real backend (found on Rigsheet:
+        # supabase/seed-demo-account.ts, 162 lines, written specifically for
+        # App Review) as it is client-side "first run" code, and the default
+        # roots below never look at a repo-level supabase/, server/, or
+        # scripts/ directory. Default stays empty so every other caller's
+        # search scope is unchanged.
+        rx = re.compile(pattern, re.I)
+        roots = self._source_roots(extra_roots)
         checked = 0
         for r in roots:
             for dirpath, dirs, files in os.walk(r):
@@ -2065,6 +2475,7 @@ class Scan:
             self.check_permission_request_hygiene()
             self.check_listing_claims(md)
             self.check_review_notes_claims(md)
+            self.check_concrete_promises(md)
             self.check_listing_url_content(md)
             self.check_export_compliance(plist)
             self.check_dev_artifacts(deps + devdeps, cfg)

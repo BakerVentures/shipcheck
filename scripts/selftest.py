@@ -1187,6 +1187,117 @@ def run_listing_claim_checks():
     return fails
 
 
+def run_concrete_promise_checks():
+    """check_concrete_promises: the seven real 2026-10 listing/notes-vs-binary
+    rejections as small synthetic projects, plus negatives that must stay
+    silent."""
+    fails = []
+    print("\nConcrete promises vs binary (7 real 2026-10 rejection shapes + negatives)")
+    LIST = "src/screens/ListScreen.tsx"
+    cases = [
+        # (desc, files, metadata, finding-id prefix, must fire)
+        ("IOLTAlign: review notes point at a sample account the app never creates",
+         {"src/db.ts": "export function createAccount(n){return {n};}\n"},
+         {"review notes": "Open the sample account on the home screen to review."},
+         "CLAIM-PHANTOM-seeded-data", True),
+        ("TentClock: notes promise a populated alarm list; new user sees the empty state",
+         {"src/screens/Alarms.tsx":
+          "export const A=()=> <FlatList data={[]} ListEmptyComponent={<Text>No alarms yet</Text>}/>;\n"},
+         {"review notes": "The Alarms tab already contains three alarms for you to review."},
+         "PROMISE-POPULATED-STATE", True),
+        ("Foldbook: listing promises saved reading progress; only the screenshot tool writes it",
+         {"src/dev/screenshotSeed.ts":
+          "import AsyncStorage from '@react-native-async-storage/async-storage';\n"
+          "export const seed=()=>AsyncStorage.setItem('progress','42');\n",
+          "src/screens/Reader.tsx": "const p = progress; export const R=()=>null;\n"},
+         {"description": "Pick up where you left off, with your reading progress saved."},
+         "PROMISE-PROGRESS-NO-WRITER", True),
+        ("DenialDesk: review notes name two buttons that do not exist",
+         {LIST: "export const L=()=> <Button title='Add letter'/>;\n"},
+         {"review notes": 'Tap "Generate Appeal" then press the "Send to Insurer" button.'},
+         "PROMISE-UI-MISSING-generate-appeal", True),
+        ("DenialDesk (second button is also flagged)",
+         {LIST: "export const L=()=> <Button title='Add letter'/>;\n"},
+         {"review notes": 'Tap "Generate Appeal" then press the "Send to Insurer" button.'},
+         "PROMISE-UI-MISSING-send-to-insurer", True),
+        ("Nearvo: $129.99 lifetime advertised; the allowlist refuses to sell it",
+         {"src/iap.ts": "export const ALLOWED_PRODUCT_IDS = ['nearvo.monthly','nearvo.annual'];\n"
+                        "Purchases.purchaseProduct(id);\n"},
+         {"description": "Unlock everything with lifetime access for $129.99."},
+         "PROMISE-LIFETIME-UNBACKED", True),
+        ("Rigsheet: 14-day free trial promised, zero introductory offers configured",
+         {"src/paywall.ts": "export const trialDays = 14;\nPurchases.getOfferings();\n"},
+         {"description": "Start your 14-day free trial today.",
+          "subscriptions": "yes\nMonthly $19.99. Free trial: none (0 introductory offers configured)."},
+         "PROMISE-TRIAL-UNBACKED", True),
+        ("FlirtGym: copy states a 7-day trial and a free tier; no trial anywhere, hard paywall",
+         {"src/paywall.ts": "Purchases.getOfferings();\nexport const P=()=>null;\n"},
+         {"description": "Try it with a 7-day free trial, or stay on the free plan.",
+          "subscriptions": "yes\nHard paywall, subscription required. No free tier."},
+         "PROMISE-TRIAL-UNBACKED", True),
+        ("FlirtGym (free tier contradiction)",
+         {"src/paywall.ts": "Purchases.getOfferings();\n"},
+         {"description": "Stay on the free plan as long as you like.",
+          "subscriptions": "yes\nHard paywall, subscription required. No free tier."},
+         "PROMISE-FREE-TIER-UNBACKED", True),
+        # negatives
+        ("NEG: 14-day trial backed by code stating 14 days and metadata saying so",
+         {"src/paywall.ts": "export const trialDays = 14;\nPurchases.getOfferings();\n"},
+         {"description": "Start your 14-day free trial today.",
+          "subscriptions": "yes\nMonthly $19.99 with a 14-day free trial."},
+         "PROMISE-TRIAL-UNBACKED", False),
+        ("NEG: lifetime advertised and the lifetime product is in the allowlist",
+         {"src/iap.ts": "export const ALLOWED_PRODUCT_IDS = ['x.monthly','x.lifetime'];\n"},
+         {"description": "Unlock everything with lifetime access for $129.99."},
+         "PROMISE-LIFETIME-UNBACKED", False),
+        ("NEG: notes name buttons that exist as labels in source",
+         {LIST: "export const L=()=> <><Button title='Generate Appeal'/><Text>Send to Insurer</Text></>;\n"},
+         {"review notes": 'Tap "Generate Appeal" then press the "Send to Insurer" button.'},
+         "PROMISE-UI-MISSING", False),
+        ("NEG: populated-list note, and the app seeds on first launch",
+         {"src/screens/Alarms.tsx": "export const A=()=> <FlatList ListEmptyComponent={<Text>No alarms yet</Text>}/>;\n",
+          "src/seed.ts": "export function seedIfEmpty(){}\n"},
+         {"review notes": "The Alarms tab already contains three alarms for you to review."},
+         "PROMISE-POPULATED-STATE", False),
+        ("NEG: saved-progress promise with a real shipping write",
+         {"src/screens/Reader.tsx":
+          "import AsyncStorage from '@react-native-async-storage/async-storage';\n"
+          "export const save=(p)=>AsyncStorage.setItem('progress',p);\n"},
+         {"description": "Pick up where you left off, with your reading progress saved."},
+         "PROMISE-PROGRESS-NO-WRITER", False),
+        ("NEG: mixed products (Annual has a 14-day trial, Monthly says 'no trial') -- found on HormoneLog",
+         {"src/paywall.ts": "export const trialDays = 14;\nPurchases.getOfferings();\n"},
+         {"review notes": "Subscribe to Annual to start the 14-day free trial.",
+          "subscriptions": "yes\n- Annual: $49.99/yr, 14-day free trial\n- Monthly: $7.99/mo, no trial"},
+         "PROMISE-TRIAL-UNBACKED", False),
+        ("MileTruth (found by running this on the real repo): 'no in-app purchases' but a RevenueCat paywall ships",
+         {"src/lib/purchases.ts": "import Purchases from 'react-native-purchases';\nPurchases.configure({apiKey:'k'});\n"},
+         {"description": "Log your drives -- no in-app purchases, nothing to buy."},
+         "PROMISE-FREE-BUT-SELLS", True),
+        ("NEG: 'no free trial' wording and an honestly free app with no purchase code",
+         {"src/app.ts": "export const x = 1;\n"},
+         {"description": "Completely free. There is no free trial because nothing is paid."},
+         "PROMISE-", False),
+    ]
+    for desc, files, md, fid, must_fire in cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            for rel, content in files.items():
+                _write(tmp, rel, content)
+            s = scan.Scan(tmp)
+            s.check_review_notes_claims(md)
+            s.check_concrete_promises(md)
+            ids = {f["id"] for f in s.findings}
+        fired = any(i == fid or (fid.endswith(("UI-MISSING", "PROMISE-")) and i.startswith(fid))
+                    for i in ids)
+        if fired == must_fire:
+            print("  ok     %s" % desc)
+        else:
+            print("  FAIL   %s (want %s %s, got ids=%s)"
+                  % (desc, fid, "to fire" if must_fire else "NOT to fire", sorted(ids)))
+            fails.append("concrete-promises: " + desc)
+    return fails
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true")
@@ -1251,6 +1362,7 @@ def main():
     fails += run_privacy_manifest_config_checks()
     fails += run_permission_hygiene_checks()
     fails += run_listing_claim_checks()
+    fails += run_concrete_promise_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))

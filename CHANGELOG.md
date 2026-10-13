@@ -1,5 +1,35 @@
 # Changelog
 
+## v0.2.21: specific promises, checked one at a time (2026-10-13)
+
+v0.2.18's `CLAIM-UNBACKED-*` asks "does the code contain any implementation of
+feature X". Several of the nine rejections were promises specific enough to check
+against one named thing. New `check_concrete_promises` (all `PROMISE-*` ids) fires
+only when it can name the missing thing:
+
+- `PROMISE-TRIAL-UNBACKED` (3.1.2): a trial in the listing or notes that the
+  Subscriptions section denies, states with a different length, or that has no
+  trial/introductory-offer shape in source (Rigsheet, FlirtGym).
+- `PROMISE-FREE-TIER-UNBACKED`, `PROMISE-FREE-BUT-SELLS`: "free plan" against a hard
+  paywall; "no in-app purchases" against shipped purchase code (FlirtGym).
+- `PROMISE-LIFETIME-UNBACKED`, `PROMISE-PRICE-MISMATCH`: a lifetime purchase no
+  product or allowlist in source will sell; a listing price absent from the
+  Subscriptions section (Nearvo).
+- `PROMISE-UI-MISSING-<name>`: a quoted button/screen the review notes tell the
+  reviewer to use that is not a string, route or filename in shipping source
+  (DenialDesk).
+- `PROMISE-POPULATED-STATE`: notes describe a populated list while the app shows an
+  empty state and nothing seeds (TentClock).
+- `PROMISE-PROGRESS-NO-WRITER`: "saved progress" whose only writer is a
+  screenshot/seed/dev file (Foldbook).
+- `PROMISE-SIGNIN-NO-AUTH`: notes say to sign in; the app has no sign-in.
+
+IOLTAlign's sample account was already covered by `CLAIM-PHANTOM-seeded-data`.
+Run against the real portfolio repos, it found one true positive (MileTruth's
+listing says "no in-app purchases" while a RevenueCat paywall ships) and one false
+positive (HormoneLog: "Monthly: no trial" beside "Annual: 14-day free trial"),
+fixed and pinned by a regression test. 17 new selftest cases, 7 of them negatives.
+
 ## v0.2.19: permission timing (2026-10-13)
 
 Nine apps from one developer's portfolio were rejected by App Review in a single
