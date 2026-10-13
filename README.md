@@ -120,6 +120,34 @@ types and their permissions; account deletion including the web route Play
 requires and Apple does not; Play Billing disclosures; and the closed-testing
 gate for new personal developer accounts.
 
+## Built on its own rejections
+
+The two newest checks didn't come from reading the guidelines. They came from nine
+real rejections, in one batch, in one week, across this project's own author's other
+apps.
+
+Four of those nine had a shipped listing or App Review note describing something the
+binary didn't do: a notification feature with no code that ever sent one, review
+notes pointing at a demo account nothing in the app actually seeded, a privacy page
+still reading "a working name, the final app name is not yet chosen" weeks after
+launch. `CLAIM-UNBACKED-*` and `CLAIM-PHANTOM-*` check your listing and your review
+notes against your source the same way, before a reviewer does.
+
+One of the nine, and the only one with a clean control to compare against: two apps
+off the same code scaffold entered review within the same window. One asked for
+location permission the moment its first screen rendered, before the user had done
+anything. The other asked from inside the button that needed it, with a sentence
+explaining why. The first was rejected. The second passed, 81 seconds later.
+`PERM-REQUEST-ON-MOUNT` catches that difference. It was re-checked independently
+against both the rejected apps and the ones that passed, and it doesn't fire on
+anything Apple already approved.
+
+Building these also found a bug in a check that had already shipped: the link
+checker never followed an HTTP 308 redirect, which is how most static-site hosts
+handle a plain domain pointing at its `www` address. It read a live, working privacy
+page as a dead link. Fixed, independent of either rule above, because the way you
+find that kind of bug is by pointing the tool at your own work.
+
 ## Why the corpus matters
 
 Apple and Google change these pages constantly. ShipCheck does not hardcode
@@ -176,6 +204,9 @@ parties are, and how to have anything deleted — is in
 | `/shipcheck:reply` rejection drafter | | ✅ | ✅ | ✅ |
 | Unlimited re-scans | | ✅ *(that app)* | ✅ | ✅ |
 | Shareable across a team | | | | ✅ |
+
+Checkout isn't live yet. The free tier (risk score, top findings) works today;
+`/shipcheck:unlock` is ready for a key once one exists to buy.
 
 The $29 tier binds to one bundle identifier the first time you scan, and then
 runs forever on that app. Ship more than one app and the yearly plan is cheaper
