@@ -1261,6 +1261,15 @@ class Scan:
         listing_text = " ".join(md.get(f, "") for f in
             ("subtitle", "short description", "description",
              "promotional text", "what's new", "screenshot descriptions"))
+        # Real listing copy in shipcheck.metadata.md is hand-wrapped prose
+        # (Nearvo's own file wraps "Love notes that land on / their phone."
+        # across a line break at ~90 columns) -- every claim pattern in the
+        # data table is written as literal-space-separated words, so an
+        # un-normalized newline between two words of a real phrase is an
+        # exact miss. Collapse all whitespace to single spaces before
+        # matching; found by running this check against Nearvo's real
+        # metadata file, where it missed its own cited example otherwise.
+        listing_text = re.sub(r"\s+", " ", listing_text)
         if not listing_text.strip():
             return
         for c in (self.map.get("listing_claims", {}).get("claims") or []):
@@ -1289,6 +1298,7 @@ class Scan:
 
     def check_review_notes_claims(self, md):
         notes = (md or {}).get("review notes", "")
+        notes = re.sub(r"\s+", " ", notes)  # same reasoning as check_listing_claims
         if not notes.strip():
             return
         for c in (self.map.get("review_notes_claims", {}).get("claims") or []):

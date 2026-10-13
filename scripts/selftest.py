@@ -735,6 +735,14 @@ def run_listing_claim_checks():
          "}\n",
          "CLAIM-UNBACKED-notifications", False),
 
+        ("notifications claim hard-wrapped across a line break in real prose "
+         "-- a real shipcheck.metadata.md file wraps at ~90 cols, and Nearvo's "
+         "own actual listing splits exactly on 'land on / their phone.'",
+         {"description": "Shared photo memories. Love notes that land on\n"
+                         "their phone. A daily mood check-in."},
+         None,
+         "CLAIM-UNBACKED-notifications", True),
+
         ("import/restore claim with no picker/reader anywhere "
          "(Steadychart: 'a full JSON backup' with no way back in)",
          {"description": "Restore from a backup any time you switch phones."},
