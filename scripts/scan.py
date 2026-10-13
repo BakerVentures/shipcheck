@@ -19,6 +19,7 @@ import re
 import subprocess
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -1833,6 +1834,48 @@ BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
               "Chrome/124.0.0.0 Safari/537.36")
 
 
+def _open_following_redirects(url, method, ua, timeout, cap=None, max_hops=5):
+    """One HTTP request, manually following 301/302/303/307/308 redirects up
+    to max_hops times, and reading up to `cap` bytes of the final 2xx body
+    (None for a HEAD, or when cap is None). Found 2026-10-13 dogfooding
+    check_listing_url_content against Nearvo's real privacy URL: Python's
+    urllib has never implemented redirect-following for 308 Permanent
+    Redirect (CPython's HTTPRedirectHandler only defines http_error_301/302/
+    303/307), so a 308 -- which Cloudflare and most static-site hosts issue
+    routinely for an apex-to-www or scheme/trailing-slash normalization --
+    surfaced as a bare HTTPError. head_ok's caller-visible bug from the same
+    root cause was worse: it read that as a CONFIRMED dead link and would
+    have raised URL-DEAD-* (critical) against a page that opens fine in any
+    browser or to a real reviewer -- exactly the false-CRITICAL-from-a-guess
+    class this file keeps getting fixed for (see the F4 comment on
+    head_ok). Handling all five redirect codes here, uniformly and
+    explicitly, removes any dependence on which of them urllib's default
+    opener happens to already follow on a given Python version.
+
+    Raises urllib.error.HTTPError for a genuinely terminal (non-redirect)
+    error status or too many hops, and whatever network-level exception
+    urlopen raises for a connection failure -- both unchanged from the
+    shape a direct urlopen() call already raises, so existing callers'
+    except clauses need no change."""
+    current = url
+    for _ in range(max_hops):
+        req = urllib.request.Request(current, method=method,
+                                      headers={"User-Agent": ua})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                body = r.read(cap) if cap else None
+                return r.status, current, body
+        except urllib.error.HTTPError as e:
+            if e.code in (301, 302, 303, 307, 308):
+                loc = e.headers.get("Location") if e.headers else None
+                if not loc:
+                    raise
+                current = urllib.parse.urljoin(current, loc)
+                continue
+            raise
+    raise urllib.error.HTTPError(current, 310, "Too many redirects", None, None)
+
+
 def head_ok(url, timeout=12):
     """Returns (ok, detail, confirmed, blocked).
 
@@ -1858,16 +1901,15 @@ def head_ok(url, timeout=12):
                 ("GET", BROWSER_UA))
     for method, ua in attempts:
         try:
-            req = urllib.request.Request(url, method=method,
-                                         headers={"User-Agent": ua})
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                if 200 <= r.status < 400:
-                    return True, "HTTP %d" % r.status, True, False
-                if r.status in (403, 405):
-                    saw_blocked = True
-                    last_err = "HTTP %d" % r.status
-                    continue
-                return False, "HTTP %d" % r.status, True, False
+            status, _final_url, _body = _open_following_redirects(
+                url, method, ua, timeout)
+            if 200 <= status < 400:
+                return True, "HTTP %d" % status, True, False
+            if status in (403, 405):
+                saw_blocked = True
+                last_err = "HTTP %d" % status
+                continue
+            return False, "HTTP %d" % status, True, False
         except urllib.error.HTTPError as e:
             if e.code in (403, 405):
                 saw_blocked = True
@@ -1891,11 +1933,11 @@ def fetch_text(url, timeout=12, cap=512 * 1024):
     status: a dead or blocked page has nothing to read for placeholder
     text, and that failure mode is already reported by check_urls."""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": BROWSER_UA})
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            if not (200 <= r.status < 300):
-                return None
-            return r.read(cap).decode("utf-8", errors="ignore")
+        status, _final_url, body = _open_following_redirects(
+            url, "GET", BROWSER_UA, timeout, cap=cap)
+        if not (200 <= status < 300):
+            return None
+        return body.decode("utf-8", errors="ignore")
     except Exception:                                   # noqa: BLE001
         return None
 

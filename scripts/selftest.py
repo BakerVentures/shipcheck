@@ -347,6 +347,73 @@ def run_url_reachability_checks():
     return fails
 
 
+def run_redirect_following_checks():
+    fails = []
+    print("\n308 Permanent Redirect must be followed, not read as dead "
+          "(regression: dogfooding v0.2.18 against Nearvo's real privacy "
+          "URL found head_ok reading a live, 308-redirecting page as a "
+          "CONFIRMED DEAD LINK -- Python's urllib has never followed 308, "
+          "and Cloudflare/most static-site hosts issue it routinely)")
+    import http.server
+    import threading
+
+    class _Handler(http.server.BaseHTTPRequestHandler):
+        def _respond(self):
+            if self.path == "/redirect":
+                self.send_response(308)
+                self.send_header("Location", "/final")
+                self.end_headers()
+            elif self.path == "/final":
+                body = b"<html>real page, reached after a 308</html>"
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                if self.command == "GET":
+                    self.wfile.write(body)
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+        def do_HEAD(self):
+            self._respond()
+
+        def do_GET(self):
+            self._respond()
+
+        def log_message(self, *a):
+            pass
+
+    server = http.server.HTTPServer(("127.0.0.1", 0), _Handler)
+    port = server.server_address[1]
+    t = threading.Thread(target=server.serve_forever, daemon=True)
+    t.start()
+    try:
+        url = "http://127.0.0.1:%d/redirect" % port
+        ok, detail, confirmed, blocked = scan.head_ok(url)
+        if ok and detail == "HTTP 200" and confirmed and not blocked:
+            print("  ok     head_ok follows a 308 to the real 200 page "
+                  "instead of reporting the redirect itself as dead")
+        else:
+            print("  FAIL   head_ok((ok, detail, confirmed, blocked)) = "
+                  "%r, want (True, 'HTTP 200', True, False)"
+                  % ((ok, detail, confirmed, blocked),))
+            fails.append("redirect-following: head_ok on a 308")
+
+        body = scan.fetch_text(url)
+        if body and "real page, reached after a 308" in body:
+            print("  ok     fetch_text follows a 308 and reads the real "
+                  "page's content")
+        else:
+            print("  FAIL   fetch_text(url with a 308) = %r, want the "
+                  "final page's body" % (body,))
+            fails.append("redirect-following: fetch_text on a 308")
+    finally:
+        server.shutdown()
+        t.join(timeout=5)
+    return fails
+
+
 def run_grep_truncation_checks():
     fails = []
     print("\ngrep_source file-cap truncation must not compound with a second "
@@ -915,6 +982,7 @@ def main():
     fails += run_auth_confirmation_checks()
     fails += run_iap_confirmation_checks()
     fails += run_url_reachability_checks()
+    fails += run_redirect_following_checks()
     fails += run_grep_truncation_checks()
     fails += run_f1_source_signal_checks()
     fails += run_f2_submission_structure_checks()
