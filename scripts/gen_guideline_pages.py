@@ -52,7 +52,9 @@ def read_sections(source_id):
     raise KeyError("no manifest source with id %r" % source_id)
 
 
-_MD_TOKEN_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*")
+_MD_TOKEN_RE = re.compile(
+    r"\[([^\]]+)\]\(((?:[^()]|\([^()]*\))*)\)|\*\*([^*]+)\*\*|\*([^*]+)\*"
+)
 
 
 def _inline_md(text):
