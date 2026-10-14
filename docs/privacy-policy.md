@@ -29,8 +29,12 @@ matter are short enough to read in full: `scripts/license.py` (the function
   you have bought a license.
 - **There are no analytics or error-tracking services** anywhere in the plugin, the
   server, or the site.
-- **We never see your payment details.** Purchases are handled by Lemon Squeezy as
-  merchant of record.
+- **Nothing is on sale yet.** ShipCheck has no checkout, has never taken a payment and
+  has never issued a license. The purchase and license sections below describe the
+  intended flow for when payment is set up; today they describe nothing that has
+  happened. No date is promised.
+- **We never see your payment details.** When purchases exist they will be handled by
+  Lemon Squeezy as merchant of record.
 
 ---
 
@@ -124,7 +128,8 @@ That is the entire body. No project path, no repository name, no dependency list
 store metadata, no findings, no score, no username, no machine identifier, no
 hardware fingerprint.
 
-The `app_token` exists so a $29 **single-app** license can be pinned to one app. It is
+The `app_token` exists so a **single-app** license (planned at $29, not on sale) can be
+pinned to one app. It is
 a hash: the server cannot recover your bundle identifier from it without already
 knowing that bundle identifier. It is stable for a given (license, app) pair, which is
 exactly what binding requires and the only thing it can be used for.
@@ -207,7 +212,12 @@ updated when that changes.
 
 ## 4. Purchases
 
-ShipCheck licenses are sold through **Lemon Squeezy**, acting as merchant of record.
+**There is no checkout. ShipCheck cannot take payment, no license has ever been sold,
+and nothing can be bought today.** What follows describes the flow that will apply once
+payment is enabled, disclosed in advance rather than written after the fact. No date is
+promised, and until then no purchase or refund data of any kind exists.
+
+ShipCheck licenses will be sold through **Lemon Squeezy**, acting as merchant of record.
 When you buy a license you give Lemon Squeezy your name, email address, payment details
 and the tax-location information they are required to collect. **We never see or handle
 your card details.**
