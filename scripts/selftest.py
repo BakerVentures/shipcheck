@@ -1403,6 +1403,47 @@ def run_comment_strip_checks():
     return fails
 
 
+def run_doc_generator_checks():
+    """gen_guideline_pages.py / gen_comparison_pages.py read specific headings and
+    filenames out of the cached corpus by hardcoded structure -- a corpus refresh that
+    restructures a page can silently crash them, and nothing else in this suite
+    exercises either script (found 2026-10-13 on a corpus refresh, see
+    rules/lessons.md in the Brain repo). Run them for real and require a clean exit,
+    then confirm the docs/ they write aren't stale relative to the committed corpus +
+    script -- if they were, this check running them would itself prove it."""
+    fails = []
+    print("\nDoc generators (gen_guideline_pages.py, gen_comparison_pages.py)")
+    docs_dir = os.path.join(ROOT, "docs")
+    tree_was_dirty = subprocess.run(
+        ["git", "diff", "--quiet", "--", docs_dir], cwd=ROOT).returncode != 0
+
+    for script in ("gen_guideline_pages.py", "gen_comparison_pages.py"):
+        proc = subprocess.run([sys.executable, os.path.join(HERE, script)],
+                               cwd=ROOT, capture_output=True, text=True)
+        if proc.returncode != 0:
+            print("  FAIL   %s crashed (exit %d)" % (script, proc.returncode))
+            for line in proc.stderr.strip().splitlines()[-10:]:
+                print("    " + line)
+            fails.append("doc-generator: %s crashed" % script)
+        else:
+            print("  ok     %s ran clean" % script)
+
+    if not fails:
+        if tree_was_dirty:
+            # Can't tell whether any remaining docs/ diff is this run's doing or
+            # pre-existing uncommitted work -- don't make a call either way.
+            print("  skip   stale-docs check (docs/ already had uncommitted changes "
+                  "before this ran)")
+        elif subprocess.run(["git", "diff", "--quiet", "--", docs_dir], cwd=ROOT).returncode != 0:
+            print("  FAIL   docs/ changed after regenerating -- the committed pages are "
+                  "stale relative to the current corpus + generator; run the generators "
+                  "and commit the result")
+            fails.append("doc-generator: docs/ stale")
+        else:
+            print("  ok     generated docs/ match what's committed")
+    return fails
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true")
@@ -1470,6 +1511,7 @@ def main():
     fails += run_concrete_promise_checks()
     fails += run_negated_claim_checks()
     fails += run_comment_strip_checks()
+    fails += run_doc_generator_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))
