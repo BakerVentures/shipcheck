@@ -45,10 +45,15 @@ def read_sections(source_id):
             sections_dir = src.get("sections_dir")
             if not sections_dir:
                 return ""
-            return "\n\n".join(
+            text = "\n\n".join(
                 read(os.path.join(sections_dir, sec["anchor"] + ".md"))
                 for sec in src.get("sections", [])
             )
+            # Apple's own support pages end with a "**Related** <links>" nav footer,
+            # which the fetcher's chunker sweeps into the last FAQ answer along with
+            # its real content since it splits by heading, not by this boilerplate.
+            # Strip it so it doesn't read as part of that answer.
+            return re.sub(r"\n\n\*\*Related\*\*.*$", "", text, flags=re.S).strip()
     raise KeyError("no manifest source with id %r" % source_id)
 
 
@@ -238,16 +243,12 @@ if "## Account deletion guidance" in _account_deletion_raw:
 else:
     # Apple restructured this page (2026-10-12 fetch) to FAQ-only, under H3 "### <question>"
     # headings straight off the H1 -- the "## Account deletion guidance" bullet-list section
-    # is gone, replaced entirely by the FAQ. The intro paragraph alone would just repeat the
-    # ASRG quote already shown above this section, so pull the actual FAQ answers too -- from
-    # the already-chunked .sections files (anchor-keyed, independent of the raw page's heading
-    # levels), not by re-deriving structure from the raw page, which is exactly the parsing
-    # that just broke once this refresh and would break again on the next one.
-    _account_deletion_intro = re.split(r"^#{1,2} .*$", _account_deletion_raw, maxsplit=1, flags=re.M)[-1]
-    _account_deletion_intro = re.split(r"^#{1,6} ", _account_deletion_intro, maxsplit=1, flags=re.M)[0].strip()
-    _account_deletion_guidance = "\n\n".join(
-        p for p in [_account_deletion_intro, read_sections("account-deletion")] if p
-    )
+    # is gone, replaced entirely by the FAQ. Pull the FAQ answers from the already-chunked
+    # .sections files (anchor-keyed, independent of the raw page's heading levels) rather
+    # than re-deriving an intro paragraph from the raw page with a heading regex -- that's
+    # exactly the parsing that just broke once this refresh (and the ASRG quote already
+    # shown above this section covers the same ground the intro paragraph would anyway).
+    _account_deletion_guidance = read_sections("account-deletion")
     assert _account_deletion_guidance, (
         "account-deletion.md fallback produced no content -- corpus structure changed again"
     )
