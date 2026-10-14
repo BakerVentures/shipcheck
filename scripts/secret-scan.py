@@ -181,9 +181,24 @@ NOT_A_SECRET_UNQUOTED = [
 # Kinds whose captured value came from inside a quoted string literal.
 QUOTED_KINDS = {"assign-literal"}
 
-# Extensions with no plausible credential content, plus lockfiles and corpora.
+# Extensions with no plausible credential content: binaries, images, and generated
+# bundles. Deliberately NOT lockfiles any more.
+#
+# Lockfiles were skipped here until 2026-10-14, and that was the same defect this
+# whole scanner exists to avoid: a check reporting clean on something it never read.
+# Proved with a fabricated private key planted in three files at once -- the copy in
+# `normal.md` was caught, the identical copies in `package-lock.json` and `yarn.lock`
+# were not, and the scan still exited 1 so nobody would have noticed the gap. It is
+# the same blind spot `gitleaks dir` has: it skipped the large lockfiles and scanned
+# ~164 KB of netcard where the staged scan covered 762 KB.
+#
+# Lockfiles are a real place for a credential to sit -- an npm registry `_auth` /
+# `_authToken` / `_password` entry for a private registry lands in exactly these files.
+# Measured before changing it rather than assumed: scanning netcard, tabled, rigsheet
+# and hormonelog's real `package-lock.json` files (~2.5 MB together) produces ZERO
+# findings, so closing this gap costs no false positives. The integrity hashes are
+# `sha512-...` values with no credential keyword in front of them, so no rule fires.
 SKIP_PATH = [
-    "*.lock", "*-lock.json", "*.lockb", "package-lock.json", "yarn.lock",
     "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.ico", "*.pdf", "*.mp4",
     "*.mov", "*.zip", "*.gz", "*.tgz", "*.woff", "*.woff2", "*.ttf", "*.otf",
     "*.svg", "node_modules/*", "*/node_modules/*", "*.min.js", "*.map",
