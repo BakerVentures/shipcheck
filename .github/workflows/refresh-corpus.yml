@@ -27,6 +27,12 @@ jobs:
           python3 scripts/fetch_corpus.py --diff 2>&1 | tee /tmp/refresh.log
           echo "failures=$(python3 -c "import json;print(json.load(open('corpus/manifest.json'))['failure_count'])")" >> "$GITHUB_OUTPUT"
 
+      # selftest.py's own doc-generator check re-runs both scripts again regardless
+      # (it has to, to catch a crash) -- that's a harmless, cheap re-run on top of
+      # this step, not a reason to drop this one. Without it, a real corpus change
+      # leaves docs/ clean going into the self-test step, so its post-run diff
+      # reads as newly-introduced staleness and fails the job outright instead of
+      # letting the PR below carry the regenerated docs alongside the corpus change.
       - name: Regenerate the docs that quote this corpus
         run: |
           python3 scripts/gen_guideline_pages.py

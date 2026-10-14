@@ -1408,9 +1408,17 @@ def run_doc_generator_checks():
     filenames out of the cached corpus by hardcoded structure -- a corpus refresh that
     restructures a page can silently crash them, and nothing else in this suite
     exercises either script (found 2026-10-13 on a corpus refresh, see
-    rules/lessons.md in the Brain repo). Run them for real and require a clean exit,
-    then confirm the docs/ they write aren't stale relative to the committed corpus +
-    script -- if they were, this check running them would itself prove it."""
+    rules/lessons.md in the Brain repo). Run them for real and require a clean exit.
+
+    Also checks, when the generated paths were clean going in, that regenerating
+    didn't change them -- i.e. the committed docs match what the corpus + script
+    produce right now. That half is a real check for a developer running this
+    locally after editing the corpus or the generators by hand. It's not a check
+    refresh-corpus.yml's own run of this script can ever hit, though: that workflow
+    regenerates docs/ itself first specifically so a real corpus change lands as
+    "already dirty, skip" here rather than failing the job outright -- for that
+    pipeline, the crash check above is what's actually protecting it, and the PR
+    peter-evans/create-pull-request opens is what carries the (legitimate) diff."""
     fails = []
     print("\nDoc generators (gen_guideline_pages.py, gen_comparison_pages.py)")
     # Only the paths these two scripts actually write -- docs/index.html (the hand-
