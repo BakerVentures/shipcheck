@@ -34,7 +34,32 @@ def read(rel):
     return body
 
 
-_MD_TOKEN_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*")
+def read_sections(source_id):
+    """Concatenate every .sections chunk for a manifest source, in the manifest's own
+    order. Each chunk already carries its own "### Heading" line (para_html() renders
+    that as a bolded line), so this is robust to the raw page's heading levels or prose
+    layout changing on the next corpus refresh -- unlike re-deriving structure from the
+    raw page with a heading regex, which is exactly what broke on this one."""
+    for src in MANIFEST["sources"]:
+        if src.get("id") == source_id:
+            sections_dir = src.get("sections_dir")
+            if not sections_dir:
+                return ""
+            text = "\n\n".join(
+                read(os.path.join(sections_dir, sec["anchor"] + ".md"))
+                for sec in src.get("sections", [])
+            )
+            # Apple's own support pages end with a "**Related** <links>" nav footer,
+            # which the fetcher's chunker sweeps into the last FAQ answer along with
+            # its real content since it splits by heading, not by this boilerplate.
+            # Strip it so it doesn't read as part of that answer.
+            return re.sub(r"\n\n\*\*Related\*\*.*$", "", text, flags=re.S).strip()
+    raise KeyError("no manifest source with id %r" % source_id)
+
+
+_MD_TOKEN_RE = re.compile(
+    r"\[([^\]]+)\]\(((?:[^()]|\([^()]*\))*)\)|\*\*([^*]+)\*\*|\*([^*]+)\*"
+)
 
 
 def _inline_md(text):
@@ -210,6 +235,24 @@ def render(page):
 
 PAGES = []
 
+_account_deletion_raw = read("apple/account-deletion.md")
+if "## Account deletion guidance" in _account_deletion_raw:
+    _account_deletion_guidance = (
+        _account_deletion_raw.split("## Frequently")[0].split("## Account deletion guidance")[1]
+    )
+else:
+    # Apple restructured this page (2026-10-12 fetch) to FAQ-only, under H3 "### <question>"
+    # headings straight off the H1 -- the "## Account deletion guidance" bullet-list section
+    # is gone, replaced entirely by the FAQ. Pull the FAQ answers from the already-chunked
+    # .sections files (anchor-keyed, independent of the raw page's heading levels) rather
+    # than re-deriving an intro paragraph from the raw page with a heading regex -- that's
+    # exactly the parsing that just broke once this refresh (and the ASRG quote already
+    # shown above this section covers the same ground the intro paragraph would anyway).
+    _account_deletion_guidance = read_sections("account-deletion")
+    assert _account_deletion_guidance, (
+        "account-deletion.md fallback produced no content -- corpus structure changed again"
+    )
+
 PAGES.append(dict(
     slug="5-1-1-v-account-deletion",
     eyebrow="APP STORE GUIDELINE 5.1.1(v)",
@@ -223,7 +266,7 @@ PAGES.append(dict(
     source_label="App Store Review Guidelines, 5.1.1(v)",
     sections=[
         ("What counts as compliant, per Apple's own account-deletion guidance",
-         read("apple/account-deletion.md").split("## Frequently")[0].split("## Account deletion guidance")[1]),
+         _account_deletion_guidance),
         ("Why React Native and Expo apps miss this specifically",
          "Auth is usually wired through Supabase, Firebase Auth, or Clerk, and the SDK "
          "ships a `signOut()` method that's easy to mistake for account deletion in a quick "
@@ -323,6 +366,12 @@ PAGES.append(dict(
     ],
 ))
 
+_required_reason_raw = read("apple/required-reason-api.md")
+_required_reason_quote = (
+    _required_reason_raw.split("## See Also")[0].split("## Overview")[1]
+    if "## Overview" in _required_reason_raw else _required_reason_raw[:900]
+)
+
 PAGES.append(dict(
     slug="itms-91053-privacy-manifest",
     eyebrow="ITMS-91053 · REQUIRED-REASON API",
@@ -332,7 +381,7 @@ PAGES.append(dict(
     lede="This one blocks the upload itself, before a human reviewer ever sees the app -- and "
          "it's the single most common upload-time rejection in Expo projects.",
     clause_label="Apple Developer Documentation — Describing use of required reason API",
-    quote=read("apple/required-reason-api.md").split("## See Also")[0].split("## Overview")[1] if "## Overview" in read("apple/required-reason-api.md") else read("apple/required-reason-api.md")[:900],
+    quote=_required_reason_quote,
     source_label="Apple Developer Documentation, required-reason API",
     sections=[
         ("Why Expo apps trip this without writing any native code",
@@ -479,7 +528,7 @@ PAGES.append(dict(
          "and websites, the ATT prompt is not optional, and the timing and wording both matter "
          "to App Review.",
     clause_label="Using the AppTrackingTransparency framework — Apple Developer",
-    quote=read("apple/user-privacy-and-data-use.sections/using-the-apptrackingtransparency-framework.md")
+    quote=read("apple/user-privacy-and-data-use.sections/using-the-app-tracking-transparency-framework.md")
           .split("\n\n", 1)[1],
     source_label="User Privacy and Data Use, AppTrackingTransparency framework",
     sections=[

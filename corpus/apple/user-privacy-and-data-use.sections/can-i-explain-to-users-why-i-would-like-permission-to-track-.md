@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=can-i-explain-to-users-why-i-would-like-permission-to-track- url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-10-02T03:31:28+00:00 -->
+<!-- source=user-privacy-and-data-use clause=can-i-explain-to-users-why-i-would-like-permission-to-track- url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-10-12T15:33:28+00:00 -->
 
 ### Can I explain to users why I would like permission to track them before I show the tracking permission prompt?
 

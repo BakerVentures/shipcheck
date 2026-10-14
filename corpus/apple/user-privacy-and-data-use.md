@@ -3,8 +3,8 @@ shipcheck_source_id: user-privacy-and-data-use
 title: "User privacy and data use (App Tracking Transparency)"
 url: https://developer.apple.com/app-store/user-privacy-and-data-use/
 final_url: https://developer.apple.com/app-store/user-privacy-and-data-use/
-fetched_at: 2026-10-02T03:31:28+00:00
-sha256: 0f45e6a663185bb9ca612a65b1834f89d981da7749da228c6d5f985404184aeb
+fetched_at: 2026-10-12T15:33:28+00:00
+sha256: 5de775be29e3ed1d3633963728c073d50ad793e0edf414cf4ac6a39c12b38473
 vendor: apple
 ---
 
@@ -68,7 +68,7 @@ In addition, for users in the European Union, you can reprompt a user via the Ap
 
 For technical details on using the alternative App Tracking Transparency system prompt and optional text button in the European Union, see:
 
-- [Requesting Authorization with Expanded Interface (new)](/documentation/apptrackingtransparency/attrackingmanager/requesttrackingauthorization(usingexpandedinterface:additionalinformationaction:completionhandler:))
+- [Requesting Authorization with Expanded Interface (new)](/documentation/apptrackingtransparency/attrackingmanager/requesttrackingauthorization(preferexpandedinterface:additionalinformationaction:completionhandler:))
 - [Requesting Authorization](/documentation/apptrackingtransparency/attrackingmanager/requesttrackingauthorization(completionhandler:))
 - [Tracking Markdown Usage Description (new)](/documentation/bundleresources/information-property-list/nsusertrackingmarkdownusagedescription)
 - [Tracking Usage Description](/documentation/bundleresources/information-property-list/nsusertrackingusagedescription)

@@ -3,8 +3,8 @@ shipcheck_source_id: app-privacy-details
 title: "App privacy details on the App Store (nutrition labels)"
 url: https://developer.apple.com/app-store/app-privacy-details/
 final_url: https://developer.apple.com/app-store/app-privacy-details/
-fetched_at: 2026-10-02T03:31:27+00:00
-sha256: 6e6d5c34ea496d8d8da8faf2ba74747156384e130969788608b314da6ee96786
+fetched_at: 2026-10-12T15:33:27+00:00
+sha256: 439133326f78d19c8472f5c24ec97d8cde8321192f986766568707862d3c23ae
 vendor: apple
 ---
 
@@ -53,6 +53,20 @@ Data types must meet all criteria in order to be considered optional for disclos
 Examples of data that may not need to be disclosed include data collected in optional feedback forms or customer service requests that are unrelated to the primary purpose of the app and meet the other criteria above.
 
 For the purpose of clarity, data collected on an ongoing basis after an initial request for permission must be disclosed.
+
+#### Product Improvement Programs
+
+Data types that meet all of the following criteria are optional to disclose:
+
+- Data collected is only used for the purpose of improving your app and its services.
+- Collection of the data is optional and only occurs if the user explicitly opts in through a choice presented directly within the user interface — where the user is given two clear options: one to share the data and one to not share the data.
+- The user’s choice does not impact any features or functionality of the app, or their cost.
+- Users can update their choice at any time through an easily accessible setting.
+- The data is not linked to the user’s identity (via their account, device, or other details).
+- The data is not used for tracking purposes, meaning the data is not linked with Third-Party Data for advertising or advertising measurement purposes, or shared with a data broker. For details, see the Tracking section.
+- The data is not used for Third-Party Advertising, your Advertising or Marketing purposes, Product Personalization, or Other Purposes.
+
+Data types must meet all the criteria to be considered optional for disclosure. If a data type collected by your app meets some, but not all, of the above criteria, it must be disclosed in your privacy section.
 
 #### Regulated Financial Services Disclosure
 
@@ -232,3 +246,9 @@ Mark "Other User Content" to represent generic free form text fields and "Audio 
 #### You collect data to service a request but do not retain it after servicing the request.
 
 "Collect" refers to transmitting data off the device and storing it in a readable form for longer than the time it takes you and/or your third-party partners to service the request. For example, if an authentication token or IP address is sent on a server call and not retained, or if data is sent to your servers then immediately discarded after servicing the request, you do not need to disclose this in your answers in App Store Connect.
+
+#### You’d like your app to reference consent requests so you can comply with local privacy laws in its App Tracking Transparency prompt.
+
+If you’ve already shown the user a required government data-privacy consent prompt that is also covered by App Tracking Transparency (for example, through a third-party Consent Management Platform), you can reference that in your app’s App Tracking Transparency purpose string. Here’s an example of a purpose string that clearly explains the user’s choice:
+
+“[App] indicates you allowed it to use your data for advertising purposes in its legal prompt. Would you like your Apple device to provide [App] access to the advertising ID or otherwise allow it to use other means for the data processing described above?”

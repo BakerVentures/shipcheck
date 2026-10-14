@@ -3,8 +3,8 @@ shipcheck_source_id: permissions-policy
 title: "Permissions and APIs that Access Sensitive Information"
 url: https://support.google.com/googleplay/android-developer/answer/16558241
 final_url: https://support.google.com/googleplay/android-developer/answer/16558241?hl=en
-fetched_at: 2026-10-02T03:31:48+00:00
-sha256: a47aed7c2a5f86464e009e6484200867928786315bb7f386d834eaf70bbb516e
+fetched_at: 2026-10-12T15:33:46+00:00
+sha256: 23980b11e53e0034a44dc579d6beb396350fff79b7f634b4927bd94dcd5753f2
 vendor: google
 substituted_from: https://support.google.com/googleplay/android-developer/answer/9888170
 note: "Google redirected the old permissions answer ID here."
@@ -22,7 +22,7 @@ This article will be updated with recently [announced](https://support.google.co
 
 - We're introducing the[Contacts Permissions](https://support.google.com/googleplay/android-developer/answer/16909972#contacts-permissions) policy to govern broad access of users' contacts. Apps that don't need broad access must use the [Android Contact Picker](https://developer.android.com/about/versions/17/features/contact-picker), a more secure, easy-to-integrate alternative that minimizes data collection and improves user safety.
 
-To preview the updated “Permissions and APIs that Access Sensitive Information” article, visit [this page](https://support.google.com/googleplay/android-developer/answer/16909972).
+To preview the updated "Permissions and APIs that Access Sensitive Information" article, visit [this page](https://support.google.com/googleplay/android-developer/answer/16909972).
 
 **Policy Summary**
 
@@ -57,8 +57,8 @@ Certain Restricted Permissions may be subject to additional requirements as deta
 | If a user denies a restricted permission, your app must honor that decision without manipulation. | Don't use permissions to violate Google Play's [Malware](https://support.google.com/googleplay/android-developer/answer/9888380) policy, including [Elevated Privilege Abuse](https://support.google.com/googleplay/android-developer/answer/9888380#elevated-privilege-abuse). |
 | Offer a different way to perform a function if a user denies a permission, such as allowing manual data entry. | Don't manipulate or deceive users. Never pressure or trick users into granting permissions. |
 | Follow the [User Data](https://support.google.com/googleplay/android-developer/answer) policy, because all data accessed through these permissions is sensitive. | Don't deny a user a reasonable alternative if they decline a Restricted Permission; ensure the app remains functional. |
-| Request dangerous permissions (for example,`READ_CALENDAR`) with a runtime request and a clear explanation. | Don't request without justification. Only request a restricted permission for a compelling, critical feature that has no alternative. |
-| Direct users to the system settings page for approval of special permissions (for example,`SYSTEM_ALERT_WINDOW`). |  |
+| Request dangerous permissions (for example, `READ_CALENDAR`) with a runtime request and a clear explanation. | Don't request without justification. Only request a restricted permission for a compelling, critical feature that has no alternative. |
+| Direct users to the system settings page for approval of special permissions (for example, `SYSTEM_ALERT_WINDOW`). |  |
 
 ---
 
@@ -70,7 +70,7 @@ System pickers and alternatives like [Sharesheet](https://developer.android.com/
 
 - All user Photos are personal and sensitive data subject to the [User Data](https://support.google.com/googleplay/android-developer/answer/10144311) policy.
 
-- Apps that target Android 13 or later (API level 33+) may only request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions if system pickers (like the [Android Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker)) are not sufficient for your app to provide core functionality. Apps that still request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions must submit a Play Console declaration to demonstrate access needs for Photos and why Android Photo Picker (or alternatives) would not suffice.
+- Apps that target Android 13 or higher (API level 33+) may only request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions if system pickers (like the [Android Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker)) are not sufficient for your app to provide core functionality. Apps that still request the `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` permissions must submit a Play Console declaration to demonstrate access needs for Photos and why Android Photo Picker (or alternatives) would not suffice.
 
 ---
 
@@ -177,12 +177,12 @@ The inventory of installed apps queried from a device are regarded as personal a
 
 Apps that have a core purpose to launch, search, or interoperate with other apps on the device, may obtain scope-appropriate visibility to other installed apps on the device as outlined below:
 
-- **Broad app visibility:** Broad visibility is the capability of an app to have extensive (or “broad”) visibility of the installed apps (“packages”) on a device.
-  For apps targeting [API level 30 or later](https://developer.android.com/studio/releases/platforms), broad visibility to installed apps via the [``QUERY_ALL_PACKAGES``](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages) permission is restricted to specific use cases where awareness of and/or interoperability with any and all apps on the device are required for the app to function.
+- **Broad app visibility:** Broad visibility is the capability of an app to have extensive (or "broad") visibility of the installed apps ("packages") on a device.
+  For apps targeting [API level 30 or higher](https://developer.android.com/studio/releases/platforms), broad visibility to installed apps via the [``QUERY_ALL_PACKAGES``](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages) permission is restricted to specific use cases where awareness of and/or interoperability with any and all apps on the device are required for the app to function.
   - You may not use ``QUERY_ALL_PACKAGES`` if your app can operate with a more [targeted scoped package visibility declaration](https://developer.android.com/training/basics/intents/package-visibility#declare-other-apps)(for example, querying and interacting with specific packages instead of requesting broad visibility).
   Use of alternative methods to approximate the broad visibility level associated with ``QUERY_ALL_PACKAGES`` permission are also restricted to user-facing core app functionality and interoperability with any apps discovered via this method.
   Please see this [Help Center article](https://support.google.com/googleplay/android-developer/answer/10158779) for allowable use cases for the ``QUERY_ALL_PACKAGES`` permission.
-- **Limited app visibility**: Limited visibility is when an app minimizes access to data by querying for specific apps using more targeted (instead of “broad”) methods(for example, querying for specific apps that satisfy your app’s manifest declaration). You may use this method to query for apps in cases where your app has policy compliant interoperability, or management of these apps.
+- **Limited app visibility**: Limited visibility is when an app minimizes access to data by querying for specific apps using more targeted (instead of "broad") methods(for example, querying for specific apps that satisfy your app's manifest declaration). You may use this method to query for apps in cases where your app has policy compliant interoperability, or management of these apps.
 - Visibility to the inventory of installed apps on a device must be directly related to the core purpose or core functionality that users access within your app.
 
 App inventory data queried from Play-distributed apps may never be sold nor [shared](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en&sjid=9328586825007120077-NA#sharing&zippy=%2Cdata-types%2Cdata-sharing) for analytics or ads monetization purposes.
