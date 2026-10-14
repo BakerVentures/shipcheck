@@ -210,6 +210,19 @@ def render(page):
 
 PAGES = []
 
+_account_deletion_raw = read("apple/account-deletion.md")
+if "## Account deletion guidance" in _account_deletion_raw:
+    _account_deletion_guidance = (
+        _account_deletion_raw.split("## Frequently")[0].split("## Account deletion guidance")[1]
+    )
+else:
+    # Apple restructured this page (2026-10-12 fetch) to FAQ-only, under H3 "### <question>"
+    # headings straight off the H1 -- the "## Account deletion guidance" bullet-list section
+    # is gone. Fall back to the intro paragraphs before the first FAQ question, same defensive
+    # shape as the required-reason-api fallback below.
+    _after_h1 = re.split(r"^#{1,2} .*$", _account_deletion_raw, maxsplit=1, flags=re.M)[-1]
+    _account_deletion_guidance = re.split(r"^#{1,6} ", _after_h1, maxsplit=1, flags=re.M)[0].strip()
+
 PAGES.append(dict(
     slug="5-1-1-v-account-deletion",
     eyebrow="APP STORE GUIDELINE 5.1.1(v)",
@@ -223,7 +236,7 @@ PAGES.append(dict(
     source_label="App Store Review Guidelines, 5.1.1(v)",
     sections=[
         ("What counts as compliant, per Apple's own account-deletion guidance",
-         read("apple/account-deletion.md").split("## Frequently")[0].split("## Account deletion guidance")[1]),
+         _account_deletion_guidance),
         ("Why React Native and Expo apps miss this specifically",
          "Auth is usually wired through Supabase, Firebase Auth, or Clerk, and the SDK "
          "ships a `signOut()` method that's easy to mistake for account deletion in a quick "
@@ -479,7 +492,7 @@ PAGES.append(dict(
          "and websites, the ATT prompt is not optional, and the timing and wording both matter "
          "to App Review.",
     clause_label="Using the AppTrackingTransparency framework — Apple Developer",
-    quote=read("apple/user-privacy-and-data-use.sections/using-the-apptrackingtransparency-framework.md")
+    quote=read("apple/user-privacy-and-data-use.sections/using-the-app-tracking-transparency-framework.md")
           .split("\n\n", 1)[1],
     source_label="User Privacy and Data Use, AppTrackingTransparency framework",
     sections=[
