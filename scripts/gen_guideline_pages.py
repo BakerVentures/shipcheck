@@ -34,6 +34,24 @@ def read(rel):
     return body
 
 
+def read_sections(source_id):
+    """Concatenate every .sections chunk for a manifest source, in the manifest's own
+    order. Each chunk already carries its own "### Heading" line (para_html() renders
+    that as a bolded line), so this is robust to the raw page's heading levels or prose
+    layout changing on the next corpus refresh -- unlike re-deriving structure from the
+    raw page with a heading regex, which is exactly what broke on this one."""
+    for src in MANIFEST["sources"]:
+        if src.get("id") == source_id:
+            sections_dir = src.get("sections_dir")
+            if not sections_dir:
+                return ""
+            return "\n\n".join(
+                read(os.path.join(sections_dir, sec["anchor"] + ".md"))
+                for sec in src.get("sections", [])
+            )
+    raise KeyError("no manifest source with id %r" % source_id)
+
+
 _MD_TOKEN_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*")
 
 
@@ -218,10 +236,19 @@ if "## Account deletion guidance" in _account_deletion_raw:
 else:
     # Apple restructured this page (2026-10-12 fetch) to FAQ-only, under H3 "### <question>"
     # headings straight off the H1 -- the "## Account deletion guidance" bullet-list section
-    # is gone. Fall back to the intro paragraphs before the first FAQ question, same defensive
-    # shape as the required-reason-api fallback below.
-    _after_h1 = re.split(r"^#{1,2} .*$", _account_deletion_raw, maxsplit=1, flags=re.M)[-1]
-    _account_deletion_guidance = re.split(r"^#{1,6} ", _after_h1, maxsplit=1, flags=re.M)[0].strip()
+    # is gone, replaced entirely by the FAQ. The intro paragraph alone would just repeat the
+    # ASRG quote already shown above this section, so pull the actual FAQ answers too -- from
+    # the already-chunked .sections files (anchor-keyed, independent of the raw page's heading
+    # levels), not by re-deriving structure from the raw page, which is exactly the parsing
+    # that just broke once this refresh and would break again on the next one.
+    _account_deletion_intro = re.split(r"^#{1,2} .*$", _account_deletion_raw, maxsplit=1, flags=re.M)[-1]
+    _account_deletion_intro = re.split(r"^#{1,6} ", _account_deletion_intro, maxsplit=1, flags=re.M)[0].strip()
+    _account_deletion_guidance = "\n\n".join(
+        p for p in [_account_deletion_intro, read_sections("account-deletion")] if p
+    )
+    assert _account_deletion_guidance, (
+        "account-deletion.md fallback produced no content -- corpus structure changed again"
+    )
 
 PAGES.append(dict(
     slug="5-1-1-v-account-deletion",
@@ -336,6 +363,12 @@ PAGES.append(dict(
     ],
 ))
 
+_required_reason_raw = read("apple/required-reason-api.md")
+_required_reason_quote = (
+    _required_reason_raw.split("## See Also")[0].split("## Overview")[1]
+    if "## Overview" in _required_reason_raw else _required_reason_raw[:900]
+)
+
 PAGES.append(dict(
     slug="itms-91053-privacy-manifest",
     eyebrow="ITMS-91053 · REQUIRED-REASON API",
@@ -345,7 +378,7 @@ PAGES.append(dict(
     lede="This one blocks the upload itself, before a human reviewer ever sees the app -- and "
          "it's the single most common upload-time rejection in Expo projects.",
     clause_label="Apple Developer Documentation — Describing use of required reason API",
-    quote=read("apple/required-reason-api.md").split("## See Also")[0].split("## Overview")[1] if "## Overview" in read("apple/required-reason-api.md") else read("apple/required-reason-api.md")[:900],
+    quote=_required_reason_quote,
     source_label="Apple Developer Documentation, required-reason API",
     sections=[
         ("Why Expo apps trip this without writing any native code",
