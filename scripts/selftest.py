@@ -1403,6 +1403,67 @@ def run_comment_strip_checks():
     return fails
 
 
+def run_doc_generator_checks():
+    """gen_guideline_pages.py / gen_comparison_pages.py read specific headings and
+    filenames out of the cached corpus by hardcoded structure -- a corpus refresh that
+    restructures a page can silently crash them, and nothing else in this suite
+    exercises either script (found 2026-10-13 on a corpus refresh, see
+    rules/lessons.md in the Brain repo). Run them for real and require a clean exit.
+
+    Also checks, when the generated paths were clean going in, that regenerating
+    didn't change them -- i.e. the committed docs match what the corpus + script
+    produce right now. That half is a real check for a developer running this
+    locally after editing the corpus or the generators by hand. It's not a check
+    refresh-corpus.yml's own run of this script can ever hit, though: that workflow
+    regenerates docs/ itself first specifically so a real corpus change lands as
+    "already dirty, skip" here rather than failing the job outright -- for that
+    pipeline, the crash check above is what's actually protecting it, and the PR
+    peter-evans/create-pull-request opens is what carries the (legitimate) diff."""
+    fails = []
+    print("\nDoc generators (gen_guideline_pages.py, gen_comparison_pages.py)")
+    # Only the paths these two scripts actually write -- docs/index.html (the hand-
+    # maintained landing page) and docs/privacy-policy.md live under docs/ too but
+    # aren't theirs, so scoping to the whole docs/ dir would let an unrelated WIP
+    # edit to either one mask real staleness in docs/guidelines/ or the root sitemap.
+    generated_paths = [os.path.join(ROOT, "docs", "guidelines"),
+                        os.path.join(ROOT, "docs", "sitemap.xml")]
+
+    def _generated_dirty():
+        # --porcelain (not `git diff --quiet`) so a brand-new untracked page a
+        # generator just wrote -- `git diff` is blind to those -- still counts.
+        return bool(subprocess.run(
+            ["git", "status", "--porcelain", "--"] + generated_paths,
+            cwd=ROOT, capture_output=True, text=True).stdout.strip())
+
+    tree_was_dirty = _generated_dirty()
+
+    for script in ("gen_guideline_pages.py", "gen_comparison_pages.py"):
+        proc = subprocess.run([sys.executable, os.path.join(HERE, script)],
+                               cwd=ROOT, capture_output=True, text=True)
+        if proc.returncode != 0:
+            print("  FAIL   %s crashed (exit %d)" % (script, proc.returncode))
+            for line in proc.stderr.strip().splitlines()[-10:]:
+                print("    " + line)
+            fails.append("doc-generator: %s crashed" % script)
+        else:
+            print("  ok     %s ran clean" % script)
+
+    if not fails:
+        if tree_was_dirty:
+            # Can't tell whether any remaining diff is this run's doing or
+            # pre-existing uncommitted work -- don't make a call either way.
+            print("  skip   stale-docs check (docs/guidelines/ or docs/sitemap.xml "
+                  "already had uncommitted changes before this ran)")
+        elif _generated_dirty():
+            print("  FAIL   docs/guidelines/ or docs/sitemap.xml changed after "
+                  "regenerating -- the committed pages are stale relative to the "
+                  "current corpus + generator; run the generators and commit the result")
+            fails.append("doc-generator: docs/ stale")
+        else:
+            print("  ok     generated docs/ match what's committed")
+    return fails
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true")
@@ -1470,6 +1531,7 @@ def main():
     fails += run_concrete_promise_checks()
     fails += run_negated_claim_checks()
     fails += run_comment_strip_checks()
+    fails += run_doc_generator_checks()
 
     print("\n%d findings, %d passes, %d gaps"
           % (len(data["findings"]), len(data.get("passes") or []), len(data["gaps"])))
