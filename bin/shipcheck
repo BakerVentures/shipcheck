@@ -239,7 +239,15 @@ def cmd_gate(args):
                 ("version", "%s (%s)" % (facts["version"], facts["build"])),
                 ("linked SDK", facts["linked_sdk"]),
                 ("min OS", facts["minos"]),
-                ("binary UUID", facts["binary_uuid"]),
+                ("binary UUID", "%s  (%s slice)"
+                 % (facts["binary_uuid"], facts.get("binary_arch") or "?")),
+                ("slices (LC_UUID per arch)",
+                 ", ".join("%s=%s" % (a, facts["binary_uuids"][a])
+                           for a in sorted(facts.get("binary_uuids") or {}))
+                 or "(unreadable)"),
+                ("build type", "%s  (%s)" % (facts.get("build_type"),
+                                             facts.get("build_type_how"))),
+                ("read from arch", facts.get("binary_arch") or "?"),
                 ("plist fingerprint", facts["fingerprint"]),
                 ("scene manifest", "yes" if facts["scene_manifest"] else "no"),
                 ("scene delegate", facts["scene_delegate"] or c("31", "NONE")),
@@ -393,7 +401,8 @@ def cmd_gate(args):
                     badge, os.path.basename(pa),
                     c("2", "%s+%s  sdk %s  uuid %s"
                       % (f["version"], f["build"], f["linked_sdk"],
-                         (f["binary_uuid"] or "?")[:8]))))
+                         "%s/%s" % ((f["binary_uuid"] or "?")[:8],
+                                    f.get("binary_arch") or "?")))))
                 print("          %s" % c("2", pa))
                 for fd in sorted(r["findings"],
                                  key=lambda x: ORDER.index(
@@ -484,13 +493,21 @@ def cmd_gate(args):
         print("  %s  %s  %s" % (c("1", "shipcheck gate"),
                                 os.path.basename(f["app"]),
                                 c("2", "%s+%s" % (f["version"], f["build"]))))
-        print("  %s" % c("2", "SDK %s · binary %s · %s"
+        print("  %s" % c("2", "SDK %s · binary %s (%s slice) · %s"
                          % (f["linked_sdk"], (f["binary_uuid"] or "?")[:8],
+                            f.get("binary_arch") or "?",
                             f["fingerprint"])))
+        # Which architecture and which build type this verdict came from.
+        # BUILD-STANDARD.md §3.6: the simulator build is a PROXY for the
+        # device link set and the proxy has never been tested. A verdict that
+        # does not say which one it read invites exactly that mistake.
+        prov_colour = "33" if f.get("build_type") == "simulator" else "2"
+        print("  %s" % c(prov_colour, f.get("provenance") or "measured on: ?"))
         print()
         ev = res["evidence"]
         label = {"exact": c("32", "proven (this binary)"),
-                 "sibling": c("32", "proven (sibling build, keys agree)"),
+                 "sibling": c("33", "proven (SIBLING build, no slice in "
+                                    "common, plist keys agree)"),
                  "absent": c("31", "no evidence"),
                  "expired": c("31", "expired / wrong binary"),
                  "config": c("32", "tracked config"),
