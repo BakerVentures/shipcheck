@@ -76,7 +76,8 @@ ALLOW_FILE = ".secret-scan-allow"
 #     pass", "signInWithPassword" is fine but "pass X" is not).
 #   * "key" alone is never a keyword: keyExtractor, object keys, keyboard.
 KEYWORD = (
-    r"(?:pass(?:word|wd|phrase|code)|pwd|secret|api[_-]?key|apikey|auth[_-]?token|"
+    r"(?:pass(?:word|wd|phrase|code)|pwd|secret|api[_-]?key|apikey|api[_-]?token|"
+    r"auth[_-]?token|"
     r"access[_-]?token|refresh[_-]?token|client[_-]?secret|access[_-]?key|"
     r"private[_-]?key|service[_-]?role(?:[_-]?key)?|anon[_-]?key|credential)"
 )
@@ -84,10 +85,10 @@ KEYWORD = (
 RULES: list[tuple[str, re.Pattern[str]]] = [
     # 1. assignment to a quoted literal:  PASSWORD = "...."   password: '....'
     ("assign-literal", re.compile(
-        r"(?i)" + KEYWORD + r"[A-Za-z0-9_]*\s*(?:=|:|=>|:=)\s*[\"'`]([^\"'`\n]{6,120})[\"'`]")),
+        r"(?i)" + KEYWORD + r"[A-Za-z0-9_]*\s*[\"']?\s*(?:=|:|=>|:=)\s*[\"'`]([^\"'`\n]{6,120})[\"'`]")),
     # 2. unquoted assignment:  PASSWORD=....   (shell, dotenv, CI yaml)
     ("assign-bare", re.compile(
-        r"(?i)(?:^|[\s;&|({\[,])" + KEYWORD + r"[A-Za-z0-9_]*\s*=\s*([^\s\"'`,;)\]}\n]{8,120})")),
+        r"(?i)(?:^|[\s;&|({\[,:/_\"'])" + KEYWORD + r"[A-Za-z0-9_]*\s*=\s*([^\s\"'`,;)\]}\n]{8,120})")),
     # 3. command-line flag:  --password hunter2 / --password=hunter2  # secret-scan:allow
     ("cli-flag", re.compile(
         r"(?i)--" + KEYWORD + r"[A-Za-z0-9_-]*[= ]([^\s\"'`\n]{6,120})")),
@@ -121,6 +122,41 @@ RULES: list[tuple[str, re.Pattern[str]]] = [
         r"|phc_[A-Za-z0-9]{32,}"
         r"|eyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}"
         r")")),
+    # 7. npm's own config key `_auth`, which no keyword above can reach: the
+    #    scanner has no bare `auth` keyword (far too common in code) and
+    #    `auth[_-]?token` requires the word "token". A LEADING UNDERSCORE is what
+    #    makes this safe to match on its own -- `_auth` is npm's config key and
+    #    essentially nothing else, where bare `auth` is `auth.signIn`, `const auth
+    #    =`, `auth: true` everywhere. `.npmrc`, `package-lock.json` and
+    #    `yarn.lock` are exactly where it lands. Measured, not assumed: zero
+    #    matches across every tracked and ignored file in the portfolio.
+    ("npm-auth-key", re.compile(
+        r"(?i)(?<![A-Za-z0-9])_auth(?![A-Za-z0-9_])\s*[\"']?\s*[:=]\s*"
+        r"[\"']?([^\s\"'`,;)\]}\n]{8,200})")),
+    # 8. an env-var-shaped name ending in TOKEN, assigned a bare or quoted value:
+    #    `FOO_TOKEN=....`, `CLOUDFLARE_API_TOKEN="...."`. This is the shape that
+    #    actually leaked -- the NOTIFY logger wrote an inline
+    #    `CLOUDFLARE_API_TOKEN=` assignment into a tracked markdown log and it sat
+    #    on main for five weeks while every scanner reported clean. KEYWORD has no
+    #    bare `token`, and adding one there was measured and REFUSED: it fires on
+    #    `token:`/`accessToken` references throughout this portfolio's TypeScript.
+    #    The narrowing that makes this cheap is UPPERCASE + `=`: an env-var
+    #    assignment, not a property access. Case-insensitive deliberately NOT used.
+    #    `FOO_TOKEN=$VAR` and `FOO_TOKEN=${{ secrets.X }}` are excused by
+    #    NOT_A_SECRET, and an UPPER_SNAKE value is excused as a reference.
+    ("env-token", re.compile(
+        r"(?<![A-Za-z0-9_])(?:[A-Z][A-Z0-9]*_)*TOKEN\s*=\s*"
+        r"[\"'`]?([^\s\"'`,;)\]}\n]{8,120})")),
+    # 9. a credential in a URL's userinfo:  https://user:SECRET@host. npm writes
+    #    this into a lockfile's `"resolved"` field for a private registry, and git
+    #    remotes and database URLs carry it too. NOT a quoted kind, on purpose:
+    #    that keeps the plain-word filter in play, so `postgresql://postgres:
+    #    postgres@localhost` -- which is in every stock supabase config -- stays
+    #    quiet while a mixed-class token does not. Stated plainly: an
+    #    all-lowercase-letters password in a URL is indistinguishable from
+    #    `postgres:postgres` by shape alone, and is missed.
+    ("url-userinfo", re.compile(
+        r"[A-Za-z][A-Za-z0-9+.\-]*://[^\s/:@\"']{1,64}:([^\s/:@\"'`]{6,120})@")),
     # 6. private key blocks, in any file type.
     ("private-key-block", re.compile(
         r"(-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----)")),
@@ -136,7 +172,13 @@ NOT_A_SECRET = [
     re.compile(r"^<.*>$"),                                             # <your-key>
     re.compile(r"^\$"),                                                # $VAR ${VAR}
     re.compile(r"\$\{"),                                               # `Bearer ${t}`
-    re.compile(r"(?i)^(?:your|my|the|a|an|some|new|old|same|real|valid|invalid)[-_ ]"),
+    # `REPLACE_WITH_ASC_P8_KEY_PATH` in jarvis-mini/reports/portfolio-inventory.md
+    # was the ONE false positive the 2026-10-15 widening introduced across 3,940
+    # tracked files: an UPPER_SNAKE placeholder inside a quoted JSON value, where
+    # the UPPER_SNAKE-reference filter below is deliberately suppressed. Measured,
+    # then fixed -- not fixed on a hunch.
+    re.compile(r"(?i)^(?:your|my|the|a|an|some|new|old|same|real|valid|invalid|"
+               r"replace|insert|paste|fill)[-_ ]"),
     re.compile(r"(?i)^(?:changeme|placeholder|example|redacted|dummy|sample|todo|tbd|"
                r"null|none|nil|undefined|true|false|empty|unset|omitted|hidden|"
                r"required|optional|string|number|boolean|object)$"),
@@ -176,6 +218,13 @@ NOT_A_SECRET_UNQUOTED = [
     re.compile(r"^[A-Za-z]+(?:[-\u2019'][A-Za-z]{1,12})*$"),            # a plain word   (real FP)
     re.compile(r"^</?[A-Za-z]"),                                       # </Text> markup (real FP)
     re.compile(r"^[<>{}\[\]()]"),                                      # stray bracket  (real FP)
+    # `const authToken = useAuthToken();` -- the capture class for an unquoted
+    # value stops at `)` but not at `(`, so the value came out as `useAuthToken(`,
+    # which no filter above excused. A bare call is a reference, never a value.
+    # This is a PRE-EXISTING false positive, not one introduced on 2026-10-15: the
+    # 2026-10-14 scanner flags that line too. NOT_A_SECRET already excuses
+    # `require(` and `import(` for the same reason; this generalises it.
+    re.compile(r"^[A-Za-z_$][A-Za-z0-9_$]*\($"),                       # bare call (real FP)
 ]
 
 # Kinds whose captured value came from inside a quoted string literal.
@@ -371,6 +420,34 @@ SELF_TEST_FIXTURES = [
     ('const DEMO_PASSWORD = "correct-horse-batter";', True,  # secret-scan:allow
      "passphrase-style literal (the shape missed on the first tuning pass)"),
     ("password: DEMO_PASSWORD,", False, "UPPER_SNAKE reference"),
+    # --- 2026-10-15: the threat-shaped fixtures. Every one of these was MISSED by
+    # the version of this file that shipped on 2026-10-14, which had just been
+    # widened to READ lockfiles because npm credentials live in them -- and was
+    # verified with a planted private key, a shape its rules already matched.
+    # Values are fabricated. Choose the canary from the threat, not from the rules.
+    ('"_authToken": "FABRICATEDcanary9x7q2w3e4r5t"', True, "npm: quoted JSON key"),  # secret-scan:allow
+    ('//registry.npmjs.org/:_authToken=FABRICATEDcanary9x7q2w', True,  # secret-scan:allow
+     "npm: .npmrc registry-scoped key"),
+    ('_auth = RkFCUklDQVRFRGNhbmFyeTEyMzQ1Ng==', True, "npm: _auth base64"),  # secret-scan:allow
+    ('"_auth": "RkFCUklDQVRFRGNhbmFyeTEyMzQ1Ng=="', True, "npm: quoted _auth"),  # secret-scan:allow
+    ('npm_authToken=FABRICATEDcanary9x7q2w3e4r', True, "npm: underscore mid-name"),  # secret-scan:allow
+    ('"resolved": "https://u:FABRICATEDcanary9x7q2w@npm.pkg.internal/x.tgz"', True,  # secret-scan:allow
+     "npm: credential in a resolved URL"),
+    ('authToken = "FABRICATEDcanary9x7q2w3e4r"', True, "npm: plain authToken"),  # secret-scan:allow
+    ('$ FOO_TOKEN=FABRICATEDcanary9x7q2w3e4r ./deploy.sh', True,  # secret-scan:allow
+     "inline FOO_TOKEN= in a command log -- the shape that leaked for five weeks"),
+    ('$ CLOUDFLARE_API_TOKEN="cfuFABRICATEDcanary0A1b2C3d4E5f6G7h8I9j0K" wrangler deploy',  # secret-scan:allow
+     True, "inline vendor-shaped token in a command log"),
+    # --- and the lines that must stay quiet, each one a real shape in this portfolio.
+    ('GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}', False, "CI secret interpolation"),
+    ('EXPO_TOKEN=$EXPO_TOKEN', False, "shell variable reference"),
+    ('CLOUDFLARE_API_TOKEN=', False, "empty assignment"),  # secret-scan:allow
+    ('FOO_TOKEN=SOME_OTHER_VAR', False, "UPPER_SNAKE reference"),
+    ('url = "postgresql://postgres:postgres@localhost:54322/postgres"', False,
+     "stock supabase db url -- plain-word userinfo"),
+    ('"integrity": "sha512-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="', False,
+     "lockfile integrity hash"),
+    ('const authToken = useAuthToken();', False, "code reference, no literal"),
 ]
 
 
