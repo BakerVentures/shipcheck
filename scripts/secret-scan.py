@@ -214,7 +214,33 @@ NOT_A_SECRET = [
 # regardless of how word-like it looks.
 NOT_A_SECRET_UNQUOTED = [
     re.compile(r"^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$"),                    # UPPER_SNAKE name
-    re.compile(r"^[a-z]+(?:[A-Z][a-z0-9]*)+$"),                        # camelCaseName  (real FP)
+    # A camelCase identifier: `api_key: posthogKey` is the real false positive this
+    # came from. BOUNDED 2026-10-15. Unbounded, this one entry also excused
+    # **30.26% of random 40-character alphanumeric tokens** and **8.82% of
+    # 40-character base64url tokens** sitting in an unquoted credential slot --
+    # 20,000 trials each, measured by calling this file's own
+    # is_reference_or_placeholder(). A random token that happens to start with
+    # lowercase letters and then contains an uppercase one IS this shape, so the
+    # filter was silently excusing roughly one real-shaped key in eleven. That is
+    # how it was found: a control canary reported MISSED once and CAUGHT five
+    # times, and the flake was measured instead of retried.
+    #
+    # Two bounds, both set from measurement rather than taste -- at most 23
+    # characters and at most 4 uppercase letters. Across 9,469 tracked and
+    # 1,953,876 ignored files in 38 working directories, every value in a
+    # credential slot that this regex matches is at most 17 characters long, has
+    # at most 3 uppercase letters, and contains no digit at all.
+    #
+    # The measured false-positive cost of adding the bounds is ZERO, and the
+    # reason is structural rather than lucky: the "plain word" entry below already
+    # excuses every all-letter value, so this entry's only UNIQUE job is excusing
+    # a camelCase name that contains a DIGIT -- and there is no such value in a
+    # credential slot anywhere in the portfolio. A 40-character random token, by
+    # contrast, contains a digit essentially always. Stated plainly, so it is not
+    # mistaken for a wider claim: an all-letter token of any length is still
+    # excused, by the plain-word entry below and not by this one.
+    re.compile(r"^(?=.{1,23}$)(?=(?:[^A-Z]*[A-Z]){1,4}[^A-Z]*$)"
+               r"[a-z]+(?:[A-Z][a-z0-9]*)+$"),                     # camelCaseName  (real FP)
     re.compile(r"^[A-Za-z]+(?:[-\u2019'][A-Za-z]{1,12})*$"),            # a plain word   (real FP)
     re.compile(r"^</?[A-Za-z]"),                                       # </Text> markup (real FP)
     re.compile(r"^[<>{}\[\]()]"),                                      # stray bracket  (real FP)
@@ -448,6 +474,31 @@ SELF_TEST_FIXTURES = [
     ('"integrity": "sha512-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="', False,
      "lockfile integrity hash"),
     ('const authToken = useAuthToken();', False, "code reference, no literal"),
+    # --- 2026-10-15 (second pass): the shapes the camelCase FALSE-POSITIVE FILTER
+    # was excusing. Chosen from the threat, not from the rules: each value below is
+    # a full-entropy fabricated token that the 2026-10-15 morning file matched with
+    # `^[a-z]+(?:[A-Z][a-z0-9]*)+$` and therefore reported CLEAN. That filter alone
+    # excused 30.26% of 40-char alphanumeric tokens and 8.82% of 40-char base64url
+    # tokens in an unquoted credential slot. Every fixture here is red against that
+    # file and green against this one. Values are fabricated; no real credential.
+    ('$ FOO_TOKEN=gWt479FHTZWRzrBLQ0tEU5NXaL6Vh2AZF4AGvOPV ./deploy.sh', True,  # secret-scan:allow
+     "camel-shaped 40-char alphanumeric token in a command log"),
+    ('CLOUDFLARE_API_TOKEN=cP0He8XFxEc6p9nAROuPsYFeHDQGjvsTsiWc2o9B', True,  # secret-scan:allow
+     "camel-shaped 40-char base64url token, unquoted dotenv assignment"),
+    ('//registry.npmjs.org/:_authToken=yC6X0wCanhFfi2O4w0YpECQB7UghBrVr', True,  # secret-scan:allow
+     "camel-shaped 32-char npm registry token"),
+    ('psql --password cLgRXqVatoDK4ZW8sdJOte9w', True,  # secret-scan:allow
+     "camel-shaped 24-char value -- exactly one over the length bound"),
+    ('postgresql://admin:iNbEqxfeBFZOpEE8@db.internal:5432/app', True,  # secret-scan:allow
+     "camel-shaped 16-char URL password -- caught by the uppercase bound, not length"),
+    ('The review account password is gWt479FHTZWRzrBLQ0tEU5NXaL6Vh2AZF4AGvOPV today.',  # secret-scan:allow
+     True, "camel-shaped token disclosed in prose"),
+    # --- and the lines the bounds must still keep quiet.
+    ('api_key: apiKeyForPlatform,', False,
+     "the longest real camelCase value in the portfolio (17 chars, 3 uppercase)"),
+    ('access_token=fMAz5qtPuOxum55w45mh51k', False,
+     "23 chars / 4 uppercase -- inside both bounds, still excused"),
+    ('const authToken = someCamelCaseValue;', False, "camelCase reference, no digits"),
 ]
 
 
