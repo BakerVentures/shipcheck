@@ -68,6 +68,7 @@ section p{max-width:620px;margin:0 0 12px}
 .plan .per{color:var(--muted);font-size:14px}
 .plan p{margin:10px 0 16px;color:var(--muted);font-size:15px}
 .plan a{display:inline-block;background:var(--cta-bg);color:var(--cta-fg);text-decoration:none;border-radius:6px;padding:10px 14px;font-weight:500;font-size:14px}
+.plan .soon{display:inline-block;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:10px 14px;font-weight:500;font-size:14px}
 .plan.free{border-style:dashed;background:transparent}
 .plan.free a{background:transparent;color:var(--ink);border:1px solid var(--ink)}
 .faq dt{font-weight:600;margin-top:16px}
@@ -132,30 +133,6 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
           "priceCurrency": "USD",
           "url": "https://bakerventures.github.io/shipcheck/#pricing",
           "category": "Risk score plus top three findings, on every app"
-        },
-        {
-          "@type": "Offer",
-          "name": "One app",
-          "price": "29",
-          "priceCurrency": "USD",
-          "url": "https://bakerventures.github.io/shipcheck/#pricing",
-          "category": "Full report, unlimited rescans, reply drafts, one app forever"
-        },
-        {
-          "@type": "Offer",
-          "name": "Unlimited",
-          "price": "49",
-          "priceCurrency": "USD",
-          "url": "https://bakerventures.github.io/shipcheck/#pricing",
-          "category": "Unlimited apps, billed yearly"
-        },
-        {
-          "@type": "Offer",
-          "name": "Agency",
-          "price": "149",
-          "priceCurrency": "USD",
-          "url": "https://bakerventures.github.io/shipcheck/#pricing",
-          "category": "Unlimited apps shareable across a team, billed yearly"
         }
       ]
     },
@@ -200,7 +177,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
           "name": "Refunds?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Fourteen days, no questions. Email the address on your receipt."
+            "text": "Nothing is on sale yet, so there is nothing to refund. When checkout opens it will be fourteen days, no questions."
           }
         }
       ]
@@ -292,6 +269,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
 
 <section id="pricing">
 <h2>Pricing</h2>
+<p><b>There is no checkout yet, so none of the paid tiers can be bought today.</b> The free scan is the whole product right now: a risk score and your top three findings, with the clause text and the fix. The prices below are what the paid tiers will cost when payment is set up, not an offer.</p>
 <div class="pricing">
   <div class="plan free">
     <div class="price">Free</div>
@@ -303,16 +281,16 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
     <div class="price">$29</div>
     <div class="per">one app, forever</div>
     <p>Full report, unlimited rescans, Resolution Center reply drafts.</p>
-    <a href="REPLACE_CHECKOUT_SINGLE">Buy for one app</a>
+    <span class="soon">Not on sale yet</span>
   </div>
   <div class="plan">
     <div class="price">$49</div>
     <div class="per">per year, unlimited apps</div>
     <p>Everything above across every project you ship.</p>
-    <a href="REPLACE_CHECKOUT_YEARLY">Buy unlimited</a>
+    <span class="soon">Not on sale yet</span>
   </div>
 </div>
-<p class="agency-row">Need team seats? <b style="color:var(--ink)">$149/yr</b> — unlimited apps, shareable across your team, priority guideline updates. <a href="REPLACE_CHECKOUT_AGENCY">Buy for a team &rarr;</a></p>
+<p class="agency-row">Need team seats? <b style="color:var(--ink)">$149/yr</b> — unlimited apps, shareable across your team, priority guideline updates. Not on sale yet.</p>
 </section>
 
 <section>
@@ -322,7 +300,7 @@ footer{color:var(--muted);font-size:14px;padding:24px 0 48px;border-top:1px soli
   <dt>Does it guarantee approval?</dt><dd>No. It catches the rejections that come from the guidelines and from common React Native and Expo configuration mistakes. It can't run your app or predict a reviewer's mood.</dd>
   <dt>Why React Native and Expo specifically?</dt><dd>Because that's where the config-level rejections cluster: transitive permission strings, SDK privacy manifests, Expo Go leftovers. Native Swift projects work too, with less depth.</dd>
   <dt>Why not just ask Claude to review my app against the guidelines?</dt><dd>Because "the guidelines" in Claude's training data are however old the model's cutoff is, and Apple and Google change these pages constantly. shipcheck fetches the live pages, hashes them, and cites the clause off disk — <code>/shipcheck:refresh</code> shows you exactly what changed since your last scan. A citation in your report is text it actually fetched, not text a model remembered.</dd>
-  <dt>Refunds?</dt><dd>Fourteen days, no questions. Email the address on your receipt.</dd>
+  <dt>Refunds?</dt><dd>Nothing is on sale yet, so there is nothing to refund. When checkout opens it will be fourteen days, no questions.</dd>
 </dl>
 </section>
 

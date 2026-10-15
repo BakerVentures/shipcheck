@@ -56,3 +56,12 @@ marketing/*
 *.keystore
 *.mobileprovision
 *service-account*.json
+
+# Submission-gate receipts (scripts/shipgate.py).
+# The JSON receipts are COMMITTED ON PURPOSE: the machine that builds and the
+# machine that uploads are not the same machine here, and a launch proof that
+# lives only in ~/.config on the mini would block every legitimate upload from
+# the laptop. They are keyed to a bundle id + version + build + binary UUID and
+# expire the moment the build number moves, so a stale one cannot vouch for
+# anything. The launch SCREENSHOTS are megabytes each and are not committed.
+.shipcheck-receipts/*.png

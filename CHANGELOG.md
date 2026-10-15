@@ -1,5 +1,164 @@
 # Changelog
 
+## Unreleased: the gate's exit status, which read only `critical` (2026-10-15)
+
+**A sweep over two genuinely defective repos printed six `high`
+`BIN-FRAMEWORK-PURPOSE-STRING` findings and returned shell status 0.** Measured
+on `~/steadychart-ios27-verify` and `~/policyready-ios27-scene`, whose binaries
+link CoreLocation/CoreMotion with no purpose string — the ITMS-90683 that
+bounced MileTruth build 3 at delivery, and the only rejection Apple has ever put
+in writing. Every exit status in the gate was computed inline from
+`severity == "critical"`, in four places, and that rule is `high`. Any CI step
+or script reading `$?` called those repos clean. It went unnoticed because every
+published sweep so far also contained a `GATE-NO-ARTIFACT` or a critical
+`BIN-SCENE-NOT-ADOPTED`, so the 1 was always being earned by something else.
+
+`gate check` had the same bug from the other side: on that binary it exits 1
+only because its launch and stress receipts are missing. With the receipts in
+order it was `REVIEW`, exit 0, with the defect intact — reproduced as a fixture
+in `selftest_gate.py`.
+
+- **`shipgate.BLOCKING_SEVERITIES = ("critical", "high")`**, with
+  `blocking_findings()`, used by `gate check`, `gate sweep` and the `--json`
+  exit status of both. One definition instead of four inline comparisons. The
+  fix is the mapping, not a promotion: every `high` in this gate is either a
+  refusal at upload (ITMS-90683, a reused build number, a missing icon or
+  app privacy manifest) or an "I could not check" —
+  `GATE-CANNOT-READ-LINKAGE`'s own fix text already said *"This blocks rather
+  than passing"*, which it did not. `medium` and below are reported.
+- **An SDK's own embedded privacy manifest drops from `high` to `medium`.** Its
+  docstring already said "reported rather than blocking", and `high` would now
+  contradict that and block on a finding whose only fix is someone else's
+  release. Costs nothing: measured across 216 embedded manifests in six repos,
+  zero findings.
+- **`shipcheck scan` is unchanged.** It reads config, not the artifact, and has
+  a documented `fail-on` knob defaulting to `critical`. The gate has no knob.
+- **Regression test, and it runs `bin/shipcheck` as a subprocess.** Every
+  existing assertion in `selftest_gate.py` called `gate_sweep()` / `gate_check()`
+  in process and asserted on the returned dict; all 104 were green while the
+  CLI exited 0. The exit status was never the subject of a test. The new
+  `test_exit_status_mapping` asserts on nothing but `returncode`, on a fixture
+  whose findings are deliberately high-only (SDK 26, so the critical scene rule
+  is exempt and cannot earn the 1), and on a clean fixture that still carries a
+  `medium` finding, so exit 0 is not merely "nothing was found".
+
+## v0.3.0: the submission gate — binary evidence, a launch proof, a stress pass (2026-10-14)
+
+ShipCheck was run across 27 of Ryan's repos on 2026-10-13. It produced 61 findings
+and, by that sweep's own closing line, **0 true positives** — while eight of those
+apps sat rejected. This release is the answer to why, and it is not a new rule.
+
+**The config is not the artifact.** `scan.py:collect_info_plist()` walks `ios/` and
+skips any path containing `build`, so the one file that actually ships — the built
+`Info.plist` — is the one file the scanner had never read. And `ios/` is gitignored
+CNG output in every one of these repos, so the scanner's view of the plist depended
+on whether someone had run `expo prebuild` on that machine. That produced false
+findings in both directions, and both happened:
+
+- **False MISSING.** FlirtGym was reported missing `NSCameraUsageDescription`,
+  `NSPhotoLibraryUsageDescription` and `NSUserTrackingUsageDescription`. All three
+  are in the built binary, written at prebuild time by the `expo-image-picker` and
+  `expo-tracking-transparency` config plugins. A worker spent a commit pinning a
+  non-problem. A permission string is a property of the plugin graph, and only the
+  build resolves the plugin graph.
+- **False PRESENT.** TentClock's scene manifest exists only in an untracked `ios/`
+  directory on one Mac. Every config-or-source read calls it adopted. No build on
+  any other machine reproduces it.
+
+### New: `shipcheck gate` (scripts/shipgate.py)
+
+`scan` still reads config and source. `gate` reads the **built artifact** and requires
+**proof it was run**. Nothing should be submitted until `gate check` passes.
+
+- `gate inspect` — what the binary actually says: linked SDK and minos from
+  `LC_BUILD_VERSION`, `LC_UUID`, the real scene delegate, embedded privacy manifests,
+  bundled icon, `PlugIns/*.appex`.
+- `gate check` — the verdict. Exit 1 blocked, 3 unevaluable, 0 cleared. "I could not
+  check" never reads the same as "it is fine".
+- `gate launch` — installs and launches on a simulator and **measures the first
+  frame** (a stdlib PNG decoder over the screenshot). "It launched" is not "it drew
+  something": a flat frame after the settle delay is a blank window, and a liveness
+  check calls that a pass.
+- `gate stress` — nine abuse patterns, each one a defect that really happened here.
+  `--run` drives what simctl alone honestly can and prints the rest as still owed.
+- `gate attest` — what no tool can do, required and signed: real hardware, a reviewer
+  walkthrough, red-then-green on every fix, and each app extension exercised.
+
+New binary rules, each from a real case:
+
+- `BIN-SCENE-NOT-ADOPTED` — linked SDK ≥ 27 with no *named* scene delegate. An empty
+  `UISceneConfigurations` is not adoption. **Nearvo's shipped 1.0.0+9 binary has
+  exactly that**: the manifest is present and configures nothing.
+- `BIN-FRAMEWORK-PURPOSE-STRING-*` — `otool -L` against the built plist's purpose
+  strings. This is MileTruth build 3, rejected at delivery with **ITMS-90683**:
+  `expo-location`'s precompiled XCFramework links CoreMotion unconditionally, so
+  `motionUsagePermission: false` deleted the key and could not remove the linkage.
+- `BIN-BUILD-NUMBER-REUSED` — a second, different binary at the same version+build.
+  One FlirtGym submission died at **upload processing**, not review, over exactly
+  this, and no review-focused check looks for it.
+- `GATE-SCENE-PROVENANCE-UNTRACKED` — the artifact's safety is not reproducible from
+  tracked config. This is the TentClock hole, and the existing
+  `ios27-upload-gate.sh` passes TentClock with exit 0.
+- `BIN-PRIVACY-MANIFEST-ABSENT`, `BIN-ICON-ABSENT`, `BIN-EXPORT-COMPLIANCE-MISSING`
+  — all read from the bundle. The scanner's `node_modules` guess said "ShipCheck
+  cannot tell" on 9 of 27 apps; in the bundle there is nothing to be unsure about.
+
+### Receipts name the binary, not just the build number
+
+`ios27-upload-gate.sh` keys receipts on `bundleid@version+build` and defends that at
+length (you launch a sim build and upload a device build). The reasoning is right and
+the key is not sound, as running it showed: a receipt earned on Vocabdrift's **fixed**
+binary was applied to a **different** binary, same `1.0.1+3`, with no scene manifest
+at all. Receipts now carry the launched binary's `LC_UUID` and a fingerprint of the
+gate-relevant plist keys, and matching is three-valued — `exact`, `sibling` (different
+binary, same build, keys agree: the legitimate sim→device case), `expired`. A build
+number bump still expires everything.
+
+### Tests: 57 checks, and red-then-green is enforced rather than advised
+
+`scripts/selftest_gate.py`. Every rule has a **must-not-fire** case from a real app,
+because a gate that blocks a good submission teaches everyone to skip it.
+
+A green suite is not evidence: 2,115 Nearvo tests passed while the onboarding loop
+App Review rejected was live and shipping, and the *first* regression test written for
+that bug passed against the unfixed code. So for every rule this suite also builds the
+fixture the rule is meant to **pass** and asserts silence — a rule that fires on both
+is indistinguishable from one that always fires. The centrepiece is a real red/green
+pair: `clang` builds a genuine Mach-O linked once against SDK 26 and once against
+SDK 27, same absent manifest in both, and the scene rule must be silent on one and
+fire on the other. Mocking `vtool` would have tested the mock.
+
+Four bugs the tests found in the gate itself, each the gate's own failure mode:
+a false CRITICAL on IOLTAlign (the provenance regex did not match JSON quoting); an
+**unsatisfiable** requirement (`extension-exercised` demanded and then refused);
+a **pass recorded for a permission denial that never happened** (`simctl privacy`
+takes `revoke`, not `deny`, and every call had been failing silently); and fixtures
+that were testing their own error path because a fixture salt was not a valid C
+identifier.
+
+### Honest about scope
+
+`BIN-FRAMEWORK-PURPOSE-STRING-*` is `high`, not blocking: it fires on linkage, which
+is what bounced MileTruth, but a linked framework is not proof of use. It was also
+tightened by measurement — scanning every Mach-O in the bundle flagged
+`Photos.framework` on half the Expo apps, always via `ExpoFileSystem`, so the rule now
+reads only the app's own executable and each extension's. The gate cannot see App
+Store Connect (Nearvo's one recorded rejection, 2.1(b), is a submission-assembly
+fact), cannot see uploaded screenshots, and cannot take a single simulator off the
+network. Those are required and recorded, not automated.
+
+**A correction to this changelog's own record.** The v0.2.19 and v0.2.21 entries below
+say "nine rejections". No file in the company enumerates nine apps. The accurate
+figures are **eight apps currently in a rejected state** and **at least thirteen
+distinct rejection events** once Nearvo's five-or-more and FlirtGym's two are counted
+separately. Apple's notices for the batch of eight carried an **empty issues block**:
+no guideline, no reason text. Seven of those reasons are unrecorded and unrecoverable
+without Ryan's Apple sign-in, so this release makes no claim about which of them the
+gate would have caught. What it catches is stated above and was measured. Standing
+rule going with it: if an App Review citation is ever read, paste the **verbatim** text
+into that app's decision log the same hour — the single surviving verbatim citation in
+the whole corpus survives only because a human pasted it into a commit message.
+
 ## v0.2.22: five false positives from the 27-app portfolio sweep (2026-10-13)
 
 The sweep found 0 true positives and 5 false positives; fixed at the cause.

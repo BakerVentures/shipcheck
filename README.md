@@ -95,7 +95,73 @@ the Claude Code plugin where your own Claude does that work.
 | `/shipcheck:android` | Google Play only: Data safety, permissions, target API, testing gate |
 | `/shipcheck:refresh` | Re-fetch Apple/Google policy and print a changelog of what changed |
 | `/shipcheck:reply` | Draft a Resolution Center reply to a rejection you received |
+| `/shipcheck:gate` | **The pre-submission gate.** Reads the *built binary*, requires a launch proof and a stress pass, and blocks a submission with no evidence behind it |
 | `/shipcheck:unlock` | Add your license key (`/shipcheck:license` is the same command) |
+
+## The config is not the artifact
+
+`scan` reads `app.json`, `package.json` and your source. That catches a real class
+of problem and it is **not sufficient**, which this tool learned the hard way: a
+sweep across 27 of its author's own repos produced 61 findings and, by that sweep's
+own closing line, **zero true positives** — while eight of those apps sat rejected.
+The reason was structural. `collect_info_plist()` walked `ios/` and skipped any path
+containing `build`, so the one file that actually ships — the **built** `Info.plist` —
+was the one file it never read. And `ios/` is gitignored CNG output in a managed Expo
+app, so the answer depended on whether someone had run `expo prebuild` on that
+machine. The same commit scanned differently in CI.
+
+That gave false findings in both directions. Three permission strings were reported
+missing from one app and all three were in the binary, written at prebuild time by
+config plugins — a permission string is a property of the plugin graph, and only the
+build resolves the plugin graph. In the other direction, one app's iOS-27 scene
+manifest existed only in an untracked directory on one Mac; every config read called
+it adopted, and no build anywhere else would reproduce it.
+
+So `shipcheck gate` reads the **artifact** and requires **proof it was run**:
+
+| Evidence | What it means |
+|---|---|
+| **Binary facts** | the built `Info.plist`, `LC_BUILD_VERSION` (linked SDK), `LC_UUID`, `otool -L` linkage, embedded privacy manifests, the bundled icon, `PlugIns/*.appex` |
+| **Provenance** | would a build from **tracked** config reproduce this artifact? Read from `git ls-files` |
+| **A launch proof** | installed, launched on a simulator, process alive, no crash report, and a **first frame with pixels in it** — "it launched" is not "it drew something" |
+| **A stress pass** | nine abuse patterns, each one a defect that really happened: double-tap every mutating control, kill the app with a field focused, no network, every empty screen, realistic volume, decline every permission, re-onboard, the exact demo credential, sign out and in as someone else |
+| **Attestations** | what no tool can do, signed by a person: real hardware, a reviewer walkthrough, red-then-green on every fix, each app extension exercised |
+
+Receipts name the **binary** (`LC_UUID`) plus a fingerprint of the build-relevant
+plist keys, not just the version string — so a proof earned on one build cannot vouch
+for a different binary, and every receipt expires the moment the build number moves.
+
+**A gate that blocks a good submission is worse than no gate**, because it teaches
+everyone to skip it. Every rule ships with a must-not-fire case drawn from a real app,
+and "I could not check" never reports the same as "it is fine" — it exits 3.
+
+```
+shipcheck gate inspect <artifact>   # what the binary actually says
+shipcheck gate launch  <artifact>   # earn the launch proof on a simulator
+shipcheck gate stress  <artifact> --run
+shipcheck gate attest  <artifact> --item device-render --by "you" --note "..."
+shipcheck gate check   <artifact>   # 0 cleared · 1 blocked · 3 could not evaluate
+shipcheck gate sweep   <repo>...    # which apps has the gate actually SEEN?
+```
+
+**Both exit 1 on any finding at `critical` or `high`.** Not `critical` alone:
+`BIN-FRAMEWORK-PURPOSE-STRING-*` — the rule built from the only rejection Apple
+has ever put in writing — is `high`, and until 2026-10-15 a sweep over two
+genuinely defective binaries printed six of those findings and returned shell
+status 0. Everything this gate calls `high` is either a refusal at upload
+(ITMS-90683, a reused build number, a missing icon or privacy manifest) or an
+"I could not check"; `medium` and below are reported and do not fail.
+`shipcheck scan` is different and unchanged — it reads config, not the
+artifact, and has a `fail-on` setting that defaults to `critical`.
+
+`gate sweep` answers the question `gate check` cannot: **coverage.** Every repo
+named gets a line, including the ones with nothing built — and a repo with no
+artifact is reported as a BLOCKING `GATE-NO-ARTIFACT`, never omitted. On
+2026-10-14 the gate's own dogfood table listed six apps and found the ITMS-90683
+purpose-string defect in four of them. Two more apps had it and were not in the
+table, because neither had a built binary, so the gate had never been pointed at
+them. Both were confirmed defective on 2026-10-15 the moment a binary existed.
+A correct rule that nobody ran is indistinguishable from a clean app.
 
 ## What it checks
 
@@ -122,18 +188,29 @@ gate for new personal developer accounts.
 
 ## Built on its own rejections
 
-The two newest checks didn't come from reading the guidelines. They came from nine
-real rejections, in one batch, in one week, across this project's own author's other
-apps.
+These checks didn't come from reading the guidelines. They came from real rejections,
+in one batch, in one week, across this project's own author's other apps: **eight
+apps in a rejected state, and at least thirteen distinct rejection events** once the
+apps rejected more than once are counted separately. (Earlier versions of this file
+and the changelog said "nine". That figure matched no actual enumeration and has been
+corrected rather than quietly dropped.)
 
-Four of those nine had a shipped listing or App Review note describing something the
-binary didn't do: a notification feature with no code that ever sent one, review
+An uncomfortable fact worth stating plainly, because it shaped everything here:
+**Apple's notices for that batch carried an empty issues block — no guideline, no
+reason text.** Seven of the eight reasons are unrecorded and unrecoverable. Exactly
+one verbatim App Review citation survives anywhere, and only because a human pasted
+it into a commit message. That is why the newest work in this tool is a gate that
+audits the **running app** against the guidelines rather than a tool that parses
+rejection letters: you cannot parse what you were never sent.
+
+Four of those rejections had a shipped listing or App Review note describing something
+the binary didn't do: a notification feature with no code that ever sent one, review
 notes pointing at a demo account nothing in the app actually seeded, a privacy page
 still reading "a working name, the final app name is not yet chosen" weeks after
 launch. `CLAIM-UNBACKED-*` and `CLAIM-PHANTOM-*` check your listing and your review
 notes against your source the same way, before a reviewer does.
 
-One of the nine, and the only one with a clean control to compare against: two apps
+One rejection, and the only one in the batch with a clean control to compare against: two apps
 off the same code scaffold entered review within the same window. One asked for
 location permission the moment its first screen rendered, before the user had done
 anything. The other asked from inside the button that needed it, with a sentence
@@ -223,11 +300,17 @@ Stored at `~/.shipcheck/license`, cached for 7 days.
 ```
 .claude-plugin/     plugin.json, marketplace.json
 skills/shipcheck/   SKILL.md — the reasoning procedure
-commands/           six slash commands (license and unlock are the same command,
+commands/           seven slash commands (license and unlock are the same command,
                     two names — see /shipcheck:license)
 scripts/            fetch_corpus.py, scan.py, report.py, license.py
                     htmlmd.py, docc.py, asrg.py  (extractors)
+                    shipgate.py                  (the submission gate: binary
+                                                 evidence, launch proof, stress)
                     selftest.py                  (26 seeded violations + regressions)
+                    selftest_gate.py             (121 gate checks; every rule has a
+                                                 must-not-fire case, and the scene
+                                                 rule is proved with a real Mach-O
+                                                 linked against two different SDKs)
                     data/rn_sdk_map.json         (structural rules)
 corpus/             cached policy, chunked, + manifest.json
 corpus/patterns/    hand-curated RN/Expo rejection patterns

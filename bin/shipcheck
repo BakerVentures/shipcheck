@@ -14,6 +14,21 @@ Code plugin where the user's own Claude does that work.
     shipcheck refresh            re-fetch policy corpus and diff
     shipcheck corpus             show what the cached corpus contains
 
+    shipcheck gate check <artifact>    THE SUBMISSION GATE -- requires evidence
+    shipcheck gate sweep <repo>...     which apps has the gate actually SEEN?
+    shipcheck gate inspect <artifact>  what the built binary actually says
+    shipcheck gate launch <artifact>   earn the launch proof on a simulator
+    shipcheck gate stress <artifact>   the abuse patterns that found real bugs
+    shipcheck gate attest <artifact>   record what a tool cannot check
+
+`gate check` and `gate sweep` exit 1 on any finding at critical OR high --
+see shipgate.BLOCKING_SEVERITIES for which rules those are and why. `scan`
+exits 1 on critical only, and takes a `fail-on` setting; the gate does not.
+
+`scan` reads config and source: useful, and not sufficient. `gate` reads the
+BUILT ARTIFACT and requires proof that it was run. Nothing is submitted until
+`gate check` passes -- see scripts/shipgate.py for why, at length.
+
 Standard library only. Python 3.9+.
 """
 import argparse
@@ -183,6 +198,229 @@ def cmd_init(args):
     return 0
 
 
+def cmd_gate(args):
+    """The submission gate. Binary evidence, a launch proof, a stress pass."""
+    import shipgate                                        # noqa: PLC0415
+
+    sub = args.gate_cmd
+    try:
+        if sub == "inspect":
+            art = shipgate.Artifact(args.artifact)
+            try:
+                facts = art.facts()
+                exts = art.extensions()
+                try:
+                    linked = art.linked_system_frameworks()
+                except shipgate.GateError:
+                    linked = {}
+                prov, prov_why = shipgate.scene_provenance(args.project, art)
+            finally:
+                art.cleanup()
+            if args.json:
+                print(json.dumps(dict(facts=facts,
+                                      extensions=[n for n, _p in exts],
+                                      linked_frameworks=sorted(linked),
+                                      scene_provenance=prov,
+                                      scene_provenance_detail=prov_why),
+                                 indent=2, default=str))
+                return 0
+            print()
+            print("  %s  %s" % (c("1", "gate inspect"),
+                                os.path.basename(facts["app"])))
+            print("  %s" % c("2", "read from the artifact, not from config"))
+            print()
+            rows = [
+                ("bundle id", facts["bundle_id"]),
+                ("version", "%s (%s)" % (facts["version"], facts["build"])),
+                ("linked SDK", facts["linked_sdk"]),
+                ("min OS", facts["minos"]),
+                ("binary UUID", facts["binary_uuid"]),
+                ("plist fingerprint", facts["fingerprint"]),
+                ("scene manifest", "yes" if facts["scene_manifest"] else "no"),
+                ("scene delegate", facts["scene_delegate"] or c("31", "NONE")),
+                ("scene provenance", "%s — %s" % (prov, prov_why)),
+                ("usage descriptions",
+                 ", ".join(facts["usage_descriptions"]) or "(none)"),
+                ("app privacy manifest",
+                 "yes" if facts["app_privacy_manifest"] else c("31", "no")),
+                ("sdk privacy manifests", facts["sdk_privacy_manifests"]),
+                ("icon in bundle", facts["icon_detail"]),
+                ("export compliance", facts["export_compliance"]),
+                ("app extensions",
+                 ", ".join(n for n, _p in exts) or "(none)"),
+            ]
+            for k, v in rows:
+                print("  %-22s %s" % (k, wrap(v, 74, 25)))
+            if facts["read_error"]:
+                print("  %-22s %s" % ("read error",
+                                      c("31", facts["read_error"])))
+            print()
+            return 0
+
+        if sub == "launch":
+            rc, _r = shipgate.do_launch(
+                args.artifact, udid=args.udid, runtime=args.runtime,
+                settle=args.settle, project_root=args.project)
+            return rc
+
+        if sub == "stress":
+            if args.record:
+                return shipgate.record_stress(
+                    args.artifact, args.record, args.result, args.note,
+                    args.by, project_root=args.project)
+            if args.run:
+                return shipgate.run_stress(
+                    args.artifact, udid=args.udid, runtime=args.runtime,
+                    project_root=args.project)
+            print("The %d patterns, each of which caught a real defect in\n"
+                  "this portfolio -- none of them visible to any scan:"
+                  % len(shipgate.STRESS_PATTERNS))
+            for k, title, why in shipgate.STRESS_PATTERNS:
+                print("\n  %s  %s" % (c("1", k), title))
+                print("      %s" % c("2", wrap(why, 72, 6)))
+            print("\nDrive what can be driven:  gate stress <artifact> --run")
+            print("Record the rest:           gate stress <artifact> "
+                  "--record <pattern> --result pass|fail|n/a --note \"...\"")
+            print("%s" % c("2", "n/a needs a reason: an unexplained n/a is how "
+                                "a required check quietly becomes optional."))
+            return 0
+
+        if sub == "attest":
+            if not args.item:
+                print("Things this tool cannot check, and therefore requires "
+                      "were done and recorded:")
+                for k, title, why in (list(shipgate.ATTEST_ITEMS)
+                                      + [shipgate.EXTENSION_ATTEST]):
+                    print("\n  %s  %s" % (c("1", k), title))
+                    print("      %s" % c("2", wrap(why, 72, 6)))
+                print("\n  gate attest <artifact> --item <item> --by \"<name>\" "
+                      "--note \"<what you did and saw>\"")
+                return 0
+            return shipgate.record_attest(
+                args.artifact, args.item, args.result, args.note, args.by,
+                project_root=args.project)
+
+        # ---------------------------------------------------------- sweep
+        if sub == "sweep":
+            # The coverage question, which `check` cannot ask. `check` answers
+            # "is THIS artifact fit to submit?"; sweep answers "which of these
+            # apps has the gate looked at at all?" -- and reports an app with
+            # no built artifact as BLOCKING rather than leaving it out of the
+            # table. On 2026-10-14 MoveWitness and DenialDesk were left out of
+            # exactly such a table and both were carrying the ITMS-90683
+            # defect that bounced MileTruth build 3 at delivery.
+            entries = shipgate.gate_sweep(args.repos)
+            if args.json:
+                print(json.dumps(entries, indent=2, default=str))
+                return 1 if any(
+                    shipgate.blocking_findings(e["findings"])
+                    for e in entries) else 0
+            worst = 0
+            print()
+            for e in entries:
+                name = os.path.basename(e["project"].rstrip("/"))
+                # shipgate.BLOCKING_SEVERITIES, not "critical" -- the
+                # ITMS-90683 purpose-string rule is `high`, and this line
+                # reading only `critical` is why a sweep over two defective
+                # binaries printed six findings and exited 0.
+                blockers = shipgate.blocking_findings(e["findings"])
+                if not e["artifacts"]:
+                    worst = 1
+                    print("  %s  %s" % (c("31", "NO ARTIFACT"), c("1", name)))
+                    print("      %s" % e["findings"][0]["evidence"]
+                          .split(". ")[0] + ".")
+                    print("      %s" % c("2", "unevaluated, NOT clean"))
+                    print()
+                    continue
+                if blockers:
+                    worst = 1
+                for a in e["artifacts"]:
+                    ids = sorted({f["id"] for f in a["findings"]})
+                    tag = (c("31", "FINDINGS  ") if ids
+                           else c("32", "clean     "))
+                    print("  %s  %s  %s" % (
+                        tag, c("1", name),
+                        c("2", os.path.basename(a["path"]))))
+                    for fid in ids:
+                        f = next(x for x in a["findings"] if x["id"] == fid)
+                        print("      %-8s %s" % (f["severity"], fid))
+                    if not ids:
+                        print("      %s" % c("2", "no binary-rule findings"))
+                    print()
+            print("  %d repo(s), %d artifact(s). %s" % (
+                len(entries), sum(len(e["artifacts"]) for e in entries),
+                c("31", "exit 1") if worst else c("32", "exit 0")))
+            print("  %s" % c("2", "An app with no artifact is unevaluated. "
+                                  "Silence from a binary rule is only "
+                                  "evidence when there was a binary."))
+            print()
+            return worst
+
+        # ---------------------------------------------------------- check
+        res = shipgate.gate_check(args.artifact, args.project)
+        if args.json:
+            print(json.dumps(res, indent=2, default=str))
+            return 1 if res["blocking"] else 0
+
+        width = min(shutil.get_terminal_size((100, 24)).columns, 100)
+        f = res["facts"]
+        print()
+        print("  %s  %s  %s" % (c("1", "shipcheck gate"),
+                                os.path.basename(f["app"]),
+                                c("2", "%s+%s" % (f["version"], f["build"]))))
+        print("  %s" % c("2", "SDK %s · binary %s · %s"
+                         % (f["linked_sdk"], (f["binary_uuid"] or "?")[:8],
+                            f["fingerprint"])))
+        print()
+        ev = res["evidence"]
+        label = {"exact": c("32", "proven (this binary)"),
+                 "sibling": c("32", "proven (sibling build, keys agree)"),
+                 "absent": c("31", "no evidence"),
+                 "expired": c("31", "expired / wrong binary"),
+                 "config": c("32", "tracked config"),
+                 "tracked-plist": c("32", "tracked ios plist"),
+                 "tracked-plugin": c("32", "tracked config plugin"),
+                 "unexplained": c("1;31", "NOT REPRODUCIBLE"),
+                 "unknown": c("33", "could not establish"),
+                 "n/a": c("2", "not applicable")}
+        for k in ("provenance", "launch", "stress", "attest"):
+            print("  %-12s %s" % (k, label.get(ev[k], ev[k])))
+        print()
+        for fi in res["findings"]:
+            sev = fi["severity"]
+            print("  %s  %s" % (BADGE.get(sev, BADGE["info"])(),
+                               wrap(fi["title"], width - 14, 12)))
+            if fi.get("clause"):
+                print("            %s" % c("2", fi["clause"]))
+            if fi.get("evidence"):
+                print("            %s" % c("2", wrap(fi["evidence"],
+                                                     width - 14, 12)))
+            if fi.get("fix") and args.verbose:
+                print("            %s %s" % (c("2", "fix:"),
+                                             wrap(fi["fix"], width - 18, 17)))
+        print()
+        print("  " + "─" * (width - 4))
+        verdict = {"BLOCKED": c("1;31", "DO NOT SUBMIT"),
+                   "REVIEW": c("1;33", "REVIEW"),
+                   "CLEARED": c("1;32", "CLEARED TO SUBMIT")}[res["verdict"]]
+        print("  %s — %d blocking, %d total"
+              % (verdict, res["blocking"], len(res["findings"])))
+        if res["verdict"] == "BLOCKED":
+            print("  %s" % c("2", "Every blocking item is a missing piece of "
+                                  "evidence or a measured defect. None of them "
+                                  "can be cleared by editing a config file."))
+        if not args.verbose:
+            print("  %s" % c("2", "-v for the fix for each"))
+        print()
+        return 1 if res["blocking"] else 0
+
+    except shipgate.GateError as e:
+        print("gate could not evaluate: %s" % e, file=sys.stderr)
+        # 3, not 1 and never 0: "I could not check" must not read as "it is
+        # fine", and must be distinguishable from "I checked and it failed".
+        return 3
+
+
 def cmd_refresh(args):
     return subprocess.run(
         [sys.executable, os.path.join(SCRIPTS, "fetch_corpus.py"), "--diff"]).returncode
@@ -232,6 +470,71 @@ def main():
 
     sub.add_parser("refresh", help="re-fetch policy corpus").set_defaults(fn=cmd_refresh)
     sub.add_parser("corpus", help="show cached corpus").set_defaults(fn=cmd_corpus)
+
+    # ------------------------------------------------------------------ gate
+    g = sub.add_parser("gate", help="the submission gate: binary evidence, "
+                                    "a launch proof, a stress pass")
+    gsub = g.add_subparsers(dest="gate_cmd")
+
+    def gcommon(p, artifact=True):
+        if artifact:
+            p.add_argument("artifact",
+                           help="a built .app, .ipa or .xcarchive -- the "
+                                "artifact, not the project")
+        p.add_argument("--project", default=".",
+                       help="the git repo this artifact was built from; used "
+                            "to check whether its safety is reproducible from "
+                            "TRACKED config, and where receipts are written")
+        p.add_argument("--json", action="store_true")
+        p.add_argument("-v", "--verbose", action="store_true")
+        return p
+
+    gc = gcommon(gsub.add_parser(
+        "check", help="the verdict; exit 1 if blocked, 3 if unevaluable"))
+    gc.set_defaults(fn=cmd_gate, gate_cmd="check")
+
+    gw = gsub.add_parser(
+        "sweep", help="which apps has the gate actually seen? an app with no "
+                      "built artifact is reported as BLOCKING, not omitted")
+    gw.add_argument("repos", nargs="+",
+                    help="one or more app repos. Every one gets a line, "
+                         "including the ones with nothing built.")
+    gw.add_argument("--json", action="store_true")
+    gw.add_argument("-v", "--verbose", action="store_true")
+    gw.set_defaults(fn=cmd_gate, gate_cmd="sweep")
+
+    gi = gcommon(gsub.add_parser(
+        "inspect", help="what the built binary actually says"))
+    gi.set_defaults(fn=cmd_gate, gate_cmd="inspect")
+
+    gl = gcommon(gsub.add_parser(
+        "launch", help="install and launch on a simulator, earn the receipt"))
+    gl.add_argument("--udid", default=None)
+    gl.add_argument("--runtime", default="iOS-26",
+                    help="runtime substring to match (default iOS-26; build "
+                         "for 26.5 from this machine, since an iOS 27 build "
+                         "here crashes unless the app carries the scene fix)")
+    gl.add_argument("--settle", type=int, default=10)
+    gl.set_defaults(fn=cmd_gate, gate_cmd="launch")
+
+    gs = gcommon(gsub.add_parser("stress", help="the abuse patterns"))
+    gs.add_argument("--run", action="store_true",
+                    help="drive the patterns a tool can honestly drive")
+    gs.add_argument("--record", default=None, metavar="PATTERN")
+    gs.add_argument("--result", default="pass",
+                    choices=["pass", "fail", "n/a"])
+    gs.add_argument("--note", default="")
+    gs.add_argument("--by", default=None)
+    gs.add_argument("--udid", default=None)
+    gs.add_argument("--runtime", default="iOS-26")
+    gs.set_defaults(fn=cmd_gate, gate_cmd="stress")
+
+    ga = gcommon(gsub.add_parser("attest", help="record what a tool cannot do"))
+    ga.add_argument("--item", default=None)
+    ga.add_argument("--result", default="pass", choices=["pass", "fail"])
+    ga.add_argument("--note", default="")
+    ga.add_argument("--by", default=None)
+    ga.set_defaults(fn=cmd_gate, gate_cmd="attest")
 
     args = ap.parse_args()
     if not getattr(args, "fn", None):
