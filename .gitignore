@@ -1,7 +1,11 @@
 .shipcheck/
 shipcheck-report.md
 shipcheck-reply.md
+# Both spellings, deliberately. `node_modules/` matches a DIRECTORY only, so a
+# SYMLINK named node_modules -- which is how a git worktree borrows the main
+# checkout's install -- slips straight past it and gets committed by `git add -A`.
 node_modules/
+node_modules
 .DS_Store
 *.pyc
 __pycache__/
