@@ -1527,6 +1527,136 @@ def test_exit_status_mapping(r):
         del bad_app
 
 
+def test_gate_app_entrypoint(r):
+    """`gate app <repo>`: one command per app, and its exit status.
+
+    Every assertion here runs bin/shipcheck AS A SUBPROCESS and asserts on the
+    return code. That is not a style preference. The bug this suite's
+    test_exit_status_mapping was written for -- the sweep that printed six real
+    ITMS-90683 findings and returned 0 -- was invisible to 104 assertions
+    because every one of them called the function in process. A new entry point
+    inherits the same risk, so it gets the same proof.
+
+    Three states, three distinct codes, because collapsing any two of them is
+    how "not checked" gets read as "clean":
+
+        0  evaluated and fit
+        1  evaluated and blocked
+        2  NOT CHECKED -- nothing built, so no binary rule ran at all
+    """
+    print("\ngate app: one command per app, and the three exit codes")
+    wt = os.path.dirname(HERE)
+    tmp = tempfile.mkdtemp(prefix="gate-app-")
+    home = tempfile.mkdtemp(prefix="gate-app-home-")
+    try:
+        # ---- exit 2: a real repo with nothing built -------------------------
+        empty = os.path.join(tmp, "nothing-built")
+        os.makedirs(empty)
+        git_init(empty, {"app.json": "{}"})
+        res = _cli(wt, ["gate", "app", empty], home)
+        r.check("gate app EXITS 2 on a repo with no artifact -- not 0, and "
+                "not 1: 'I could not look' is its own answer",
+                res.returncode == 2, "rc=%d\n%s"
+                % (res.returncode, res.stdout[-400:]))
+        r.check("and says UNEVALUATED in as many words, so a reader cannot "
+                "mistake it for a pass",
+                "UNEVALUATED" in res.stdout and "not clean" in res.stdout,
+                res.stdout[-200:])
+        res = _cli(wt, ["gate", "app", empty, "--json"], home)
+        r.check("--json agrees with the text path on the exit code",
+                res.returncode == 2, "rc=%d" % res.returncode)
+        r.check("and no build was run for us -- the repo is still empty",
+                not os.path.isdir(os.path.join(empty, "ios", "build")),
+                "a gate that silently builds changes its own subject")
+
+        # ---- exit 1: a binary with a blocking finding ----------------------
+        bad = os.path.join(tmp, "defective")
+        prod = os.path.join(bad, "ios", "build", "dd", "Build", "Products",
+                            "Release-iphonesimulator")
+        os.makedirs(prod)
+        git_init(bad, {"app.json": "{}"})
+        with Quiet():
+            # Links CoreMotion with NO NSMotionUsageDescription: ITMS-90683,
+            # the only rejection Apple has ever put in writing here, and
+            # `high` -- the exact severity that used to exit 0.
+            bad_app = make_app(prod, "AppDefective",
+                               {"ITSAppUsesNonExemptEncryption": False},
+                               sdk="26.0", salt="am", frameworks=("CoreMotion",))
+        open(os.path.join(bad_app, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(bad_app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        _full_receipts(bad_app, bad)
+        res = _cli(wt, ["gate", "app", bad, "--json"], home)
+        got = json.loads(res.stdout)
+        sevs = sorted({f["severity"]
+                       for a in got["artifacts"]
+                       for f in a["result"]["findings"]})
+        r.check("the defective fixture's findings are high-only, so exit 1 "
+                "cannot be earned by a critical instead",
+                "critical" not in sevs and "high" in sevs, str(sevs))
+        r.check("gate app EXITS 1 on it", res.returncode == 1,
+                "rc=%d sevs=%s" % (res.returncode, sevs))
+
+        # ---- exit 0: must-not-fire ----------------------------------------
+        good = os.path.join(tmp, "fit")
+        gprod = os.path.join(good, "ios", "build", "dd", "Build", "Products",
+                             "Release-iphonesimulator")
+        os.makedirs(gprod)
+        git_init(good, {"app.json": "{}"})
+        with Quiet():
+            good_app = make_app(
+                gprod, "AppFit",
+                {"ITSAppUsesNonExemptEncryption": False,
+                 "NSMotionUsageDescription": "Fixture does not use motion."},
+                sdk="26.0", salt="am", frameworks=("CoreMotion",))
+        open(os.path.join(good_app, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(good_app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        _full_receipts(good_app, good)
+        res = _cli(wt, ["gate", "app", good], home)
+        r.check("gate app EXITS 0 on a fit binary with its receipts in order "
+                "(must-not-fire: proves the fix is not 'always fail')",
+                res.returncode == 0, "rc=%d\n%s"
+                % (res.returncode, res.stdout[-500:]))
+
+        # ---- two binaries of the same app, same version+build -------------
+        # Law 2: a version and build number do not identify a binary. Two have
+        # carried the same stamp on this machine, twice in one day, and a proof
+        # earned on one was accepted for the other. `gate app` must evaluate
+        # BOTH and must not pick.
+        second = os.path.join(good, "ios", "build", "dd2", "Build", "Products",
+                              "Release-iphonesimulator")
+        os.makedirs(second)
+        with Quiet():
+            twin = make_app(second, "AppFit",
+                            {"ITSAppUsesNonExemptEncryption": False},
+                            sdk="26.0", salt="twin", frameworks=("CoreMotion",))
+        open(os.path.join(twin, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(twin, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        res = _cli(wt, ["gate", "app", good, "--json"], home)
+        got = json.loads(res.stdout)
+        vb = sorted({"%s+%s" % (a["result"]["facts"]["version"],
+                                a["result"]["facts"]["build"])
+                     for a in got["artifacts"]})
+        uuids = sorted({a["result"]["facts"]["binary_uuid"]
+                        for a in got["artifacts"]})
+        r.check("both binaries are evaluated, not one of them chosen",
+                len(got["artifacts"]) == 2, str(len(got["artifacts"])))
+        r.check("they carry ONE version+build between them and TWO uuids -- "
+                "which is the whole argument for binding to the uuid",
+                len(vb) == 1 and len(uuids) == 2, "%s / %s" % (vb, uuids))
+        r.check("and the defective twin drags the exit status to 1, so a fit "
+                "sibling cannot vouch for it",
+                res.returncode == 1, "rc=%d" % res.returncode)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(home, ignore_errors=True)
+
+
 def test_real_binaries(r, enabled):
     print("\nReal binaries on this machine (the Mach-O half cannot be "
           "synthesised honestly)")
@@ -1598,6 +1728,7 @@ def main():
     test_purpose_strings(r)
     test_sweep_coverage(r)
     test_exit_status_mapping(r)
+    test_gate_app_entrypoint(r)
     test_real_binaries(r, args.artifacts)
 
     shutil.rmtree(sandbox, ignore_errors=True)

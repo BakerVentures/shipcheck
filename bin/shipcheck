@@ -14,6 +14,8 @@ Code plugin where the user's own Claude does that work.
     shipcheck refresh            re-fetch policy corpus and diff
     shipcheck corpus             show what the cached corpus contains
 
+    shipcheck gate app <repo>          ONE COMMAND PER APP -- find the
+                                       artifact(s) and give the full verdict
     shipcheck gate check <artifact>    THE SUBMISSION GATE -- requires evidence
     shipcheck gate sweep <repo>...     which apps has the gate actually SEEN?
     shipcheck gate inspect <artifact>  what the built binary actually says
@@ -21,9 +23,12 @@ Code plugin where the user's own Claude does that work.
     shipcheck gate stress <artifact>   the abuse patterns that found real bugs
     shipcheck gate attest <artifact>   record what a tool cannot check
 
-`gate check` and `gate sweep` exit 1 on any finding at critical OR high --
-see shipgate.BLOCKING_SEVERITIES for which rules those are and why. `scan`
-exits 1 on critical only, and takes a `fail-on` setting; the gate does not.
+`gate app`, `gate check` and `gate sweep` exit 1 on any finding at critical OR
+high -- see shipgate.BLOCKING_SEVERITIES for which rules those are and why.
+`scan` exits 1 on critical only, and takes a `fail-on` setting; the gate does
+not. `gate app` additionally exits **2** when the repo has no built artifact,
+because "I could not look" is not the same answer as "I looked and it is bad",
+and a caller that cannot tell them apart reads silence as safety.
 
 `scan` reads config and source: useful, and not sufficient. `gate` reads the
 BUILT ARTIFACT and requires proof that it was run. Nothing is submitted until
@@ -300,6 +305,117 @@ def cmd_gate(args):
                 args.artifact, args.item, args.result, args.note, args.by,
                 project_root=args.project)
 
+        # ------------------------------------------------------------ app
+        if sub == "app":
+            # ONE COMMAND PER APP. `check` needs the .app path, which means
+            # the caller has to go and find it first -- and a caller who
+            # guesses wrong gets a confident verdict on the wrong binary.
+            # That is not hypothetical here: running the published per-app
+            # command at the root of the rigsheet monorepo generated a binary
+            # called `rigsheet.app` that is not Rigsheet, and had it built, a
+            # verdict would have been published for an app that does not
+            # exist. So this subcommand takes the REPO, finds every artifact
+            # in it, and renders `check` for each -- and if there is more than
+            # one it says so and evaluates them all rather than picking.
+            #
+            # It is a composition of gate_sweep + gate_check, deliberately
+            # adding no new rule: the rules live in shipgate.py, and the exit
+            # status comes from shipgate.blocking_findings, the single
+            # definition added on fix/gate-exit-status-2026-10-15. A fifth
+            # inline `== "critical"` comparison here would reintroduce the
+            # exact bug that branch exists to fix.
+            repo = os.path.abspath(args.repo)
+            entries = shipgate.gate_sweep([repo])
+            e = entries[0]
+            arts = e["artifacts"]
+            name = os.path.basename(repo.rstrip("/"))
+
+            if not arts:
+                # No artifact. Exit 2, not 0 and not 1: "I could not look" is
+                # a different answer from "I looked and it is bad", and a
+                # caller that cannot tell them apart will read silence as
+                # safety. A sweep did exactly that for four apps for a week.
+                f = e["findings"][0]
+                if args.json:
+                    print(json.dumps(dict(project=repo, artifacts=[],
+                                          verdict="UNEVALUATED",
+                                          findings=e["findings"]),
+                                     indent=2, default=str))
+                    return 2
+                print()
+                print("  %s  %s" % (c("1;31", "UNEVALUATED"), c("1", name)))
+                print("      %s" % f["id"])
+                print("      %s" % wrap(f["evidence"], 80, 6))
+                print()
+                print("  %s" % c("1;31", "exit 2 -- NOT CHECKED, which is not "
+                                         "clean."))
+                print("  %s" % c("2", "No build is run for you: builds are "
+                                      "expensive and a gate that silently "
+                                      "builds"))
+                print("  %s" % c("2", "is a gate that changes its own "
+                                      "subject. " + f["fix"].split(".")[0]
+                                 + "."))
+                print()
+                return 2
+
+            results = []
+            for a in arts:
+                results.append((a["path"],
+                                shipgate.gate_check(a["path"], repo)))
+            if args.json:
+                print(json.dumps(dict(project=repo,
+                                      artifacts=[dict(path=pa, result=r)
+                                                 for pa, r in results]),
+                                 indent=2, default=str))
+                return 1 if any(r["blocking"] for _pa, r in results) else 0
+
+            print()
+            print("  %s  %s" % (c("1", "shipcheck gate app"), c("1", name)))
+            if len(results) > 1:
+                # Two binaries of the same app have carried the identical
+                # version and build number on this machine, twice in one day,
+                # and a launch proof earned on one was accepted for the other.
+                # So: evaluate every one, and key the output on the UUID.
+                print("  %s" % c("33", "%d artifacts in this repo. All %d are "
+                                       "evaluated and none is chosen for you:"
+                                 % (len(results), len(results))))
+                print("  %s" % c("2", "a version and build number do not "
+                                      "identify a binary."))
+            print()
+            worst = 0
+            for pa, r in results:
+                f = r["facts"]
+                blockers = shipgate.blocking_findings(r["findings"])
+                verdict = r["verdict"]
+                badge = (c("32", "PASS   ") if not blockers
+                         else c("1;31", "BLOCKED"))
+                print("  %s  %s  %s" % (
+                    badge, os.path.basename(pa),
+                    c("2", "%s+%s  sdk %s  uuid %s"
+                      % (f["version"], f["build"], f["linked_sdk"],
+                         (f["binary_uuid"] or "?")[:8]))))
+                print("          %s" % c("2", pa))
+                for fd in sorted(r["findings"],
+                                 key=lambda x: ORDER.index(
+                                     x.get("severity", "info"))):
+                    mark = ("*" if fd.get("severity")
+                            in shipgate.BLOCKING_SEVERITIES else " ")
+                    print("        %s %-8s %s" % (mark, fd["severity"],
+                                                  fd["id"]))
+                if not r["findings"]:
+                    print("          %s" % c("2", "no findings"))
+                print("          verdict %s, %d blocking" % (verdict,
+                                                             len(blockers)))
+                print()
+                if blockers:
+                    worst = 1
+            print("  %s   %s" % (
+                c("31", "exit 1") if worst else c("32", "exit 0"),
+                c("2", "* = fails the gate (severity in %s)"
+                  % ", ".join(shipgate.BLOCKING_SEVERITIES))))
+            print()
+            return worst
+
         # ---------------------------------------------------------- sweep
         if sub == "sweep":
             # The coverage question, which `check` cannot ask. `check` answers
@@ -492,6 +608,15 @@ def main():
     gc = gcommon(gsub.add_parser(
         "check", help="the verdict; exit 1 if blocked, 3 if unevaluable"))
     gc.set_defaults(fn=cmd_gate, gate_cmd="check")
+
+    gp = gsub.add_parser(
+        "app", help="ONE COMMAND PER APP: find this repo's built artifact(s) "
+                    "and render the full gate verdict for each. exit 0 pass, "
+                    "1 blocked, 2 nothing built (NOT CHECKED)")
+    gp.add_argument("repo", help="the app repo, not the artifact")
+    gp.add_argument("--json", action="store_true")
+    gp.add_argument("-v", "--verbose", action="store_true")
+    gp.set_defaults(fn=cmd_gate, gate_cmd="app")
 
     gw = gsub.add_parser(
         "sweep", help="which apps has the gate actually seen? an app with no "
