@@ -388,8 +388,14 @@ def test_privacy_reason_codes(r):
     # An SDK's manifest is checked too, but reports instead of blocking.
     g = shipgate.privacy_reason_code_findings(
         _pm(NEARVO_BUILD1, "Frameworks/Thing.framework/PrivacyInfo.xcprivacy"))
-    r.check("SDK manifest: same 2 findings, high not critical",
-            len(g) == 2 and all(f["severity"] == "high" for f in g),
+    # Asserted against shipgate.BLOCKING_SEVERITIES, not against the literal
+    # "high". These two assertions said `== "high"` until 2026-10-15, when
+    # `high` started failing the gate -- at which point the literal still
+    # matched and the SENTENCE ABOVE IT stopped being true. The intent is
+    # "reported, not blocking"; test the intent.
+    r.check("SDK manifest: same 2 findings, reported but NOT blocking",
+            len(g) == 2 and all(f["severity"] not in
+                                shipgate.BLOCKING_SEVERITIES for f in g),
             str([f["severity"] for f in g]))
 
     # An unreadable manifest must not read as a passing one.
@@ -473,8 +479,9 @@ def test_privacy_tracking_consistency(r):
     # SDK manifests: reported, not blocking.
     g = shipgate.privacy_tracking_findings(
         _pm(FLIRTGYM_BUILD24, "Frameworks/X.framework/PrivacyInfo.xcprivacy"))
-    r.check("SDK manifest tracking: high not critical",
-            len(g) == 1 and g[0]["severity"] == "high", str(g))
+    r.check("SDK manifest tracking: reported but NOT blocking",
+            len(g) == 1 and g[0]["severity"]
+            not in shipgate.BLOCKING_SEVERITIES, str(g))
 
 
 def test_privacy_rules_reach_the_bundle(r):
@@ -1281,6 +1288,245 @@ def test_sweep_coverage(r):
                 "GATE-NO-ARTIFACT" not in ids, str(sorted(ids)))
 
 
+# ======================================================= severity -> exit code
+# THE BUG THIS EXISTS FOR, AND WHY NO TEST IN THIS FILE COULD SEE IT
+#
+# Every assertion above this point calls shipgate.check_binary() /
+# gate_sweep() / gate_check() IN PROCESS and asserts on finding ids and
+# severities. All of them were green on 2026-10-15 while this was true:
+#
+#   $ shipcheck gate sweep ~/steadychart-ios27-verify ~/policyready-ios27-scene
+#     ... eight `high` BIN-FRAMEWORK-PURPOSE-STRING findings ...
+#     2 repo(s), 4 artifact(s). exit 0
+#   $ echo $?
+#   0
+#
+# The exit status lived in bin/shipcheck, computed from
+# `severity == "critical"`, and `BIN-FRAMEWORK-PURPOSE-STRING-*` is `high`. So
+# the rule built from THE ONLY REJECTION APPLE HAS EVER PUT IN WRITING printed
+# its finding and told every CI step reading $? that the repo was clean. A
+# suite that asserts on the returned dict cannot see that; it is
+# VERIFICATION-LESSON.md row one, "a check that cannot see its subject",
+# committed by the suite that holds the lesson.
+#
+# So these assertions RUN bin/shipcheck AS A SUBPROCESS and look at nothing
+# but its exit status. That is the subject.
+def _cli(wt_root, argv, home):
+    """bin/shipcheck in a subprocess, with HOME pointed at a sandbox.
+
+    HOME matters: shipgate.HOME_RECEIPTS is ~/.config/shipcheck/receipts and a
+    subprocess does not inherit this suite's in-process override, so without
+    this a test run would write receipts into Ryan's real store -- the mistake
+    the first version of this file made with nine stress receipts for a
+    fixture app called "Round".
+    """
+    env = dict(os.environ)
+    env["HOME"] = home
+    env["NO_COLOR"] = "1"
+    return subprocess.run(
+        [sys.executable, os.path.join(wt_root, "bin", "shipcheck")] + argv,
+        capture_output=True, text=True, env=env, timeout=600)
+
+
+def _full_receipts(app, repo):
+    """Launch + stress + attest receipts for a fixture, in a sandbox.
+
+    This is the counterfactual the bug was hiding behind: `gate check` on a
+    purpose-string-defective binary exits 1 today, but only because its launch
+    and stress receipts are missing. With the receipts in order it was REVIEW,
+    exit 0, with the ITMS-90683 defect still in the binary. These receipts put
+    them in order so the exit status has nothing else to be earned by.
+
+    The launch receipt is written directly rather than by `gate launch`: there
+    is no simulator in a test run, and a fabricated "rendered" frame is honest
+    here precisely because it is a fixture in a throwaway repo. It would not
+    be honest for a real app, which is what gate launch exists for.
+    """
+    art = shipgate.Artifact(app)
+    try:
+        with Quiet():
+            shipgate.save_receipt(art, "launch", dict(
+                kind="launch", bundle_id=art.bundle_id, version=art.version,
+                build=art.build, binary_uuid=art.identity(),
+                fingerprint=art.fingerprint(),
+                first_frame=dict(verdict="rendered", colors=412,
+                                 dominant=0.41),
+                runtime="fixture", when="2026-10-15T00:00:00Z",
+                note="selftest fixture receipt"), project_root=repo)
+            for key, _t, _w in shipgate.STRESS_PATTERNS:
+                shipgate.record_stress(app, key, "pass",
+                                       "driven in the fixture", "selftest",
+                                       project_root=repo)
+            for key, _t, _w in shipgate.required_attestations(art):
+                shipgate.record_attest(app, key, "pass",
+                                       "exercised by hand in the fixture",
+                                       "selftest", project_root=repo)
+    finally:
+        art.cleanup()
+
+
+def test_exit_status_mapping(r):
+    print("\nSeverity -> exit status (the sweep that printed ITMS-90683 and "
+          "exited 0)")
+
+    # ---- the mapping itself, which needs no toolchain and runs on Linux CI.
+    hi = [dict(id="X", severity="high")]
+    r.check("a `high` finding is blocking",
+            len(shipgate.blocking_findings(hi)) == 1,
+            str(shipgate.BLOCKING_SEVERITIES))
+    r.check("a `critical` finding is blocking",
+            len(shipgate.blocking_findings(
+                [dict(id="X", severity="critical")])) == 1)
+    r.check("medium / low / info are NOT blocking (must-not-fire: a gate that "
+            "fails on everything teaches everyone to skip it)",
+            shipgate.blocking_findings(
+                [dict(id="X", severity=s)
+                 for s in ("medium", "low", "info")]) == [])
+    r.check("an unknown severity string is not silently blocking-or-not by "
+            "accident",
+            shipgate.blocking_findings(
+                [dict(id="X", severity="HIGH")]) == [])
+
+    # The one rule whose docstring says `high` means "report, do not block".
+    # It must not be in the blocking set, or the policy and the rule disagree.
+    r.check("an SDK's own embedded privacy manifest is reported, not blocking "
+            "(its only fix is someone else's release)",
+            shipgate._pm_sev("Frameworks/X.framework/PrivacyInfo.xcprivacy")
+            not in shipgate.BLOCKING_SEVERITIES,
+            shipgate._pm_sev("Frameworks/X.framework/PrivacyInfo.xcprivacy"))
+    r.check("the APP's own privacy manifest still blocks",
+            shipgate._pm_sev("PrivacyInfo.xcprivacy")
+            in shipgate.BLOCKING_SEVERITIES)
+
+    # ---- and now the thing that was actually broken: the CLI's exit status.
+    if not HAVE_MACHO_TOOLS or not HAVE_CLANG or real_macho(
+            "26.0", "cm", ("CoreMotion",)) is None:
+        r.skip("bin/shipcheck exit status on a high-only finding",
+               "needs a real Mach-O")
+        return
+
+    wt = os.path.dirname(HERE)
+    FID = "BIN-FRAMEWORK-PURPOSE-STRING-CoreMotion"
+    with tempfile.TemporaryDirectory() as tmp:
+        home = os.path.join(tmp, "home")
+        os.makedirs(home)
+
+        # SDK 26, so the critical scene rule is correctly exempt and cannot
+        # earn the exit status for us -- the whole point of the bug was that a
+        # critical finding was always there to earn it.
+        defective = os.path.join(tmp, "repo-high-only")
+        prod = os.path.join(defective, "ios", "build", "dd", "Build",
+                            "Products", "Release-iphonesimulator")
+        os.makedirs(prod)
+        with Quiet():
+            bad_app = make_app(prod, "HighOnly", {}, sdk="26.0", salt="cm",
+                               frameworks=("CoreMotion",))
+
+        res = _cli(wt, ["gate", "sweep", defective, "--json"], home)
+        entries = json.loads(res.stdout)
+        sevs = sorted({f["severity"]
+                       for e in entries for f in e["findings"]})
+        ids = {f["id"] for e in entries for f in e["findings"]}
+        r.check("the fixture really carries the ITMS-90683 defect",
+                FID in ids, str(sorted(ids)))
+        r.check("and NOTHING critical, so the exit status cannot be earned by "
+                "something else (this is what hid the bug for two days)",
+                "critical" not in sevs, str(sevs))
+        r.check("gate sweep --json EXITS 1 on a high-only finding",
+                res.returncode == 1, "rc=%d sev=%s" % (res.returncode, sevs))
+
+        res = _cli(wt, ["gate", "sweep", defective], home)
+        r.check("gate sweep (terminal output) EXITS 1 on the same repo",
+                res.returncode == 1,
+                "rc=%d\n%s" % (res.returncode, res.stdout[-300:]))
+
+        # MUST-NOT-FIRE: the same machinery on a clean artifact. Without this
+        # the fix "always fail" would pass every assertion above.
+        clean = os.path.join(tmp, "repo-clean")
+        cprod = os.path.join(clean, "ios", "build", "dd", "Build", "Products",
+                             "Release-iphonesimulator")
+        os.makedirs(cprod)
+        # Deliberately WITHOUT ITSAppUsesNonExemptEncryption, so this fixture
+        # still has a MEDIUM finding. "exit 0 on a repo with no findings at
+        # all" would not prove that medium is non-blocking; this does.
+        with Quiet():
+            good_app = make_app(
+                cprod, "AllClean",
+                {"NSMotionUsageDescription": "Fixture does not use motion."},
+                sdk="26.0", salt="cm", frameworks=("CoreMotion",))
+        open(os.path.join(good_app, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(good_app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+
+        res = _cli(wt, ["gate", "sweep", clean, "--json"], home)
+        entries = json.loads(res.stdout)
+        allf = [f for e in entries for f in e["findings"]]
+        r.check("the clean fixture has no blocking finding -- but DOES carry "
+                "a medium one, so exit 0 is not merely 'nothing was found'",
+                not shipgate.blocking_findings(allf)
+                and any(f["severity"] == "medium" for f in allf),
+                str([(f["severity"], f["id"]) for f in allf]))
+        r.check("gate sweep EXITS 0 on it, so the fix is not 'always fail'",
+                res.returncode == 0,
+                "rc=%d %s" % (res.returncode, res.stdout[-300:]))
+
+        # ---- gate check: the same bug, and the counterfactual that proves it
+        # was there. With launch + stress + attestations all recorded, the
+        # ONLY findings left on the defective binary are `high`.
+        repo_d = os.path.join(tmp, "checked-defective")
+        os.makedirs(repo_d)
+        git_init(repo_d, {"app.json": "{}"})
+        with Quiet():
+            d_app = make_app(repo_d, "CheckBad", {}, sdk="26.0", salt="cm",
+                             frameworks=("CoreMotion",))
+        _full_receipts(d_app, repo_d)
+        res = _cli(wt, ["gate", "check", d_app, "--project", repo_d,
+                        "--json"], home)
+        got = json.loads(res.stdout)
+        sevs = sorted({f["severity"] for f in got["findings"]})
+        r.check("with receipts IN ORDER, the defective binary's findings are "
+                "high-only -- which is exactly when `check` used to exit 0",
+                "critical" not in sevs and FID in
+                {f["id"] for f in got["findings"]},
+                str([(f["severity"], f["id"]) for f in got["findings"]]))
+        r.check("gate check EXITS 1 on it", res.returncode == 1,
+                "rc=%d verdict=%s" % (res.returncode, got["verdict"]))
+        r.check("and says BLOCKED rather than REVIEW, so the printed verdict "
+                "agrees with the exit status",
+                got["verdict"] == "BLOCKED", got["verdict"])
+
+        # MUST-NOT-FIRE: a clean binary with the same receipts clears.
+        repo_c = os.path.join(tmp, "checked-clean")
+        os.makedirs(repo_c)
+        git_init(repo_c, {"app.json": "{}"})
+        with Quiet():
+            c_app = make_app(
+                repo_c, "CheckGood",
+                {"ITSAppUsesNonExemptEncryption": False,
+                 "NSMotionUsageDescription": "Fixture does not use motion."},
+                sdk="26.0", salt="cm", frameworks=("CoreMotion",))
+        open(os.path.join(c_app, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(c_app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        _full_receipts(c_app, repo_c)
+        res = _cli(wt, ["gate", "check", c_app, "--project", repo_c,
+                        "--json"], home)
+        got = json.loads(res.stdout)
+        r.check("gate check EXITS 0 on a clean binary with its receipts in "
+                "order (must-not-fire)",
+                res.returncode == 0,
+                "rc=%d verdict=%s findings=%s"
+                % (res.returncode, got.get("verdict"),
+                   [(f["severity"], f["id"]) for f in got["findings"]]))
+        r.check("and the receipt sandbox kept it out of the real store",
+                not os.path.isdir(os.path.expanduser(
+                    "~/.config/shipcheck/receipts/fixture-leak")),
+                "sanity")
+        del bad_app
+
+
 def test_real_binaries(r, enabled):
     print("\nReal binaries on this machine (the Mach-O half cannot be "
           "synthesised honestly)")
@@ -1351,6 +1597,7 @@ def main():
     test_privacy_rules_reach_the_bundle(r)
     test_purpose_strings(r)
     test_sweep_coverage(r)
+    test_exit_status_mapping(r)
     test_real_binaries(r, args.artifacts)
 
     shutil.rmtree(sandbox, ignore_errors=True)

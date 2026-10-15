@@ -1067,6 +1067,78 @@ FRAME_MAX_DOMINANT = 0.995
 
 
 # ===================================================================== checks
+# WHICH SEVERITIES FAIL THE GATE -- ONE DEFINITION, AND WHY IT IS NOT "critical"
+#
+# Until 2026-10-15 every exit status in the gate was computed inline from
+# `severity == "critical"`, in four separate places. `BIN-FRAMEWORK-PURPOSE-
+# STRING-*` is severity `high`, so:
+#
+#     $ shipcheck gate sweep ~/steadychart-ios27-verify ~/policyready-ios27-scene
+#       ... eight `high` ITMS-90683 findings printed ...
+#       exit 0
+#
+# A sweep over two genuinely defective binaries printed the finding built from
+# THE ONLY REJECTION APPLE HAS EVER PUT IN WRITING and returned shell status 0.
+# Any CI step or script reading $? called it clean. It went unnoticed because
+# every published sweep so far also happened to contain a GATE-NO-ARTIFACT or a
+# critical BIN-SCENE-NOT-ADOPTED, so the 1 was always being earned by something
+# else. `gate check` had the same bug: on that binary it exits 1 only because
+# the launch and stress receipts are missing -- the same binary with its
+# receipts in order was REVIEW, exit 0, with the ITMS-90683 defect intact.
+#
+# The fix is not to promote one rule to critical. The severity vocabulary in
+# this gate already means something specific, and the mapping to exit status
+# should follow that meaning rather than one rule's importance:
+#
+#   critical  this build cannot work or cannot be evaluated -- it will not
+#             launch (BIN-SCENE-NOT-ADOPTED), it drew a blank first frame, or
+#             the gate could not read it / has no artifact / has no run proof.
+#   high      Apple will REFUSE this upload, or the gate could not establish
+#             something it needs:
+#               BIN-FRAMEWORK-PURPOSE-STRING-*  ITMS-90683, refused at delivery
+#               BIN-BUILD-NUMBER-REUSED         refused at upload processing
+#               BIN-ICON-ABSENT                 refused at upload
+#               BIN-PRIVACY-MANIFEST-ABSENT     refused at upload
+#               GATE-CANNOT-READ-LINKAGE        "I could not check" -- and its
+#                                               own fix text already said
+#                                               "This blocks rather than
+#                                               passing", which it did not
+#               GATE-SCENE-PROVENANCE-UNKNOWN   could not establish
+#               GATE-STRESS-MISSING-*           no proof for a required pattern
+#               GATE-ATTEST-MISSING-*           no proof for a required item
+#   medium    a nuisance, not a refusal: BIN-EXPORT-COMPLIANCE-MISSING makes
+#             App Store Connect ask a question on every upload. It does not
+#             stop one.
+#
+# Every `high` in that list is either a rejection or an unanswered question.
+# None of them is a style note. So the gate fails on critical AND high, and
+# reports medium and below. This is the whole of the mapping, in one place, so
+# that a fifth caller cannot quietly reintroduce the inline version.
+#
+# The one place `high` was being used to mean "report, do not block" was
+# _pm_sev() for an SDK's own embedded privacy manifest, whose docstring says so
+# in as many words. That is now `medium`, which is what this mapping makes that
+# sentence mean -- rather than leaving one rule whose severity contradicts the
+# policy. It costs nothing in detection: the SDK manifests were measured across
+# 216 embedded files in six repos and produced zero findings.
+#
+# `shipcheck scan` is deliberately NOT changed. It reads config, not the
+# artifact, and it has a user-facing, documented `fail-on` knob (action.yml,
+# README) that defaults to critical. The gate has no knob: it is the last thing
+# before an upload, and nothing it calls critical or high should pass it.
+BLOCKING_SEVERITIES = ("critical", "high")
+
+
+def blocking_findings(findings):
+    """The findings that must make the process exit non-zero.
+
+    Used by `gate check`, by `gate sweep`, and by the --json exit status of
+    both. One function, so there is one answer.
+    """
+    return [f for f in findings
+            if f.get("severity") in BLOCKING_SEVERITIES]
+
+
 def _f(fid, severity, title, evidence, fix, clause=None, confidence="high"):
     return dict(id=fid, severity=severity, title=title, evidence=evidence,
                 fix=fix, clause=clause, confidence=confidence,
