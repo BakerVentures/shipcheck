@@ -1164,8 +1164,13 @@ def _pm_sev(relpath):
     and produced ZERO findings, so it costs no false positives. (The precedent
     is the Photos.framework noise that the purpose-string rule had to be
     narrowed to remove.)
+
+    "Reported rather than blocking" is `medium`, not `high`. It was `high`
+    until 2026-10-15, when `high` meant nothing to any exit status; now that
+    BLOCKING_SEVERITIES includes high, `high` here would contradict this
+    docstring and block on a finding whose only fix is someone else's release.
     """
-    return "critical" if relpath == "PrivacyInfo.xcprivacy" else "high"
+    return "critical" if relpath == "PrivacyInfo.xcprivacy" else "medium"
 
 
 def _pm_whose(relpath):
@@ -1809,7 +1814,7 @@ def gate_check(artifact_path, project_root=None):
         # Record that this binary was evaluated, AFTER reading the ledger, so a
         # single run never reports a collision with itself.
         ledger_append(art, project_root)
-        blocking = [f for f in findings if f["severity"] == "critical"]
+        blocking = blocking_findings(findings)
         return dict(
             artifact=artifact_path, project=project_root, facts=facts,
             evidence=dict(provenance=prov_state, launch=launch_state,

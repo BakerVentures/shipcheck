@@ -144,6 +144,16 @@ shipcheck gate check   <artifact>   # 0 cleared · 1 blocked · 3 could not eval
 shipcheck gate sweep   <repo>...    # which apps has the gate actually SEEN?
 ```
 
+**Both exit 1 on any finding at `critical` or `high`.** Not `critical` alone:
+`BIN-FRAMEWORK-PURPOSE-STRING-*` — the rule built from the only rejection Apple
+has ever put in writing — is `high`, and until 2026-10-15 a sweep over two
+genuinely defective binaries printed six of those findings and returned shell
+status 0. Everything this gate calls `high` is either a refusal at upload
+(ITMS-90683, a reused build number, a missing icon or privacy manifest) or an
+"I could not check"; `medium` and below are reported and do not fail.
+`shipcheck scan` is different and unchanged — it reads config, not the
+artifact, and has a `fail-on` setting that defaults to `critical`.
+
 `gate sweep` answers the question `gate check` cannot: **coverage.** Every repo
 named gets a line, including the ones with nothing built — and a repo with no
 artifact is reported as a BLOCKING `GATE-NO-ARTIFACT`, never omitted. On
@@ -297,7 +307,7 @@ scripts/            fetch_corpus.py, scan.py, report.py, license.py
                     shipgate.py                  (the submission gate: binary
                                                  evidence, launch proof, stress)
                     selftest.py                  (26 seeded violations + regressions)
-                    selftest_gate.py             (104 gate checks; every rule has a
+                    selftest_gate.py             (121 gate checks; every rule has a
                                                  must-not-fire case, and the scene
                                                  rule is proved with a real Mach-O
                                                  linked against two different SDKs)

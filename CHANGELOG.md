@@ -1,5 +1,47 @@
 # Changelog
 
+## Unreleased: the gate's exit status, which read only `critical` (2026-10-15)
+
+**A sweep over two genuinely defective repos printed six `high`
+`BIN-FRAMEWORK-PURPOSE-STRING` findings and returned shell status 0.** Measured
+on `~/steadychart-ios27-verify` and `~/policyready-ios27-scene`, whose binaries
+link CoreLocation/CoreMotion with no purpose string — the ITMS-90683 that
+bounced MileTruth build 3 at delivery, and the only rejection Apple has ever put
+in writing. Every exit status in the gate was computed inline from
+`severity == "critical"`, in four places, and that rule is `high`. Any CI step
+or script reading `$?` called those repos clean. It went unnoticed because every
+published sweep so far also contained a `GATE-NO-ARTIFACT` or a critical
+`BIN-SCENE-NOT-ADOPTED`, so the 1 was always being earned by something else.
+
+`gate check` had the same bug from the other side: on that binary it exits 1
+only because its launch and stress receipts are missing. With the receipts in
+order it was `REVIEW`, exit 0, with the defect intact — reproduced as a fixture
+in `selftest_gate.py`.
+
+- **`shipgate.BLOCKING_SEVERITIES = ("critical", "high")`**, with
+  `blocking_findings()`, used by `gate check`, `gate sweep` and the `--json`
+  exit status of both. One definition instead of four inline comparisons. The
+  fix is the mapping, not a promotion: every `high` in this gate is either a
+  refusal at upload (ITMS-90683, a reused build number, a missing icon or
+  app privacy manifest) or an "I could not check" —
+  `GATE-CANNOT-READ-LINKAGE`'s own fix text already said *"This blocks rather
+  than passing"*, which it did not. `medium` and below are reported.
+- **An SDK's own embedded privacy manifest drops from `high` to `medium`.** Its
+  docstring already said "reported rather than blocking", and `high` would now
+  contradict that and block on a finding whose only fix is someone else's
+  release. Costs nothing: measured across 216 embedded manifests in six repos,
+  zero findings.
+- **`shipcheck scan` is unchanged.** It reads config, not the artifact, and has
+  a documented `fail-on` knob defaulting to `critical`. The gate has no knob.
+- **Regression test, and it runs `bin/shipcheck` as a subprocess.** Every
+  existing assertion in `selftest_gate.py` called `gate_sweep()` / `gate_check()`
+  in process and asserted on the returned dict; all 104 were green while the
+  CLI exited 0. The exit status was never the subject of a test. The new
+  `test_exit_status_mapping` asserts on nothing but `returncode`, on a fixture
+  whose findings are deliberately high-only (SDK 26, so the critical scene rule
+  is exempt and cannot earn the 1), and on a clean fixture that still carries a
+  `medium` finding, so exit 0 is not merely "nothing was found".
+
 ## v0.3.0: the submission gate — binary evidence, a launch proof, a stress pass (2026-10-14)
 
 ShipCheck was run across 27 of Ryan's repos on 2026-10-13. It produced 61 findings

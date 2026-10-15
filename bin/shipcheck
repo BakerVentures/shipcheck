@@ -21,6 +21,10 @@ Code plugin where the user's own Claude does that work.
     shipcheck gate stress <artifact>   the abuse patterns that found real bugs
     shipcheck gate attest <artifact>   record what a tool cannot check
 
+`gate check` and `gate sweep` exit 1 on any finding at critical OR high --
+see shipgate.BLOCKING_SEVERITIES for which rules those are and why. `scan`
+exits 1 on critical only, and takes a `fail-on` setting; the gate does not.
+
 `scan` reads config and source: useful, and not sufficient. `gate` reads the
 BUILT ARTIFACT and requires proof that it was run. Nothing is submitted until
 `gate check` passes -- see scripts/shipgate.py for why, at length.
@@ -309,14 +313,17 @@ def cmd_gate(args):
             if args.json:
                 print(json.dumps(entries, indent=2, default=str))
                 return 1 if any(
-                    f["severity"] == "critical"
-                    for e in entries for f in e["findings"]) else 0
+                    shipgate.blocking_findings(e["findings"])
+                    for e in entries) else 0
             worst = 0
             print()
             for e in entries:
                 name = os.path.basename(e["project"].rstrip("/"))
-                crit = [f for f in e["findings"]
-                        if f["severity"] == "critical"]
+                # shipgate.BLOCKING_SEVERITIES, not "critical" -- the
+                # ITMS-90683 purpose-string rule is `high`, and this line
+                # reading only `critical` is why a sweep over two defective
+                # binaries printed six findings and exited 0.
+                blockers = shipgate.blocking_findings(e["findings"])
                 if not e["artifacts"]:
                     worst = 1
                     print("  %s  %s" % (c("31", "NO ARTIFACT"), c("1", name)))
@@ -325,7 +332,7 @@ def cmd_gate(args):
                     print("      %s" % c("2", "unevaluated, NOT clean"))
                     print()
                     continue
-                if crit:
+                if blockers:
                     worst = 1
                 for a in e["artifacts"]:
                     ids = sorted({f["id"] for f in a["findings"]})
