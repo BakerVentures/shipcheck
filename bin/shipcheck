@@ -357,7 +357,14 @@ def cmd_gate(args):
             return worst
 
         # ---------------------------------------------------------- check
-        res = shipgate.gate_check(args.artifact, args.project)
+        consumed = None
+        if getattr(args, "consumed_builds", None):
+            consumed = {b.strip() for b in args.consumed_builds.split(",")
+                        if b.strip()}
+        res = shipgate.gate_check(
+            args.artifact, args.project,
+            approved=getattr(args, "approved_version", None),
+            consumed_builds=consumed)
         if args.json:
             print(json.dumps(res, indent=2, default=str))
             return 1 if res["blocking"] else 0
@@ -491,6 +498,24 @@ def main():
 
     gc = gcommon(gsub.add_parser(
         "check", help="the verdict; exit 1 if blocked, 3 if unevaluable"))
+    # Gate 2.1's missing input. ITMS-90062 compares this build's marketing
+    # version against THE PREVIOUSLY APPROVED VERSION, which is not on this
+    # machine. Left unset, the gate reads it from itunes.apple.com/lookup
+    # (three cache-busted queries). These two flags are how an operator
+    # supplies what the public lookup cannot see: an approved-but-unreleased
+    # version, and the build numbers already consumed.
+    gc.add_argument("--approved-version", default=None, metavar="X",
+                    help="the version App Store Connect shows as approved "
+                         "for this app, or the literal `none` if it shows "
+                         "nothing approved. Overrides the public lookup, "
+                         "because an approved-but-unreleased version is "
+                         "invisible to it.")
+    gc.add_argument("--consumed-builds", default=None, metavar="1,2,3",
+                    help="CFBundleVersion values already accepted for this "
+                         "app, from App Store Connect -> TestFlight/Activity. "
+                         "Comma separated. These cannot be read from here and "
+                         "they are what bounces a re-upload of an app that "
+                         "was never approved.")
     gc.set_defaults(fn=cmd_gate, gate_cmd="check")
 
     gw = gsub.add_parser(

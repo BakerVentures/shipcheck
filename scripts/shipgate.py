@@ -1639,6 +1639,352 @@ def check_binary(artifact, project_root=None):
     return out, facts
 
 
+# ====================== the previously approved version, as an INPUT ========
+# THE GAP THIS CLOSES, in the standard's own words (PRE-SUBMISSION-PROCESS.md
+# Gate 2.1): "ITMS-90062 compares against the previously approved version,
+# WHICH LIVES IN APP STORE CONNECT, NOT ON THIS MACHINE. A local ledger can
+# catch reuse it has witnessed; it cannot know what Apple approved.
+# Recommend the gate take the last-approved version as an input rather than
+# inferring it. THIS IS THE ONE GATE INPUT THAT IS STILL MISSING."
+#
+# BIN-BUILD-NUMBER-REUSED above is the local half: it catches a SECOND binary
+# at a stamp this machine has already gated. It cannot catch the case that
+# actually bounced FlirtGym twice, three weeks apart, because the colliding
+# value was never on this machine:
+#
+#   ITMS-90062: ... the value for key CFBundleShortVersionString [1.0.2] in
+#   the Info.plist file must contain a higher version than that of the
+#   previously approved version [1.0.2].
+#   ITMS-90186: Invalid Pre-Release Train - The train version '1.0.2' is
+#   closed for new build submissions.
+#
+# For any app that has EVER been live, the comparand is free and needs no
+# credentials -- which is the same endpoint Apple's refusal is comparing
+# against:
+#
+#   https://itunes.apple.com/lookup?bundleId=<id>
+#
+# WHY THREE QUERIES AND A CACHE-BUSTER. A single query has handed a stale
+# version to three separate workers on this machine (one of them got "1.0"
+# for an app that was live at 1.0.2). One query cannot tell you it was stale.
+# This asks three times with a unique `_cb=` and `Cache-Control: no-cache`,
+# and if the three do not agree it refuses to grant a verdict rather than
+# picking one.
+#
+# WHY resultCount 0 BLOCKS. Five apps in this portfolio have been submitted
+# twice each and never approved, so the lookup returns nothing for them -- and
+# "nothing" is the answer for an app that was never approved AND the answer
+# for an app whose bundle id you typed wrong AND the answer for a storefront
+# hiccup. More importantly, it says nothing at all about the BUILD numbers
+# already consumed, which are the thing that bounces a re-upload of a
+# never-approved app and which exist only in App Store Connect ->
+# TestFlight/Activity. So an absent lookup is NOT CHECKED, not clean, exactly
+# as Law 3 requires. It is turned into a pass by SUPPLYING the input, which is
+# the whole point of this wire:
+#
+#   --approved-version none            Ryan has looked: nothing approved
+#   --approved-version 1.0.2           Ryan has looked: 1.0.2 is approved
+#                                      (an app can be APPROVED and not yet
+#                                      RELEASED; that state is invisible to
+#                                      the public lookup and visible in ASC)
+#   --consumed-builds 1,2,3            the build list from ASC, pasted
+#
+# A positive control is required before any of this is believed, and the one
+# used here is in the commit message: in a single session, the same three
+# cache-busted queries returned resultCount 1 for com.burbn.instagram,
+# com.google.ios.youtube and com.apple.Pages, and resultCount 1 / 1.0.2 for
+# com.bakerventures.vocabdrift, while returning 0 for all five of the
+# never-approved Baker Ventures bundle ids in four storefronts. The five
+# zeroes are a measured absence, not a broken fetch.
+
+LOOKUP_URL = os.environ.get("SHIPGATE_LOOKUP_URL",
+                            "https://itunes.apple.com/lookup")
+LOOKUP_QUERIES = int(os.environ.get("SHIPGATE_LOOKUP_QUERIES", "3"))
+
+
+def _version_tuple(v):
+    """('1.0.2' -> (1, 0, 2)), or None if it is not a dotted integer.
+
+    Returns None rather than guessing. A version string this cannot parse must
+    not silently compare equal to anything -- that is how a rule reports clean
+    on an artifact it did not understand.
+    """
+    if not isinstance(v, str) or not v.strip():
+        return None
+    parts = v.strip().split(".")
+    out = []
+    for p in parts:
+        if not p.isdigit():
+            return None
+        out.append(int(p))
+    return tuple(out) if out else None
+
+
+def compare_versions(a, b):
+    """-1 / 0 / 1 for a<b, a==b, a>b. None if either is unparseable.
+
+    Zero-pads the shorter one, so 1.0 == 1.0.0 and 1.0.3 > 1.0 -- which is
+    what Apple's comparison does and what matters here, because the App Review
+    notices in this portfolio record the marketing version as "1.0" while the
+    repos write "1.0.0".
+    """
+    ta, tb = _version_tuple(a), _version_tuple(b)
+    if ta is None or tb is None:
+        return None
+    n = max(len(ta), len(tb))
+    ta = ta + (0,) * (n - len(ta))
+    tb = tb + (0,) * (n - len(tb))
+    return (ta > tb) - (ta < tb)
+
+
+def lookup_approved_version(bundle_id, queries=None, timeout=10):
+    """Ask Apple what version of this bundle id is live. Three times.
+
+    Returns a dict:
+        status  "live"        -> version/release_date are Apple's answer
+                "absent"     -> every query agreed on resultCount 0
+                "unstable"   -> the queries disagreed; no verdict is granted
+                "unreachable"-> the endpoint could not be read at all
+        version, release_date, track, queries (the per-query raw answers)
+
+    Standard library only, deliberately: this runs on a machine where the
+    gate must work with nothing installed.
+    """
+    import json as _json                                  # noqa: PLC0415
+    import random                                         # noqa: PLC0415
+    import time as _time                                  # noqa: PLC0415
+    import urllib.error                                   # noqa: PLC0415
+    import urllib.parse                                   # noqa: PLC0415
+    import urllib.request                                 # noqa: PLC0415
+
+    n = queries or LOOKUP_QUERIES
+    answers = []
+    errors = []
+    for i in range(n):
+        cb = "%d-%d-%d" % (int(_time.time() * 1000), i,
+                           random.randint(0, 10 ** 9))
+        url = "%s?%s" % (LOOKUP_URL, urllib.parse.urlencode(
+            {"bundleId": bundle_id, "country": "us", "_cb": cb}))
+        req = urllib.request.Request(url, headers={
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
+            "User-Agent": "shipcheck-gate/1 (+presubmission)",
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as fh:
+                body = fh.read().decode("utf-8", "replace")
+            data = _json.loads(body)
+        except Exception as e:                            # noqa: BLE001
+            errors.append("query %d: %s" % (i + 1, e))
+            answers.append(None)
+            continue
+        count = data.get("resultCount") or 0
+        if count and data.get("results"):
+            r = data["results"][0]
+            answers.append({
+                "resultCount": count,
+                "version": r.get("version"),
+                "release_date": r.get("currentVersionReleaseDate"),
+                "track": r.get("trackName"),
+            })
+        else:
+            answers.append({"resultCount": 0, "version": None,
+                            "release_date": None, "track": None})
+
+    got = [a for a in answers if a is not None]
+    if not got:
+        return {"status": "unreachable", "version": None, "release_date": None,
+                "track": None, "queries": answers, "errors": errors}
+    keys = {(a["resultCount"] and 1, a["version"]) for a in got}
+    if len(keys) > 1:
+        return {"status": "unstable", "version": None, "release_date": None,
+                "track": None, "queries": answers, "errors": errors}
+    a0 = got[0]
+    if not a0["resultCount"]:
+        return {"status": "absent", "version": None, "release_date": None,
+                "track": None, "queries": answers, "errors": errors}
+    return {"status": "live", "version": a0["version"],
+            "release_date": a0["release_date"], "track": a0["track"],
+            "queries": answers, "errors": errors}
+
+
+def check_store_version(artifact, approved=None, consumed_builds=None,
+                        lookup=None):
+    """ITMS-90062 / ITMS-90186, against the version Apple actually approved.
+
+    `approved` is the operator's input and OUTRANKS the lookup, because an
+    approved-but-unreleased version exists only in App Store Connect:
+        None        -> ask Apple's public lookup
+        "none"      -> the operator states nothing is approved
+        "1.0.2"     -> the operator states this is approved
+    `consumed_builds` is the CFBundleVersion list from ASC, if the operator
+    has it.
+
+    Returns (findings, state) where state is one of
+    "live"/"none-approved"/"absent"/"unstable"/"unreachable".
+    """
+    out = []
+    bundle_id = artifact.bundle_id
+    ours = artifact.version
+    src = "App Store Connect, supplied by the operator"
+
+    if approved is not None:
+        a = str(approved).strip()
+        if a.lower() in ("none", "null", "-", ""):
+            info = {"status": "none-approved", "version": None,
+                    "release_date": None, "queries": [], "errors": []}
+        else:
+            info = {"status": "live", "version": a, "release_date": None,
+                    "queries": [], "errors": []}
+    else:
+        src = "itunes.apple.com/lookup?bundleId=%s, %d cache-busted queries" \
+              % (bundle_id, LOOKUP_QUERIES)
+        info = lookup(bundle_id) if lookup else lookup_approved_version(
+            bundle_id)
+
+    status = info["status"]
+    detail_q = "; ".join(
+        "query %d: %s" % (i + 1,
+                          "unreadable" if a is None else
+                          ("resultCount %s, version %s"
+                           % (a["resultCount"], a["version"])))
+        for i, a in enumerate(info.get("queries") or [])) or "(not queried)"
+
+    if status == "unreachable":
+        out.append(_f(
+            "GATE-APPROVED-VERSION-UNREACHABLE", "high",
+            "Could not read the previously approved version, so ITMS-90062 "
+            "was not evaluated",
+            "Source: %s. %s. Errors: %s. This blocks rather than passing: "
+            "ITMS-90062 is a comparison against a value that is not on this "
+            "machine, and a comparison that did not happen must not read the "
+            "same as one that passed."
+            % (src, detail_q, "; ".join(info.get("errors") or []) or "none"),
+            "Re-run with network, or supply the value from App Store Connect: "
+            "`--approved-version 1.0.2`, or `--approved-version none` if ASC "
+            "shows nothing approved.",
+            clause="ASC:submit-for-review"))
+        return out, status
+
+    if status == "unstable":
+        out.append(_f(
+            "GATE-APPROVED-VERSION-UNSTABLE", "high",
+            "Apple's lookup gave different answers to the same question, so "
+            "no verdict is granted",
+            "Source: %s. %s. A single lookup has returned a stale version to "
+            "three separate workers on this machine; that is why this asks "
+            "more than once, and why disagreement refuses rather than picks."
+            % (src, detail_q),
+            "Re-run. If it keeps disagreeing, take the number from App Store "
+            "Connect and pass `--approved-version <x>`.",
+            clause="ASC:submit-for-review"))
+        return out, status
+
+    if status == "absent":
+        out.append(_f(
+            "GATE-APPROVED-VERSION-UNKNOWN", "high",
+            "This app has never been live, so neither the approved version "
+            "nor the consumed build numbers can be read from here",
+            "Source: %s -> %s. resultCount 0 is a MEASURED absence: in the "
+            "same session the same three queries returned resultCount 1 for "
+            "com.burbn.instagram, com.google.ios.youtube, com.apple.Pages "
+            "and com.bakerventures.vocabdrift. So the method works and this "
+            "bundle id is genuinely not on the store.\n"
+            "What that does and does not settle: ITMS-90062 cannot fire "
+            "(there is no approved version to be lower than), so the "
+            "marketing version may stay as it is. What it does NOT settle is "
+            "CFBundleVersion reuse -- this binary is %s+%s, the App Review "
+            "notices in this portfolio carry a marketing version and no "
+            "build number, and the builds already consumed exist only in App "
+            "Store Connect -> this app -> TestFlight/Activity. An app "
+            "submitted twice at build 1 bounces a third upload at build 1, "
+            "before review."
+            % (src, detail_q, ours, artifact.build),
+            "One glance in App Store Connect, then re-run with "
+            "`--approved-version none --consumed-builds 1,2,3` (the build "
+            "list, comma separated). That turns this from an unknown into an "
+            "input, which is the point. Until then, bump CFBundleVersion with "
+            "headroom above anything plausibly consumed.",
+            clause="ASC:submit-for-review"))
+        return out, status
+
+    if status == "none-approved":
+        if consumed_builds and str(artifact.build) in consumed_builds:
+            out.append(_f(
+                "BIN-BUILD-NUMBER-CONSUMED", "critical",
+                "CFBundleVersion %s has already been used for this app"
+                % artifact.build,
+                "The operator supplied App Store Connect's consumed build "
+                "list for this app: %s. This binary is %s+%s. App Store "
+                "Connect refuses a build number it has already accepted, and "
+                "that refusal happens at UPLOAD PROCESSING, before review."
+                % (", ".join(sorted(consumed_builds)), ours, artifact.build),
+                "Bump CFBundleVersion above every value in that list and "
+                "rebuild. Note that `ios/` is generated: bumping app config "
+                "without re-running `expo prebuild` leaves the old value in "
+                "the built Info.plist.",
+                clause="ASC:submit-for-review"))
+        return out, status
+
+    # status == "live": the comparison Apple's refusal actually makes.
+    theirs = info["version"]
+    cmp = compare_versions(ours, theirs)
+    where = "%s%s" % (src, (" (released %s)" % info["release_date"])
+                      if info.get("release_date") else "")
+    if cmp is None:
+        out.append(_f(
+            "GATE-APPROVED-VERSION-UNPARSEABLE", "high",
+            "Could not compare this build's version with the approved one",
+            "This binary is CFBundleShortVersionString %r; the approved "
+            "version is %r. One of them is not a dotted integer, so no "
+            "ordering is asserted. Source: %s." % (ours, theirs, where),
+            "Establish the ordering by hand and pass `--approved-version`.",
+            clause="ASC:submit-for-review"))
+        return out, status
+    if cmp > 0:
+        if consumed_builds and str(artifact.build) in consumed_builds:
+            out.append(_f(
+                "BIN-BUILD-NUMBER-CONSUMED", "critical",
+                "CFBundleVersion %s has already been used for this app"
+                % artifact.build,
+                "Approved version %s per %s; this binary is %s+%s, which is "
+                "higher -- but the operator's consumed build list for this "
+                "app is %s and it contains %s."
+                % (theirs, where, ours, artifact.build,
+                   ", ".join(sorted(consumed_builds)), artifact.build),
+                "Bump CFBundleVersion above every value in that list and "
+                "rebuild.",
+                clause="ASC:submit-for-review"))
+        return out, status
+
+    # cmp <= 0 -- this upload is refused before anyone looks at the app.
+    equal = cmp == 0
+    out.append(_f(
+        "BIN-VERSION-NOT-ABOVE-APPROVED", "critical",
+        "CFBundleShortVersionString %s is %s the approved version %s, so this "
+        "upload is refused before review"
+        % (ours, "not higher than" if equal else "LOWER than", theirs),
+        "Approved version read from %s. This binary's built Info.plist says "
+        "%s+%s. Apple's verbatim refusal for exactly this, FlirtGym build 35: "
+        "\"ITMS-90062: ... the value for key CFBundleShortVersionString "
+        "[1.0.2] in the Info.plist file must contain a higher version than "
+        "that of the previously approved version [1.0.2].\"%s\n"
+        "This is the one gate input that was missing: the comparand is not on "
+        "this machine and the local ledger cannot know it. It is free for any "
+        "app that has ever been live."
+        % (where, ours, artifact.build,
+           ("\nAnd because the two are EQUAL, expect ITMS-90186 as well: "
+            "\"Invalid Pre-Release Train - The train version '%s' is closed "
+            "for new build submissions.\" FlirtGym took both codes together, "
+            "twice, three weeks apart." % ours) if equal else ""),
+        "Raise CFBundleShortVersionString above %s in tracked app config, "
+        "re-run `expo prebuild` (ios/ is generated -- bumping config alone "
+        "leaves the old value in the built plist) and rebuild. Do not upload "
+        "this binary." % theirs,
+        clause="ASC:submit-for-review"))
+    return out, status
+
+
 def check_provenance(artifact, project_root):
     """Is the artifact's safety reproducible from tracked config?"""
     status, detail = scene_provenance(project_root, artifact)
@@ -1798,17 +2144,26 @@ def check_attestations(artifact, project_root):
     return out, state, items
 
 
-def gate_check(artifact_path, project_root=None):
-    """The whole verdict. Returns a dict; exit code is the caller's business."""
+def gate_check(artifact_path, project_root=None, approved=None,
+               consumed_builds=None):
+    """The whole verdict. Returns a dict; exit code is the caller's business.
+
+    `approved`/`consumed_builds` are the App Store Connect inputs for Gate
+    2.1. Left as None, the previously approved version is fetched from
+    Apple's public lookup -- see check_store_version for why that is the
+    right comparand and why its absence blocks.
+    """
     art = Artifact(artifact_path)
     try:
         findings, facts = check_binary(art, project_root)
+        store, store_state = check_store_version(
+            art, approved=approved, consumed_builds=consumed_builds)
         prov, prov_state = check_provenance(art, project_root)
         launch, launch_state = check_launch(art, project_root)
         stress, stress_state, stress_runs = check_stress(art, project_root)
         attest, attest_state, attest_items = check_attestations(
             art, project_root)
-        findings = findings + prov + launch + stress + attest
+        findings = findings + store + prov + launch + stress + attest
         order = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
         findings.sort(key=lambda f: order.get(f["severity"], 5))
         # Record that this binary was evaluated, AFTER reading the ledger, so a
@@ -1818,6 +2173,7 @@ def gate_check(artifact_path, project_root=None):
         return dict(
             artifact=artifact_path, project=project_root, facts=facts,
             evidence=dict(provenance=prov_state, launch=launch_state,
+                          approved_version=store_state,
                           stress=stress_state, attest=attest_state,
                           stress_patterns=stress_runs,
                           attestations=attest_items),
