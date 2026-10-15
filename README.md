@@ -141,7 +141,17 @@ shipcheck gate launch  <artifact>   # earn the launch proof on a simulator
 shipcheck gate stress  <artifact> --run
 shipcheck gate attest  <artifact> --item device-render --by "you" --note "..."
 shipcheck gate check   <artifact>   # 0 cleared · 1 blocked · 3 could not evaluate
+shipcheck gate sweep   <repo>...    # which apps has the gate actually SEEN?
 ```
+
+`gate sweep` answers the question `gate check` cannot: **coverage.** Every repo
+named gets a line, including the ones with nothing built — and a repo with no
+artifact is reported as a BLOCKING `GATE-NO-ARTIFACT`, never omitted. On
+2026-10-14 the gate's own dogfood table listed six apps and found the ITMS-90683
+purpose-string defect in four of them. Two more apps had it and were not in the
+table, because neither had a built binary, so the gate had never been pointed at
+them. Both were confirmed defective on 2026-10-15 the moment a binary existed.
+A correct rule that nobody ran is indistinguishable from a clean app.
 
 ## What it checks
 
@@ -287,7 +297,7 @@ scripts/            fetch_corpus.py, scan.py, report.py, license.py
                     shipgate.py                  (the submission gate: binary
                                                  evidence, launch proof, stress)
                     selftest.py                  (26 seeded violations + regressions)
-                    selftest_gate.py             (57 gate checks; every rule has a
+                    selftest_gate.py             (104 gate checks; every rule has a
                                                  must-not-fire case, and the scene
                                                  rule is proved with a real Mach-O
                                                  linked against two different SDKs)

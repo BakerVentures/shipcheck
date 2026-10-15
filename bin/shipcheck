@@ -15,6 +15,7 @@ Code plugin where the user's own Claude does that work.
     shipcheck corpus             show what the cached corpus contains
 
     shipcheck gate check <artifact>    THE SUBMISSION GATE -- requires evidence
+    shipcheck gate sweep <repo>...     which apps has the gate actually SEEN?
     shipcheck gate inspect <artifact>  what the built binary actually says
     shipcheck gate launch <artifact>   earn the launch proof on a simulator
     shipcheck gate stress <artifact>   the abuse patterns that found real bugs
@@ -295,6 +296,59 @@ def cmd_gate(args):
                 args.artifact, args.item, args.result, args.note, args.by,
                 project_root=args.project)
 
+        # ---------------------------------------------------------- sweep
+        if sub == "sweep":
+            # The coverage question, which `check` cannot ask. `check` answers
+            # "is THIS artifact fit to submit?"; sweep answers "which of these
+            # apps has the gate looked at at all?" -- and reports an app with
+            # no built artifact as BLOCKING rather than leaving it out of the
+            # table. On 2026-10-14 MoveWitness and DenialDesk were left out of
+            # exactly such a table and both were carrying the ITMS-90683
+            # defect that bounced MileTruth build 3 at delivery.
+            entries = shipgate.gate_sweep(args.repos)
+            if args.json:
+                print(json.dumps(entries, indent=2, default=str))
+                return 1 if any(
+                    f["severity"] == "critical"
+                    for e in entries for f in e["findings"]) else 0
+            worst = 0
+            print()
+            for e in entries:
+                name = os.path.basename(e["project"].rstrip("/"))
+                crit = [f for f in e["findings"]
+                        if f["severity"] == "critical"]
+                if not e["artifacts"]:
+                    worst = 1
+                    print("  %s  %s" % (c("31", "NO ARTIFACT"), c("1", name)))
+                    print("      %s" % e["findings"][0]["evidence"]
+                          .split(". ")[0] + ".")
+                    print("      %s" % c("2", "unevaluated, NOT clean"))
+                    print()
+                    continue
+                if crit:
+                    worst = 1
+                for a in e["artifacts"]:
+                    ids = sorted({f["id"] for f in a["findings"]})
+                    tag = (c("31", "FINDINGS  ") if ids
+                           else c("32", "clean     "))
+                    print("  %s  %s  %s" % (
+                        tag, c("1", name),
+                        c("2", os.path.basename(a["path"]))))
+                    for fid in ids:
+                        f = next(x for x in a["findings"] if x["id"] == fid)
+                        print("      %-8s %s" % (f["severity"], fid))
+                    if not ids:
+                        print("      %s" % c("2", "no binary-rule findings"))
+                    print()
+            print("  %d repo(s), %d artifact(s). %s" % (
+                len(entries), sum(len(e["artifacts"]) for e in entries),
+                c("31", "exit 1") if worst else c("32", "exit 0")))
+            print("  %s" % c("2", "An app with no artifact is unevaluated. "
+                                  "Silence from a binary rule is only "
+                                  "evidence when there was a binary."))
+            print()
+            return worst
+
         # ---------------------------------------------------------- check
         res = shipgate.gate_check(args.artifact, args.project)
         if args.json:
@@ -431,6 +485,16 @@ def main():
     gc = gcommon(gsub.add_parser(
         "check", help="the verdict; exit 1 if blocked, 3 if unevaluable"))
     gc.set_defaults(fn=cmd_gate, gate_cmd="check")
+
+    gw = gsub.add_parser(
+        "sweep", help="which apps has the gate actually seen? an app with no "
+                      "built artifact is reported as BLOCKING, not omitted")
+    gw.add_argument("repos", nargs="+",
+                    help="one or more app repos. Every one gets a line, "
+                         "including the ones with nothing built.")
+    gw.add_argument("--json", action="store_true")
+    gw.add_argument("-v", "--verbose", action="store_true")
+    gw.set_defaults(fn=cmd_gate, gate_cmd="sweep")
 
     gi = gcommon(gsub.add_parser(
         "inspect", help="what the built binary actually says"))

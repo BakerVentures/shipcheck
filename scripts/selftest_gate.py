@@ -93,7 +93,7 @@ class Results:
 _MACHO_CACHE = {}
 
 
-def real_macho(sdk="26.0", salt=""):
+def real_macho(sdk="26.0", salt="", frameworks=()):
     """A GENUINE Mach-O linked against `sdk`, with a real LC_UUID.
 
     Not a mock. A four-byte file with a Mach-O magic number is not a Mach-O:
@@ -110,7 +110,7 @@ def real_macho(sdk="26.0", salt=""):
     Returns bytes, or None when the toolchain is unavailable (then the caller
     skips rather than asserting against a fake).
     """
-    key = (sdk, salt)
+    key = (sdk, salt, tuple(frameworks))
     if key in _MACHO_CACHE:
         return _MACHO_CACHE[key]
     if not shutil.which("xcrun"):
@@ -140,12 +140,20 @@ def real_macho(sdk="26.0", salt=""):
                         % (ident, len(salt or "")))
                 f.write("int main(void){return 0;}\n")
             out = os.path.join(d, "bin")
+            # `frameworks` makes the purpose-string pair honest: the SAME
+            # source linked WITH and WITHOUT -framework CoreMotion produces
+            # two real Mach-Os whose otool -L output genuinely differs. A mock
+            # would have been testing the mock, which is how the Nearvo
+            # regression test passed against unfixed code.
+            fw_args = []
+            for name in frameworks:
+                fw_args += ["-framework", name]
             p = subprocess.run(
                 ["xcrun", "--sdk", "iphonesimulator", "clang",
                  "-target", "arm64-apple-ios16.4-simulator",
                  "-isysroot", sysroot, "-mios-simulator-version-min=16.4",
-                 "-Wl,-platform_version,ios-simulator,16.4," + sdk,
-                 csrc, "-o", out],
+                 "-Wl,-platform_version,ios-simulator,16.4," + sdk]
+                + fw_args + [csrc, "-o", out],
                 capture_output=True, text=True, timeout=300)
             if p.returncode != 0 or not os.path.isfile(out):
                 _MACHO_CACHE[key] = None
@@ -158,10 +166,11 @@ def real_macho(sdk="26.0", salt=""):
 
 
 def make_app(tmp, name="Fix", plist=None, exe_bytes=None, plugins=None,
-             sdk="26.0", salt=None):
+             sdk="26.0", salt=None, frameworks=()):
     """A .app directory with a real Info.plist and a real Mach-O."""
     if exe_bytes is None:
-        exe_bytes = real_macho(sdk, salt if salt is not None else name)
+        exe_bytes = real_macho(sdk, salt if salt is not None else name,
+                               frameworks)
         if exe_bytes is None:
             exe_bytes = b"\xcf\xfa\xed\xfe fake"
     app = os.path.join(tmp, name + ".app")
@@ -200,6 +209,367 @@ SCENE_EMPTY = {
     "UIApplicationSceneManifest": {
         "UIApplicationSupportsMultipleScenes": False,
         "UISceneConfigurations": {}}}
+
+
+# ================= the two known-bad privacy manifests, as shipped ==========
+# CANARIES CHOSEN FROM THE THREAT, NOT FROM THE RULES.
+#
+# This matters here specifically, because the cheap canary for each of these
+# rules is the WRONG one and would have passed:
+#
+#  * For the reason-code rule, the obvious canary is a made-up code like
+#    "ZZZZ.1". Apple did not reject a made-up code. It rejected TWO VALID CODES
+#    FILED UNDER EACH OTHER'S CATEGORIES, so a flat allow-list of Apple's 17
+#    codes is green on the real artifact. NEARVO_BUILD1 below is the real one.
+#
+#  * For the tracking rule, the obvious canary is the shape Apple's own email
+#    sentence describes -- domains listed with tracking false. FlirtGym was NOT
+#    rejected for that. It was rejected for tracking=true with NO domains, the
+#    converse, which Apple's emailed sentence does not cover. FLIRTGYM_BUILD24
+#    below is the real one, and TRACKING_EMAIL_DIRECTION is kept as a second,
+#    separate case rather than as a substitute for it.
+#
+# The precedent being obeyed: a secret scanner was widened to read lockfiles
+# because npm tokens live there, then verified with a planted PRIVATE KEY -- a
+# shape its rules already matched. It passed, and six of seven real npm token
+# shapes were still missed.
+
+# Nearvo 1.0.0 build 1 -- rejected twice, 2026-09-07 03:11 UTC, ITMS-91055 x2.
+# Reconstructed verbatim from relationship-app@2f4fd26^:app.config.ts (the
+# commit that unswapped them). E174.1 is a DiskSpace code sitting under
+# SystemBootTime; 35F9.1 is a SystemBootTime code sitting under DiskSpace.
+NEARVO_BUILD1 = {
+    "NSPrivacyAccessedAPITypes": [
+        {"NSPrivacyAccessedAPIType":
+            "NSPrivacyAccessedAPICategoryUserDefaults",
+         "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]},
+        {"NSPrivacyAccessedAPIType":
+            "NSPrivacyAccessedAPICategoryFileTimestamp",
+         "NSPrivacyAccessedAPITypeReasons": ["C617.1"]},
+        {"NSPrivacyAccessedAPIType":
+            "NSPrivacyAccessedAPICategorySystemBootTime",
+         "NSPrivacyAccessedAPITypeReasons": ["E174.1"]},   # <- DiskSpace code
+        {"NSPrivacyAccessedAPIType":
+            "NSPrivacyAccessedAPICategoryDiskSpace",
+         "NSPrivacyAccessedAPITypeReasons": ["35F9.1"]},   # <- BootTime code
+    ],
+    "NSPrivacyTracking": False,
+    "NSPrivacyTrackingDomains": [],
+}
+
+# The same app after relationship-app@2f4fd26. This is the must-not-fire case,
+# and it is byte-identical to what is in the built bundle today (verified:
+# md5 ca1b3207f6f5afcb4bfb09b3b2ba7c90 for both ios/Nearvo/PrivacyInfo.
+# xcprivacy and the copy inside Nearvo.app).
+NEARVO_FIXED = json.loads(json.dumps(NEARVO_BUILD1))
+NEARVO_FIXED["NSPrivacyAccessedAPITypes"][2][
+    "NSPrivacyAccessedAPITypeReasons"] = ["35F9.1"]
+NEARVO_FIXED["NSPrivacyAccessedAPITypes"][3][
+    "NSPrivacyAccessedAPITypeReasons"] = ["E174.1"]
+
+# FlirtGym 1.0.0 build 24 -- rejected 2026-08-03 16:48 UTC, and build 25 at
+# 19:48 with identical text, both ITMS-91064. Reconstructed from
+# RizzMaxx@c9b152f:app.json (buildNumber 24: NSPrivacyTracking true, no
+# NSPrivacyTrackingDomains key) put through the documented behaviour of
+# @expo/config-plugins ios/PrivacyInfo.js mergePrivacyInfo(), which defaults
+# NSPrivacyTrackingDomains to [] and always emits it. Independently confirmed
+# by RizzMaxx@c86f432, which read it out of the shipped build-25 .ipa:
+# "NSPrivacyTracking=<true/> with an EMPTY NSPrivacyTrackingDomains array".
+FLIRTGYM_BUILD24 = {
+    "NSPrivacyAccessedAPITypes": [
+        {"NSPrivacyAccessedAPIType":
+            "NSPrivacyAccessedAPICategoryUserDefaults",
+         "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]},
+    ],
+    "NSPrivacyTracking": True,
+    "NSPrivacyTrackingDomains": [],
+}
+
+# The same app after RizzMaxx@c86f432 -- the must-not-fire case.
+FLIRTGYM_FIXED = {
+    "NSPrivacyAccessedAPITypes": FLIRTGYM_BUILD24[
+        "NSPrivacyAccessedAPITypes"],
+    "NSPrivacyTracking": True,
+    "NSPrivacyTrackingDomains": ["ep1.facebook.com"],
+}
+
+# The direction Apple's email sentence actually describes. Not what rejected
+# FlirtGym, kept as its own case so the rule is proven to cover both halves of
+# the biconditional.
+TRACKING_EMAIL_DIRECTION = {
+    "NSPrivacyTracking": False,
+    "NSPrivacyTrackingDomains": ["ep1.facebook.com"],
+}
+
+
+def _pm(man, rel="PrivacyInfo.xcprivacy"):
+    return [(rel, man, None)]
+
+
+def test_privacy_reason_codes(r):
+    print("\n[privacy manifest: reason codes against their own category]")
+
+    # RED -- the real Nearvo build 1 manifest, the one Apple refused twice.
+    got = shipgate.privacy_reason_code_findings(_pm(NEARVO_BUILD1))
+    titles = " | ".join(f["title"] for f in got)
+    r.check("RED: Nearvo build 1 produces exactly 2 findings",
+            len(got) == 2, "got %d: %s" % (len(got), titles))
+    r.check("RED: both are BIN-PRIVACY-REASON-CODE-INVALID",
+            all(f["id"] == "BIN-PRIVACY-REASON-CODE-INVALID" for f in got),
+            titles)
+    r.check("RED: app-level manifest blocks (critical)",
+            all(f["severity"] == "critical" for f in got),
+            str([f["severity"] for f in got]))
+    # The two findings must be Apple's two, named the way Apple named them.
+    blob = json.dumps(got)
+    r.check("RED: names E174.1 under SystemBootTime, and its real home",
+            "E174.1" in blob
+            and "NSPrivacyAccessedAPICategorySystemBootTime" in blob
+            and "belongs to NSPrivacyAccessedAPICategoryDiskSpace" in blob,
+            blob[:200])
+    r.check("RED: names 35F9.1 under DiskSpace, and its real home",
+            "35F9.1" in blob
+            and "belongs to NSPrivacyAccessedAPICategorySystemBootTime"
+            in blob, blob[:200])
+
+    # THE POINT OF THE WHOLE RULE: a flat allow-list is green on that fixture.
+    flat = set(shipgate.APPLE_CODE_HOME)
+    all_codes_valid_somewhere = all(
+        c in flat
+        for e in NEARVO_BUILD1["NSPrivacyAccessedAPITypes"]
+        for c in e["NSPrivacyAccessedAPITypeReasons"])
+    r.check("every code Apple refused IS in Apple's flat code list -- so a "
+            "non-per-category check would pass this manifest",
+            all_codes_valid_somewhere)
+
+    # GREEN -- the same app, codes unswapped. Must be silent.
+    ok = shipgate.privacy_reason_code_findings(_pm(NEARVO_FIXED))
+    r.check("GREEN: Nearvo after the unswap is silent",
+            ok == [], json.dumps(ok)[:300])
+
+    # GREEN -- every real app-level manifest on this machine that is correct.
+    for man, who in ((FLIRTGYM_FIXED, "FlirtGym"),
+                     (NEARVO_FIXED, "Nearvo")):
+        r.check("GREEN: %s reason codes silent" % who,
+                shipgate.privacy_reason_code_findings(_pm(man)) == [])
+
+    # GREEN -- all 17 codes under their own category, so the table itself is
+    # self-consistent and the rule is silent on every legal declaration.
+    everything = {"NSPrivacyAccessedAPITypes": [
+        {"NSPrivacyAccessedAPIType": cat,
+         "NSPrivacyAccessedAPITypeReasons": list(codes)}
+        for cat, codes in shipgate.APPLE_REASON_CODES.items()]}
+    r.check("GREEN: all %d codes under their own categories are silent"
+            % len(shipgate.APPLE_CODE_HOME),
+            shipgate.privacy_reason_code_findings(_pm(everything)) == [],
+            json.dumps(shipgate.privacy_reason_code_findings(
+                _pm(everything)))[:300])
+
+    # RED -- an unrecognised code is reported SEPARATELY from a misfiled one.
+    unknown = {"NSPrivacyAccessedAPITypes": [
+        {"NSPrivacyAccessedAPIType":
+            "NSPrivacyAccessedAPICategoryUserDefaults",
+         "NSPrivacyAccessedAPITypeReasons": ["ZZZZ.9"]}]}
+    g = shipgate.privacy_reason_code_findings(_pm(unknown))
+    r.check("RED: an unknown code fires and is called unrecognised, not "
+            "misfiled",
+            len(g) == 1 and "Unrecognised reason code" in g[0]["title"],
+            json.dumps(g)[:200])
+
+    # RED -- an empty reasons array declares a category with no reason.
+    empty = {"NSPrivacyAccessedAPITypes": [
+        {"NSPrivacyAccessedAPIType":
+            "NSPrivacyAccessedAPICategoryDiskSpace",
+         "NSPrivacyAccessedAPITypeReasons": []}]}
+    g = shipgate.privacy_reason_code_findings(_pm(empty))
+    r.check("RED: empty reasons array fires",
+            len(g) == 1 and "no reason codes" in g[0]["title"], str(g))
+
+    # An SDK's manifest is checked too, but reports instead of blocking.
+    g = shipgate.privacy_reason_code_findings(
+        _pm(NEARVO_BUILD1, "Frameworks/Thing.framework/PrivacyInfo.xcprivacy"))
+    r.check("SDK manifest: same 2 findings, high not critical",
+            len(g) == 2 and all(f["severity"] == "high" for f in g),
+            str([f["severity"] for f in g]))
+
+    # An unreadable manifest must not read as a passing one.
+    g = shipgate.privacy_reason_code_findings(
+        [("PrivacyInfo.xcprivacy", None, "boom")])
+    r.check("RED: an unparseable manifest fires rather than passing quietly",
+            len(g) == 1
+            and g[0]["id"] == "BIN-PRIVACY-MANIFEST-UNREADABLE", str(g))
+
+
+def test_privacy_tracking_consistency(r):
+    print("\n[privacy manifest: tracking flag vs tracking domains]")
+
+    # RED -- the real FlirtGym build 24/25 manifest.
+    got = shipgate.privacy_tracking_findings(_pm(FLIRTGYM_BUILD24))
+    r.check("RED: FlirtGym build 24 fires exactly once",
+            len(got) == 1, json.dumps(got)[:300])
+    if got:
+        r.check("RED: it is BIN-PRIVACY-TRACKING-INCONSISTENT and blocks",
+                got[0]["id"] == "BIN-PRIVACY-TRACKING-INCONSISTENT"
+                and got[0]["severity"] == "critical", str(got[0]["severity"]))
+        r.check("RED: it names the true-with-no-domains direction",
+                "NSPrivacyTracking is true but NSPrivacyTrackingDomains is "
+                "empty" == got[0]["title"], got[0]["title"])
+
+    # Build 25 was the same manifest with a bumped build number, uploaded three
+    # hours later without the cause understood. Same manifest -> same finding.
+    b25 = json.loads(json.dumps(FLIRTGYM_BUILD24))
+    r.check("RED: build 25 (identical manifest) fires identically",
+            [f["title"] for f in shipgate.privacy_tracking_findings(_pm(b25))]
+            == [f["title"] for f in got])
+
+    # THE CANARY-CHOICE PROOF, stated as an assertion rather than a comment:
+    # Apple's emailed sentence is SATISFIED by the manifest Apple rejected.
+    dom = FLIRTGYM_BUILD24["NSPrivacyTrackingDomains"]
+    emailed_rule_holds = (not dom) or (
+        FLIRTGYM_BUILD24["NSPrivacyTracking"] is True)
+    r.check("Apple's emailed sentence ('tracking must be true if domains "
+            "isn't empty') is TRUE of the manifest Apple rejected -- a rule "
+            "written from the email alone would be green here",
+            emailed_rule_holds)
+
+    # GREEN -- the same app after the fix. Must be silent.
+    ok = shipgate.privacy_tracking_findings(_pm(FLIRTGYM_FIXED))
+    r.check("GREEN: FlirtGym after c86f432 is silent",
+            ok == [], json.dumps(ok)[:300])
+
+    # GREEN -- honest "we do not track": false + empty. Nearvo's real shape.
+    r.check("GREEN: tracking false with no domains is silent",
+            shipgate.privacy_tracking_findings(_pm(NEARVO_FIXED)) == [])
+    r.check("GREEN: both keys absent entirely is silent",
+            shipgate.privacy_tracking_findings(
+                _pm({"NSPrivacyAccessedAPITypes": []})) == [])
+
+    # RED -- the other half of the biconditional, the one Apple emailed.
+    g = shipgate.privacy_tracking_findings(_pm(TRACKING_EMAIL_DIRECTION))
+    r.check("RED: domains listed with tracking false fires (the emailed "
+            "direction)",
+            len(g) == 1 and "is not empty but NSPrivacyTracking is not true"
+            in g[0]["title"], json.dumps(g)[:300])
+
+    # RED -- domains listed with the flag absent altogether.
+    g = shipgate.privacy_tracking_findings(
+        _pm({"NSPrivacyTrackingDomains": ["ep1.facebook.com"]}))
+    r.check("RED: domains listed with NSPrivacyTracking absent fires",
+            len(g) == 1 and "absent" in g[0]["evidence"], json.dumps(g)[:300])
+
+    # RED -- a string "true" is not a boolean.
+    g = shipgate.privacy_tracking_findings(
+        _pm({"NSPrivacyTracking": "true",
+             "NSPrivacyTrackingDomains": ["x.example"]}))
+    r.check("RED: NSPrivacyTracking as the string 'true' fires",
+            len(g) == 1 and "not a boolean" in g[0]["title"], str(g))
+
+    # RED -- a blank domain is not a domain.
+    g = shipgate.privacy_tracking_findings(
+        _pm({"NSPrivacyTracking": True, "NSPrivacyTrackingDomains": ["  "]}))
+    r.check("RED: a blank-only domain list fires",
+            any("no usable domain" in f["title"] for f in g), str(g))
+
+    # SDK manifests: reported, not blocking.
+    g = shipgate.privacy_tracking_findings(
+        _pm(FLIRTGYM_BUILD24, "Frameworks/X.framework/PrivacyInfo.xcprivacy"))
+    r.check("SDK manifest tracking: high not critical",
+            len(g) == 1 and g[0]["severity"] == "high", str(g))
+
+
+def test_privacy_rules_reach_the_bundle(r):
+    """The rules are correct above. Do they RUN on a real bundle?
+
+    This is the lesson that outranks the others in VERIFICATION-LESSON.md:
+    verify that the runner reaches the file your check lives in. Five of twelve
+    repos' test entry points silently omit a whole source directory; a guard
+    written in the obvious place would have reported clean forever. So the two
+    rules are also driven end-to-end through check_binary() on a bundle with a
+    real PrivacyInfo.xcprivacy written to disk -- not through the pure
+    functions, which could pass while the wiring is absent.
+    """
+    print("\n[privacy manifest rules reach a real bundle]")
+    tmp = tempfile.mkdtemp(prefix="shipgate-pm-")
+    try:
+        for name, man, want in (("Bad1", NEARVO_BUILD1,
+                                 "BIN-PRIVACY-REASON-CODE-INVALID"),
+                                ("Bad2", FLIRTGYM_BUILD24,
+                                 "BIN-PRIVACY-TRACKING-INCONSISTENT"),
+                                ("Good", NEARVO_FIXED, None),
+                                ("Good2", FLIRTGYM_FIXED, None)):
+            app = make_app(tmp, name=name, sdk="26.0")
+            with open(os.path.join(app, "PrivacyInfo.xcprivacy"), "wb") as f:
+                plistlib.dump(man, f)
+            art = shipgate.Artifact(app)
+            try:
+                findings, _facts = shipgate.check_binary(art)
+            finally:
+                art.cleanup()
+            ids = [f["id"] for f in findings]
+            pm = [i for i in ids if i.startswith("BIN-PRIVACY-")]
+            if want:
+                r.check("end-to-end: %s bundle yields %s" % (name, want),
+                        want in ids, str(ids))
+            else:
+                r.check("end-to-end: %s bundle yields no BIN-PRIVACY-* "
+                        "finding" % name, pm == [], str(pm))
+        # And the manifest must actually have been FOUND -- a bundle with no
+        # manifest at all still trips the pre-existing absence rule, so a
+        # silent "Good" result could otherwise mean "never read the file".
+        app = make_app(tmp, name="NoManifest", sdk="26.0")
+        art = shipgate.Artifact(app)
+        try:
+            findings, _f2 = shipgate.check_binary(art)
+        finally:
+            art.cleanup()
+        r.check("the reader is not vacuous: a bundle with no manifest still "
+                "trips BIN-PRIVACY-MANIFEST-ABSENT",
+                "BIN-PRIVACY-MANIFEST-ABSENT" in [f["id"] for f in findings])
+        app = make_app(tmp, name="Parsed", sdk="26.0")
+        with open(os.path.join(app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump(NEARVO_FIXED, f)
+        art = shipgate.Artifact(app)
+        try:
+            got = art.privacy_manifest_contents()
+        finally:
+            art.cleanup()
+        r.check("privacy_manifest_contents() really parsed the file off disk",
+                len(got) == 1 and got[0][0] == "PrivacyInfo.xcprivacy"
+                and got[0][1] == NEARVO_FIXED and got[0][2] is None,
+                str(got)[:200])
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_apple_table_integrity(r):
+    """The table is the rule. If it is wrong, both rules are wrong politely."""
+    print("\n[Apple's reason-code table]")
+    r.check("5 categories", len(shipgate.APPLE_REASON_CODES) == 5,
+            str(sorted(shipgate.APPLE_REASON_CODES)))
+    r.check("17 codes", len(shipgate.APPLE_CODE_HOME) == 17,
+            str(len(shipgate.APPLE_CODE_HOME)))
+    dupes = [c for c in shipgate.APPLE_CODE_HOME
+             if sum(c in v for v in shipgate.APPLE_REASON_CODES.values()) > 1]
+    r.check("no code appears in two categories", dupes == [], str(dupes))
+    r.check("every category name is an NSPrivacyAccessedAPICategory*",
+            all(k.startswith("NSPrivacyAccessedAPICategory")
+                for k in shipgate.APPLE_REASON_CODES))
+    r.check("every code matches Apple's XXXX.N shape",
+            all(re.match(r"^[0-9A-F]{4}\.\d$", c)
+                for c in shipgate.APPLE_CODE_HOME),
+            str([c for c in shipgate.APPLE_CODE_HOME
+                 if not re.match(r"^[0-9A-F]{4}\.\d$", c)]))
+    r.check("the fetch date is recorded next to the table",
+            bool(re.match(r"^\d{4}-\d{2}-\d{2}$",
+                          shipgate.APPLE_REASON_CODES_FETCHED)),
+            shipgate.APPLE_REASON_CODES_FETCHED)
+    # The two codes the whole investigation turned on.
+    r.check("E174.1 is a DiskSpace code",
+            shipgate.APPLE_CODE_HOME["E174.1"]
+            == "NSPrivacyAccessedAPICategoryDiskSpace")
+    r.check("35F9.1 is a SystemBootTime code",
+            shipgate.APPLE_CODE_HOME["35F9.1"]
+            == "NSPrivacyAccessedAPICategorySystemBootTime")
 
 
 def git_init(root, files):
@@ -781,6 +1151,136 @@ REAL = [
 ]
 
 
+def test_purpose_strings(r):
+    """BIN-FRAMEWORK-PURPOSE-STRING: the rule built from the one rejection
+    Apple actually put in writing, and until 2026-10-15 the only rule in the
+    gate with NO regression test at all.
+
+    Apple's words, MileTruth build 3, ITMS-90683, 2026-10-13: "If you're using
+    external libraries or SDKs, they may reference APIs that require a purpose
+    string. While your app might not use these APIs, a purpose string is still
+    required."
+
+    The red/green pair is a real one: ONE C source, linked once WITH
+    -framework CoreMotion and once WITHOUT, so `otool -L` genuinely differs.
+    Three cases, and the second two are what make the first mean anything:
+
+      1. links CoreMotion, no NSMotionUsageDescription  -> MUST fire
+      2. links CoreMotion, has NSMotionUsageDescription -> MUST be silent
+      3. does not link CoreMotion, no key               -> MUST be silent
+
+    A rule that fired on all three would be indistinguishable from a rule that
+    always fires.
+    """
+    print("\nBIN-FRAMEWORK-PURPOSE-STRING (ITMS-90683)")
+    if not HAVE_MACHO_TOOLS or not HAVE_CLANG:
+        r.skip("purpose-string rule needs a real Mach-O",
+               "otool/clang unavailable; a faked otool would test the fake")
+        return
+    if real_macho("26.0", "cm", ("CoreMotion",)) is None:
+        r.skip("purpose-string rule needs a real Mach-O",
+               "clang could not link against CoreMotion here")
+        return
+    FID = "BIN-FRAMEWORK-PURPOSE-STRING-CoreMotion"
+    STR = ("Whatever does not use motion data. The runtime links CoreMotion "
+           "and this app never calls it.")
+    with tempfile.TemporaryDirectory() as tmp:
+        with Quiet():
+            bad = shipgate.Artifact(make_app(
+                tmp, "PsBad", dict(SCENE_ADOPTED), sdk="26.0", salt="cm",
+                frameworks=("CoreMotion",)))
+            bad_ids = {f["id"] for f in shipgate.check_binary(bad)[0]}
+
+            good = shipgate.Artifact(make_app(
+                tmp, "PsGood",
+                dict(list(SCENE_ADOPTED.items())
+                     + [("NSMotionUsageDescription", STR)]),
+                sdk="26.0", salt="cm", frameworks=("CoreMotion",)))
+            good_ids = {f["id"] for f in shipgate.check_binary(good)[0]}
+
+            none = shipgate.Artifact(make_app(
+                tmp, "PsNone", dict(SCENE_ADOPTED), sdk="26.0", salt="nocm"))
+            none_ids = {f["id"] for f in shipgate.check_binary(none)[0]}
+        try:
+            r.check("fires on a binary that links CoreMotion with no purpose "
+                    "string  (MileTruth build 3)",
+                    FID in bad_ids, str(sorted(bad_ids)))
+            r.check("SILENT once the purpose string is in the built plist",
+                    FID not in good_ids, str(sorted(good_ids)))
+            r.check("SILENT on a binary that does not link CoreMotion at all "
+                    "(must-not-fire)",
+                    FID not in none_ids, str(sorted(none_ids)))
+            # The linkage really is the only difference between case 1 and 3.
+            rc = subprocess.run(["otool", "-L", bad.exe],
+                                capture_output=True, text=True)
+            rc2 = subprocess.run(["otool", "-L", none.exe],
+                                 capture_output=True, text=True)
+            r.check("the fixture pair differs in the LINKAGE, not in a mock",
+                    "CoreMotion.framework" in rc.stdout
+                    and "CoreMotion.framework" not in rc2.stdout)
+        finally:
+            for a in (bad, good, none):
+                a.cleanup()
+
+
+def test_sweep_coverage(r):
+    """gate sweep: an app with NO built artifact is a BLOCKING finding.
+
+    This is the 2026-10-14 failure, written down as a test. The
+    purpose-string rule above works and always has. It reported nothing about
+    MoveWitness or DenialDesk because neither repo had a built binary, so
+    neither app was in the corpus -- and a table of six apps with two findings
+    reads exactly like a portfolio with two defective apps. Both apps in fact
+    had the defect, confirmed 2026-10-15 the moment a binary existed.
+
+    So: a repo with nothing built must produce GATE-NO-ARTIFACT at critical,
+    and a repo with a defective artifact must produce the rule's finding. The
+    second half is what stops this test being satisfied by a sweep that always
+    complains.
+    """
+    print("\ngate sweep -- coverage, not just correctness")
+    with tempfile.TemporaryDirectory() as tmp:
+        empty = os.path.join(tmp, "repo-with-nothing-built")
+        os.makedirs(os.path.join(empty, "src"))
+        with open(os.path.join(empty, "package.json"), "w",
+                  encoding="utf-8") as f:
+            f.write('{"name":"nothing-built"}\n')
+        with Quiet():
+            entries = shipgate.gate_sweep([empty])
+        ids = {f["id"] for f in entries[0]["findings"]}
+        sev = {f["id"]: f["severity"] for f in entries[0]["findings"]}
+        r.check("a repo with no built artifact yields GATE-NO-ARTIFACT",
+                "GATE-NO-ARTIFACT" in ids, str(sorted(ids)))
+        r.check("and it is critical, so it cannot be skimmed past",
+                sev.get("GATE-NO-ARTIFACT") == "critical", str(sev))
+        r.check("the entry exists at all rather than being omitted",
+                len(entries) == 1 and entries[0]["artifacts"] == [])
+
+        if not HAVE_MACHO_TOOLS or not HAVE_CLANG or real_macho(
+                "26.0", "cm", ("CoreMotion",)) is None:
+            r.skip("sweep finds a defective artifact it is pointed at",
+                   "needs a real Mach-O")
+            return
+        built = os.path.join(tmp, "repo-with-a-bad-build")
+        prod = os.path.join(built, "ios", "build", "dd", "Build", "Products",
+                            "Release-iphonesimulator")
+        os.makedirs(prod)
+        with Quiet():
+            make_app(prod, "SwBad", dict(SCENE_ADOPTED), sdk="26.0",
+                     salt="cm", frameworks=("CoreMotion",))
+            entries = shipgate.gate_sweep([built])
+        ids = {f["id"] for f in entries[0]["findings"]}
+        r.check("sweep finds the artifact by walking the repo",
+                len(entries[0]["artifacts"]) == 1,
+                str(entries[0]["artifacts"]))
+        r.check("and reports the ITMS-90683 defect in it",
+                "BIN-FRAMEWORK-PURPOSE-STRING-CoreMotion" in ids,
+                str(sorted(ids)))
+        r.check("GATE-NO-ARTIFACT is NOT raised when there is an artifact "
+                "(must-not-fire)",
+                "GATE-NO-ARTIFACT" not in ids, str(sorted(ids)))
+
+
 def test_real_binaries(r, enabled):
     print("\nReal binaries on this machine (the Mach-O half cannot be "
           "synthesised honestly)")
@@ -845,6 +1345,12 @@ def main():
     test_attestations(r)
     test_build_number_reuse(r)
     test_frame_measurement(r)
+    test_apple_table_integrity(r)
+    test_privacy_reason_codes(r)
+    test_privacy_tracking_consistency(r)
+    test_privacy_rules_reach_the_bundle(r)
+    test_purpose_strings(r)
+    test_sweep_coverage(r)
     test_real_binaries(r, args.artifacts)
 
     shutil.rmtree(sandbox, ignore_errors=True)

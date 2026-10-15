@@ -127,6 +127,71 @@ HOME_RECEIPTS = os.path.expanduser("~/.config/shipcheck/receipts")
 # SDK read from the Mach-O rather than on the deployment target or the OS.
 SCENE_REQUIRED_SDK_MAJOR = 27
 
+# ===================================================== Apple's reason codes ===
+# WHY A TABLE AND NOT A FLAT ALLOW-LIST: Apple's ITMS-91055 does not object to
+# unknown codes. It objects to codes that are valid *somewhere else*. Verbatim,
+# from the rejection that bounced Nearvo 1.0.0 build 1 twice on 2026-09-07:
+#
+#   "ITMS-91055: Invalid API reason declaration - The PrivacyInfo.xcprivacy file
+#    at the "PrivacyInfo.xcprivacy" path contains "E174.1" as the value for a
+#    NSPrivacyAccessedAPITypeReasons key instead of a valid reason code for
+#    using an API in the NSPrivacyAccessedAPICategorySystemBootTime category.
+#    Values for NSPrivacyAccessedAPITypeReasons keys in your app's privacy
+#    manifests must be valid reason codes for the corresponding API category."
+#
+# ...and the same text again for "35F9.1" under ...CategoryDiskSpace. Those two
+# codes had been written under each other's categories. BOTH ARE INDIVIDUALLY
+# VALID CODES. A check that asked "is this one of Apple's 17 codes?" would have
+# been GREEN on the exact binary Apple refused. The category is the check.
+#
+# PROVENANCE -- fetched 2026-10-15, not recalled. Apple's rendered HTML pages
+# are JS shells; these come from the DocC JSON that backs them:
+#   https://developer.apple.com/tutorials/data/documentation/bundleresources/
+#     app-privacy-configuration/nsprivacyaccessedapitypes/
+#       nsprivacyaccessedapitype.json          (categories, each listing its
+#                                               own permitted codes)
+#       nsprivacyaccessedapitypereasons.json   (all 17 codes, with prose)
+#   https://developer.apple.com/tutorials/data/documentation/bundleresources/
+#     describing-use-of-required-reason-api.json
+# Raw responses kept at ~/privacy-rules-work/apple-docs/.
+# The per-category grouping below was read off the FIRST url. The SECOND was
+# then used as an independent cross-check: same 17 codes, and each code's prose
+# names its own subject ("access the system boot time..." for 35F9.1, "check
+# whether there is sufficient disk space..." for E174.1). Two Apple pages, same
+# partition. The fix commit relationship-app@2f4fd26 agrees from a third angle.
+#
+# Apple's own caveat, verbatim from the article: "Apple continually reviews the
+# list of required reason APIs and reasons for usage, and will update this
+# article from time to time." Hence APPLE_REASON_CODES_FETCHED: a stale table
+# and a wrong manifest are different failures and must not read the same. An
+# UNRECOGNISED code is therefore reported differently from a MISFILED one --
+# from the outside, "Apple added a code" and "this code is in the wrong
+# category" look identical, and guessing between them is what this exists to
+# stop.
+APPLE_REASON_CODES_FETCHED = "2026-10-15"
+APPLE_REASON_CODES_SOURCE = (
+    "developer.apple.com/documentation/bundleresources/"
+    "app-privacy-configuration/nsprivacyaccessedapitypes/"
+    "nsprivacyaccessedapitype (DocC JSON, fetched %s)"
+    % APPLE_REASON_CODES_FETCHED)
+APPLE_REASON_CODES = {
+    "NSPrivacyAccessedAPICategoryFileTimestamp":
+        ("DDA9.1", "C617.1", "3B52.1", "0A2A.1"),
+    "NSPrivacyAccessedAPICategorySystemBootTime":
+        ("35F9.1", "8FFB.1", "3D61.1"),
+    "NSPrivacyAccessedAPICategoryDiskSpace":
+        ("85F4.1", "E174.1", "7D9E.1", "B728.1"),
+    "NSPrivacyAccessedAPICategoryActiveKeyboards":
+        ("3EC4.1", "54BD.1"),
+    "NSPrivacyAccessedAPICategoryUserDefaults":
+        ("CA92.1", "1C8F.1", "C56D.1", "AC6B.1"),
+}
+# code -> the one category it belongs to, so a misfiled code can be NAMED as
+# misfiled ("E174.1 belongs to DiskSpace") rather than merely rejected. Built
+# from the table above so the two can never drift apart.
+APPLE_CODE_HOME = {c: cat for cat, codes in APPLE_REASON_CODES.items()
+                   for c in codes}
+
 # Info.plist keys a launch receipt is allowed to vouch for across two binaries
 # of the same app at the same version+build (the sim-build/device-build case).
 # If any of these differs between the launched binary and the one being gated,
@@ -145,9 +210,20 @@ FINGERPRINT_KEYS = (
 # if any of them satisfies it. THIS IS THE CHECK THAT CATCHES A RECORDED, REAL
 # REJECTION: MileTruth build 3 was rejected at delivery with ITMS-90683 for a
 # missing NSMotionUsageDescription. The app config said motionUsagePermission:
-# false, which deleted the key -- and could not remove the linkage, because
-# expo-location's precompiled XCFramework links CoreMotion unconditionally.
+# false, which deleted the key -- and could not remove the linkage.
 # Config said no. The Mach-O said yes. Apple reads the Mach-O.
+#
+# WHERE THE LINKAGE ACTUALLY COMES FROM, measured 2026-10-15 and corrected:
+# this comment used to blame expo-location's precompiled XCFramework. That is
+# too narrow, and it sends the next worker to delete the wrong dependency.
+# Four of the five apps found carrying this defect -- Steadychart, PolicyReady,
+# MoveWitness, DenialDesk -- have no location or sensor package of any kind,
+# and their app executables link CoreMotion anyway. The mechanism is Swift
+# autolinking: object files that import the Expo modules runtime emit
+# `LC_LINKER_OPTION -framework CoreMotion` (and CoreLocation), so the linkage
+# lands on the app's own executable in essentially every Expo SDK 57 app. In
+# one MoveWitness build, 26 of the static libraries carried that linker option.
+# Consequence: the purpose string is the only reliable fix.
 #
 # The map is deliberately SHORT. Every entry is a framework whose presence Apple
 # treats as requiring a string, and nothing else gets in. AVFoundation is the
@@ -460,6 +536,45 @@ class Artifact:
                 sdk.append(os.path.relpath(p, self.app))
         return app_level, sorted(sdk)
 
+    def privacy_manifest_contents(self):
+        """[(relpath, parsed_dict_or_None, read_error_or_None), ...]
+
+        Every embedded PrivacyInfo.xcprivacy, PARSED. privacy_manifests() above
+        returns the SDK ones as bare paths, which is all a presence check needs
+        -- and a presence check is exactly what missed ITMS-91055 and
+        ITMS-91064. Both of those rejections fired on manifests that were
+        present and wrong inside, so the rules below need the contents.
+
+        A manifest that cannot be parsed is returned with its error rather than
+        skipped. "I could not read it" must not read the same as "it is fine";
+        that confusion is the house failure mode.
+
+        The app-level manifest sorts first and is marked by a relpath of exactly
+        "PrivacyInfo.xcprivacy", because Apple validates the app's own manifest
+        independently of its SDKs' -- established the hard way on FlirtGym,
+        where every bundled SDK manifest was individually consistent and the
+        app's own was not (RizzMaxx@c86f432, from the build-25 .ipa).
+        """
+        out = []
+        top = os.path.abspath(os.path.join(self.app, "PrivacyInfo.xcprivacy"))
+        found = []
+        for root, _dirs, files in os.walk(self.app):
+            for fn in files:
+                if fn == "PrivacyInfo.xcprivacy":
+                    found.append(os.path.join(root, fn))
+        for p in sorted(found, key=lambda q: (os.path.abspath(q) != top, q)):
+            rel = os.path.relpath(p, self.app)
+            try:
+                with open(p, "rb") as fh:
+                    d = plistlib.load(fh)
+                if not isinstance(d, dict):
+                    out.append((rel, None, "top level is not a dictionary"))
+                else:
+                    out.append((rel, d, None))
+            except Exception as exc:                  # noqa: BLE001
+                out.append((rel, None, "%s: %s" % (type(exc).__name__, exc)))
+        return out
+
     def icon(self):
         """(ok, detail) -- is there a real app icon IN the bundle?"""
         names = [n for n in os.listdir(self.app)
@@ -503,10 +618,13 @@ class Artifact:
         can act on is how a gate gets ignored.
 
         The app's OWN executable is the signal, and it is the one that catches
-        the real case: Expo modules link statically, so expo-location's
-        CoreMotion dependency -- the MileTruth ITMS-90683 -- lands on the app
-        binary. Verified: PolicyReady and Nearvo both show CoreMotion on their
-        own executable, which is exactly the shape that was rejected.
+        the real case: Expo modules link statically and Swift autolinking emits
+        a `-framework CoreMotion` linker option from anything that imports the
+        Expo modules runtime, so the MileTruth ITMS-90683 linkage lands on the
+        app binary. Verified on five apps, 2026-10-14 and 2026-10-15:
+        Steadychart, PolicyReady, Nearvo, MoveWitness and DenialDesk all show
+        CoreMotion on their own executable, which is exactly the shape Apple
+        refused -- and four of the five have no location or sensor dependency.
         """
         paths = [self.exe]
         for _name, appex in self.extensions():
@@ -955,6 +1073,320 @@ def _f(fid, severity, title, evidence, fix, clause=None, confidence="high"):
                 platform="ios", source="gate")
 
 
+# ============================ the contents of a privacy manifest ============
+# Two rejection reasons Apple has actually sent this portfolio, and the only
+# two of the four that no check had ever looked at. The nearest existing rule,
+# BIN-PRIVACY-MANIFEST-ABSENT, asks "is there a PrivacyInfo.xcprivacy?" -- and
+# BOTH of these fired on manifests that were present. A check that cannot see
+# its subject; the subject is the contents.
+
+def _pm_sev(relpath):
+    """Severity by whose manifest it is.
+
+    The app's own manifest is the one the developer writes and the one Apple
+    cited in both rejections, so it blocks. An SDK's embedded manifest is still
+    validated -- Apple checks every manifest in the bundle -- but the only fix
+    is to upgrade or drop the dependency, so it is reported rather than
+    blocking. Including SDK manifests was not free-by-assumption: it was
+    measured first across 216 embedded manifests in six repos on this machine,
+    and produced ZERO findings, so it costs no false positives. (The precedent
+    is the Photos.framework noise that the purpose-string rule had to be
+    narrowed to remove.)
+    """
+    return "critical" if relpath == "PrivacyInfo.xcprivacy" else "high"
+
+
+def _pm_whose(relpath):
+    return ("the app's own manifest" if relpath == "PrivacyInfo.xcprivacy"
+            else "an embedded SDK manifest at %s" % relpath)
+
+
+def privacy_reason_code_findings(manifests):
+    """BIN-PRIVACY-REASON-CODE-INVALID -- every code against ITS OWN category.
+
+    manifests: [(relpath, parsed_or_None, read_error_or_None)] from
+    Artifact.privacy_manifest_contents(). Taken as an argument rather than read
+    from an Artifact so the selftest can hand it the exact bytes Apple refused.
+
+    Apple: "Values for NSPrivacyAccessedAPITypeReasons keys in your app's
+    privacy manifests must be valid reason codes for the corresponding API
+    category." The words "for the corresponding API category" are the rule. A
+    global allow-list of Apple's 17 codes passes Nearvo build 1.
+    """
+    out = []
+    for rel, man, err in manifests:
+        if err is not None:
+            out.append(_f(
+                "BIN-PRIVACY-MANIFEST-UNREADABLE", _pm_sev(rel),
+                "A privacy manifest in the bundle could not be parsed, so its "
+                "contents were not checked",
+                "%s could not be read as a property list: %s. Apple validates "
+                "this file at upload; an unparseable one is not a passing one, "
+                "and 'I could not check' must never read as 'it is fine'."
+                % (_pm_whose(rel), err),
+                "Open the file and fix the plist syntax, then rebuild.",
+                clause="apple:required-reason-api"))
+            continue
+        types = man.get("NSPrivacyAccessedAPITypes")
+        if types is None:
+            continue                      # nothing declared; not this rule's
+        if not isinstance(types, list):
+            out.append(_f(
+                "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                "NSPrivacyAccessedAPITypes is not an array",
+                "In %s, NSPrivacyAccessedAPITypes is %s, not an array of "
+                "dictionaries." % (_pm_whose(rel), type(types).__name__),
+                "Make NSPrivacyAccessedAPITypes an array of dictionaries.",
+                clause="apple:required-reason-api"))
+            continue
+        for i, ent in enumerate(types):
+            where = "%s, NSPrivacyAccessedAPITypes[%d]" % (_pm_whose(rel), i)
+            if not isinstance(ent, dict):
+                out.append(_f(
+                    "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                    "A required-reason API declaration is not a dictionary",
+                    "%s is %s." % (where, type(ent).__name__),
+                    "Each entry must be a dictionary with "
+                    "NSPrivacyAccessedAPIType and "
+                    "NSPrivacyAccessedAPITypeReasons.",
+                    clause="apple:required-reason-api"))
+                continue
+            cat = ent.get("NSPrivacyAccessedAPIType")
+            reasons = ent.get("NSPrivacyAccessedAPITypeReasons")
+            known_cat = cat in APPLE_REASON_CODES
+            if not known_cat:
+                out.append(_f(
+                    "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                    "Unrecognised required-reason API category %r" % (cat,),
+                    "%s declares the category %r, which is not one of Apple's "
+                    "%d categories as of %s: %s. Either it is a typo or Apple "
+                    "has added a category since that date -- those look "
+                    "identical from here, so this is reported rather than "
+                    "guessed at."
+                    % (where, cat, len(APPLE_REASON_CODES),
+                       APPLE_REASON_CODES_FETCHED,
+                       ", ".join(sorted(APPLE_REASON_CODES))),
+                    "Re-read %s and use a listed category, or update "
+                    "APPLE_REASON_CODES if Apple has changed the list."
+                    % APPLE_REASON_CODES_SOURCE,
+                    clause="apple:required-reason-api"))
+            if reasons is None or (isinstance(reasons, list) and not reasons):
+                out.append(_f(
+                    "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                    "A declared API category carries no reason codes",
+                    "%s declares category %r with %s. Apple requires the "
+                    "reasons your app uses the API, so an empty or absent "
+                    "NSPrivacyAccessedAPITypeReasons declares the category "
+                    "without declaring any reason for it."
+                    % (where, cat,
+                       "no NSPrivacyAccessedAPITypeReasons key" if
+                       reasons is None else "an empty reasons array"),
+                    "Add at least one reason code valid for %r: %s."
+                    % (cat, ", ".join(APPLE_REASON_CODES.get(cat, ("--",)))),
+                    clause="apple:required-reason-api"))
+                continue
+            if not isinstance(reasons, list):
+                out.append(_f(
+                    "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                    "NSPrivacyAccessedAPITypeReasons is not an array",
+                    "%s has NSPrivacyAccessedAPITypeReasons as %s."
+                    % (where, type(reasons).__name__),
+                    "Make it an array of reason-code strings.",
+                    clause="apple:required-reason-api"))
+                continue
+            for code in reasons:
+                if not isinstance(code, str):
+                    out.append(_f(
+                        "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                        "A reason code is not a string",
+                        "%s lists %r (%s) as a reason code."
+                        % (where, code, type(code).__name__),
+                        "Reason codes are strings such as \"CA92.1\".",
+                        clause="apple:required-reason-api"))
+                    continue
+                home = APPLE_CODE_HOME.get(code)
+                if not known_cat:
+                    continue              # already reported; don't double up
+                if home == cat:
+                    continue              # valid FOR THIS CATEGORY
+                if home is not None:
+                    # THE NEARVO CASE. Apple's exact objection.
+                    out.append(_f(
+                        "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                        "Reason code %s is valid, but not in the %s category"
+                        % (code, cat.replace(
+                            "NSPrivacyAccessedAPICategory", "")),
+                        "%s declares %r under %s. %s is a valid code -- it "
+                        "belongs to %s. Valid codes for %s are: %s. This is "
+                        "the exact shape of ITMS-91055, which bounced Nearvo "
+                        "1.0.0 build 1 twice on 2026-09-07 with: \"contains "
+                        "%r as the value for a NSPrivacyAccessedAPITypeReasons "
+                        "key instead of a valid reason code for using an API "
+                        "in the %s category\". Because the code is valid "
+                        "elsewhere, a check against a flat list of Apple's %d "
+                        "codes passes this manifest."
+                        % (where, code, cat, code, home, cat,
+                           ", ".join(APPLE_REASON_CODES[cat]), code, cat,
+                           len(APPLE_CODE_HOME)),
+                        "Either move %s under %s, or replace it with a code "
+                        "that is valid for %s (%s) -- whichever matches what "
+                        "the app actually does. Do not guess: picking the "
+                        "wrong one reproduces the same rejection. Source: %s."
+                        % (code, home, cat,
+                           ", ".join(APPLE_REASON_CODES[cat]),
+                           APPLE_REASON_CODES_SOURCE),
+                        clause="apple:required-reason-api"))
+                else:
+                    out.append(_f(
+                        "BIN-PRIVACY-REASON-CODE-INVALID", _pm_sev(rel),
+                        "Unrecognised reason code %r" % (code,),
+                        "%s declares %r under %s, and %r is not one of "
+                        "Apple's %d reason codes in ANY category as of %s. "
+                        "Reported separately from a misfiled code on purpose: "
+                        "from here, \"Apple added a code\" and \"this code is "
+                        "in the wrong category\" are indistinguishable."
+                        % (where, code, cat, code, len(APPLE_CODE_HOME),
+                           APPLE_REASON_CODES_FETCHED),
+                        "Check %s. If the code is current, update "
+                        "APPLE_REASON_CODES and record the new fetch date; if "
+                        "not, replace it with a valid code for %s (%s)."
+                        % (APPLE_REASON_CODES_SOURCE, cat,
+                           ", ".join(APPLE_REASON_CODES[cat])),
+                        clause="apple:required-reason-api"))
+    return out
+
+
+def privacy_tracking_findings(manifests):
+    """BIN-PRIVACY-TRACKING-INCONSISTENT -- Apple's tracking invariant.
+
+    Apple's ITMS-91064 email states ONE direction, verbatim:
+
+        "NSPrivacyTracking must be true if NSPrivacyTrackingDomains isn't
+         empty."
+
+    THAT SENTENCE ALONE WOULD HAVE BEEN GREEN ON THE BUILD IT CAME FROM, and
+    that is the whole reason this docstring is long. FlirtGym 1.0.0 build 24
+    was rejected on 2026-08-03, and build 25 three hours later with identical
+    text. Its manifest violated the OTHER direction: NSPrivacyTracking=true
+    with an EMPTY NSPrivacyTrackingDomains array. Established from the shipped
+    artifact and from tracked config independently --
+      * RizzMaxx@c86f432, from the build-25 .ipa: "the app's own
+        Payload/FlirtGym.app/PrivacyInfo.xcprivacy shipped
+        NSPrivacyTracking=<true/> with an EMPTY NSPrivacyTrackingDomains
+        array";
+      * RizzMaxx@c9b152f app.json (buildNumber 24) sets NSPrivacyTracking:true
+        and has NO NSPrivacyTrackingDomains key, and @expo/config-plugins
+        ios/PrivacyInfo.js mergePrivacyInfo() defaults that key to [] and
+        always emits it -- so prebuild wrote true + [].
+    So the canary for this rule is the shape Apple rejected, NOT the shape
+    Apple's sentence describes.
+
+    Apple documents both directions; only one made it into the email. Fetched
+    2026-10-15 from the DocC JSON behind the reference pages:
+      * NSPrivacyTracking -- "When set to `true` you need to provide a list of
+        internet domains in NSPrivacyTrackingDomains."   (true => non-empty)
+      * NSPrivacyTrackingDomains -- "To provide a list of internet domains in
+        `NSPrivacyTrackingDomains`, set `NSPrivacyTracking` to `true`."
+                                                          (non-empty => true)
+    Together: one biconditional. tracking == true  <=>  domains non-empty.
+    """
+    out = []
+    for rel, man, err in manifests:
+        if err is not None:
+            continue                      # reported by the reason-code rule
+        has_t = "NSPrivacyTracking" in man
+        tracking = man.get("NSPrivacyTracking")
+        domains = man.get("NSPrivacyTrackingDomains")
+        if domains is None:
+            domains = []
+        if not isinstance(domains, list):
+            out.append(_f(
+                "BIN-PRIVACY-TRACKING-INCONSISTENT", _pm_sev(rel),
+                "NSPrivacyTrackingDomains is not an array",
+                "%s has NSPrivacyTrackingDomains as %s."
+                % (_pm_whose(rel), type(domains).__name__),
+                "Make it an array of domain strings.",
+                clause="apple:privacy-tracking"))
+            continue
+        real = [d for d in domains
+                if isinstance(d, str) and d.strip()]
+        if domains and not real:
+            out.append(_f(
+                "BIN-PRIVACY-TRACKING-INCONSISTENT", _pm_sev(rel),
+                "NSPrivacyTrackingDomains has entries but no usable domain",
+                "%s lists %d tracking domain entr%s, none of which is a "
+                "non-blank string: %r."
+                % (_pm_whose(rel), len(domains),
+                   "y" if len(domains) == 1 else "ies", domains),
+                "List the real tracking endpoints, or remove the key and set "
+                "NSPrivacyTracking to false.",
+                clause="apple:privacy-tracking"))
+        if has_t and not isinstance(tracking, bool):
+            out.append(_f(
+                "BIN-PRIVACY-TRACKING-INCONSISTENT", _pm_sev(rel),
+                "NSPrivacyTracking is not a boolean",
+                "%s has NSPrivacyTracking as %r (%s). Apple requires a "
+                "Boolean; a string \"true\" is not one, and a plist will "
+                "carry it through as a string."
+                % (_pm_whose(rel), tracking, type(tracking).__name__),
+                "Set NSPrivacyTracking to a real boolean true or false.",
+                clause="apple:privacy-tracking"))
+            continue
+
+        is_true = tracking is True
+        if bool(real) == is_true:
+            continue                      # the invariant holds
+
+        if real and not is_true:
+            # Apple's emailed direction.
+            out.append(_f(
+                "BIN-PRIVACY-TRACKING-INCONSISTENT", _pm_sev(rel),
+                "NSPrivacyTrackingDomains is not empty but NSPrivacyTracking "
+                "is not true",
+                "%s lists %d tracking domain(s) (%s) while NSPrivacyTracking "
+                "is %s. Apple, verbatim in ITMS-91064: \"NSPrivacyTracking "
+                "must be true if NSPrivacyTrackingDomains isn't empty.\" And "
+                "in the NSPrivacyTrackingDomains reference: \"To provide a "
+                "list of internet domains in NSPrivacyTrackingDomains, set "
+                "NSPrivacyTracking to true.\""
+                % (_pm_whose(rel), len(real), ", ".join(real),
+                   "absent" if not has_t else repr(tracking)),
+                "If the app really does track, set NSPrivacyTracking to true. "
+                "If it does not, remove the domains -- but remove them "
+                "because the app does not contact them, not to make the "
+                "declaration quiet. A declaration is only worth correcting "
+                "when it is the declaration that is wrong.",
+                clause="apple:privacy-tracking"))
+        else:
+            # THE FLIRTGYM CASE -- the direction Apple's email does not state.
+            out.append(_f(
+                "BIN-PRIVACY-TRACKING-INCONSISTENT", _pm_sev(rel),
+                "NSPrivacyTracking is true but NSPrivacyTrackingDomains is "
+                "empty",
+                "%s sets NSPrivacyTracking=true with %s. Apple's "
+                "NSPrivacyTracking reference: \"When set to true you need to "
+                "provide a list of internet domains in "
+                "NSPrivacyTrackingDomains.\" THIS IS THE SHAPE THAT WAS "
+                "ACTUALLY REJECTED: FlirtGym 1.0.0 build 24 (2026-08-03 "
+                "16:48) and build 25 (19:48, identical text) both died at "
+                "upload on ITMS-91064 with exactly this manifest. Note that "
+                "Apple's emailed sentence -- \"NSPrivacyTracking must be true "
+                "if NSPrivacyTrackingDomains isn't empty\" -- describes the "
+                "OTHER direction and is satisfied here, so a rule written "
+                "from the email text alone passes this manifest."
+                % (_pm_whose(rel),
+                   "no NSPrivacyTrackingDomains key" if
+                   "NSPrivacyTrackingDomains" not in man else
+                   "an empty NSPrivacyTrackingDomains array"),
+                "List the tracking endpoints the app actually contacts (for "
+                "FlirtGym that was ep1.facebook.com, the domain FBSDKCoreKit "
+                "already declares). If the app contacts none, the honest fix "
+                "is NSPrivacyTracking=false -- but only if the app genuinely "
+                "does not track; do not flip the flag to silence the gate.",
+                clause="apple:privacy-tracking"))
+    return out
+
+
 def check_binary(artifact, project_root=None):
     """Binary evidence. Reads the artifact, never the config."""
     out = []
@@ -1055,15 +1487,28 @@ def check_binary(artifact, project_root=None):
                 "%s.framework is linked but no purpose string for it is in "
                 "the built Info.plist" % fw,
                 "Linked by: %s. The built Info.plist has none of %s. App "
-                "config may well say this permission is off -- that deletes "
-                "the key and cannot remove the linkage, which is exactly how "
-                "MileTruth build 3 was rejected at delivery with ITMS-90683 "
-                "(expo-location's precompiled XCFramework links CoreMotion "
-                "unconditionally). Apple reads the Mach-O, not app.json."
+                "config may well say this permission is off, or say nothing "
+                "at all -- that deletes the key and cannot remove the "
+                "linkage, which is exactly how MileTruth build 3 was rejected "
+                "at delivery with ITMS-90683. Apple reads the Mach-O, not "
+                "app.json, and says so in the rejection: \"If you\'re using "
+                "external libraries or SDKs, they may reference APIs that "
+                "require a purpose string. While your app might not use these "
+                "APIs, a purpose string is still required.\""
                 % (", ".join(linked[fw]), ", ".join(keys)),
-                "Either add one of %s to expo.ios.infoPlist with an honest "
-                "purpose, or remove the dependency that pulls %s in. Confirm "
-                "with `otool -L` on the rebuilt binary, not with app.json."
+                "Add one of %s to the app config\'s ios.infoPlist with an "
+                "honest purpose string. If the app does not use the "
+                "capability, say so plainly -- Apple requires the string, not "
+                "a use, and inventing a use is worse. Do NOT try to remove "
+                "the linkage unless you can prove the removal: setting a "
+                "plugin permission option to false is the approach that "
+                "already failed, and %s arrives by Swift autolinking from the "
+                "Expo modules runtime, not from one named package -- measured "
+                "2026-10-15, 26 of the static libraries in a MoveWitness "
+                "build carry a `-framework CoreMotion` LC_LINKER_OPTION and "
+                "that app has no location or sensor dependency at all. "
+                "Confirm the fix with `otool -L` and plutil on the REBUILT "
+                "binary, never with app.json."
                 % (keys[0], fw),
                 clause="5.1.1", confidence="high"))
 
@@ -1106,6 +1551,13 @@ def check_binary(artifact, project_root=None):
             "NSPrivacyTracking and NSPrivacyCollectedDataTypes live in the "
             "app-level manifest and nowhere else.",
             clause="apple:required-reason-api"))
+
+    # The contents of every embedded manifest, not just their presence. The
+    # absence rule above and these two are not alternatives: Nearvo build 1 and
+    # FlirtGym build 24 both HAD the file.
+    pm_contents = artifact.privacy_manifest_contents()
+    out.extend(privacy_reason_code_findings(pm_contents))
+    out.extend(privacy_tracking_findings(pm_contents))
 
     return out, facts
 
@@ -1297,6 +1749,106 @@ def gate_check(artifact_path, project_root=None):
                 "REVIEW" if findings else "CLEARED"))
     finally:
         art.cleanup()
+
+
+# ======================================================================= sweep
+# WHY THIS EXISTS, AND IT IS THE WHOLE LESSON OF THIS PROJECT AGAIN
+#
+# BIN-FRAMEWORK-PURPOSE-STRING was built from a real, written Apple rejection
+# (MileTruth build 3, ITMS-90683, 2026-10-13) and it works: run it against a
+# binary with the defect and it fires, every time. On 2026-10-14 it was
+# dogfooded against "every real built binary on this machine" and reported the
+# defect in Steadychart, PolicyReady and both Nearvo binaries.
+#
+# It said nothing about MoveWitness or DenialDesk. Both have the defect --
+# measured 2026-10-15, CoreMotion linked on the app's own executable with no
+# NSMotionUsageDescription in the built plist, and the existing rule fires on
+# both the moment it is handed their binaries. It said nothing because THERE
+# WAS NO BINARY TO HAND IT. Neither repo had an ios/ directory, so neither app
+# was in the corpus, and a table of six apps with two findings reads exactly
+# like a portfolio with two defective apps.
+#
+# That is the same failure as every row in VERIFICATION-LESSON.md -- a check
+# that cannot see its subject -- arriving one level up: not a rule that cannot
+# read a file, but a correct rule that was never pointed at three of the apps
+# it was written for. So the fix is not in the rule. It is a command that
+# enumerates the apps, and reports an app with NO ARTIFACT as a BLOCKING
+# finding rather than as a quiet omission from a table.
+def find_artifacts(project_root):
+    """Every Release-iphone*/*.app built under this repo, newest first.
+
+    Walks the repo rather than guessing a path, because the derived-data
+    location differs per repo here (ios/build/dd, ios/build/dd-lr, and
+    Xcode's own DerivedData). node_modules/Pods/.git are skipped for speed,
+    not for correctness -- no .app is built inside them.
+    """
+    hits = []
+    for base, dirs, _files in os.walk(project_root):
+        dirs[:] = [d for d in dirs
+                   if d not in ("node_modules", ".git", "Pods")
+                   and not d.endswith(".app")]
+        if os.path.basename(base).startswith("Release-iphone"):
+            for d in sorted(os.listdir(base)):
+                if d.endswith(".app"):
+                    hits.append(os.path.join(base, d))
+    hits.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+    return hits
+
+
+def gate_sweep(roots):
+    """Run the binary rules over every artifact in every repo named.
+
+    One entry per repo, always -- including repos with nothing built, which is
+    the point. `artifacts: []` plus a GATE-NO-ARTIFACT finding is the honest
+    answer to "is this app clean?", and it is not "yes".
+    """
+    out = []
+    for root in roots:
+        root = os.path.abspath(root)
+        apps = find_artifacts(root)
+        entry = dict(project=root, artifacts=[], findings=[])
+        if not apps:
+            entry["findings"].append(_f(
+                "GATE-NO-ARTIFACT", "critical",
+                "No built binary for this app, so the gate has never looked "
+                "at it",
+                "No Release-iphone*/*.app exists anywhere under %s. Every "
+                "binary rule -- the linked-SDK scene check, the ITMS-90683 "
+                "purpose-string check, the privacy-manifest contents -- reads "
+                "the artifact, so none of them has run for this app. This is "
+                "reported as BLOCKING, not skipped: on 2026-10-14 MoveWitness "
+                "and DenialDesk were omitted from the dogfood table for "
+                "exactly this reason, and both were carrying the ITMS-90683 "
+                "defect that bounced MileTruth build 3 at delivery." % root,
+                "Build Release for the simulator and re-run: `npx expo "
+                "prebuild -p ios` then xcodebuild -configuration Release "
+                "-sdk iphonesimulator. An app with no artifact is unevaluated, "
+                "not clean."))
+            out.append(entry)
+            continue
+        for app in apps:
+            art = None
+            try:
+                art = Artifact(app)
+                findings, facts = check_binary(art, root)
+                entry["artifacts"].append(dict(
+                    path=app, facts=facts,
+                    findings=findings))
+                entry["findings"].extend(findings)
+            except GateError as e:
+                f = _f("GATE-CANNOT-READ-ARTIFACT", "critical",
+                       "Could not read a built artifact that exists",
+                       "%s: %s" % (app, e),
+                       "Fix the artifact or the toolchain. An unreadable "
+                       "artifact is not a pass.")
+                entry["artifacts"].append(dict(path=app, facts=None,
+                                               findings=[f]))
+                entry["findings"].append(f)
+            finally:
+                if art is not None:
+                    art.cleanup()
+        out.append(entry)
+    return out
 
 
 # ====================================================================== launch

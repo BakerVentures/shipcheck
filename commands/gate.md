@@ -17,6 +17,15 @@ none is given, look for the newest one under the project (commonly
 
 ## Steps
 
+0. **Before anything else, if you are looking at more than one app:** run
+   `python3 ${CLAUDE_PLUGIN_ROOT}/bin/shipcheck gate sweep <repo> [<repo>...]`
+   and read the NO ARTIFACT lines first. An app with no built binary has not
+   been checked by any binary rule, and that is not the same as clean. This step
+   exists because on 2026-10-14 two apps carrying a known delivery-rejection
+   defect were simply missing from a six-app results table — neither had a
+   binary, so neither was in the corpus, and the table read like a clean result
+   for them.
+
 1. **Inspect the artifact.** Run:
    `python3 ${CLAUDE_PLUGIN_ROOT}/bin/shipcheck gate inspect <artifact> --project .`
    Report the linked SDK, the real scene delegate, the usage descriptions and any
