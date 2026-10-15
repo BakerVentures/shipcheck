@@ -34,6 +34,14 @@ and a caller that cannot tell them apart reads silence as safety.
 BUILT ARTIFACT and requires proof that it was run. Nothing is submitted until
 `gate check` passes -- see scripts/shipgate.py for why, at length.
 
+By default the gate keeps its receipts in the artifact's own repo, which is
+what makes them committable and portable between the machine that builds and
+the machine that uploads. `--receipts DIR` (or SHIPCHECK_RECEIPTS=DIR) puts
+them somewhere else instead, for the case where the artifact lives in a repo
+the caller must leave clean -- a shared checkout, or anything mid-push. It
+replaces the search list rather than extending it, so nothing is read from the
+repo either, and the default with the flag unset is unchanged.
+
 Standard library only. Python 3.9+.
 """
 import argparse
@@ -206,6 +214,14 @@ def cmd_init(args):
 def cmd_gate(args):
     """The submission gate. Binary evidence, a launch proof, a stress pass."""
     import shipgate                                        # noqa: PLC0415
+
+    # Where receipts are written and read, for every gate subcommand that
+    # touches one. Resolved HERE, once, before any rule runs: a per-call
+    # argument would be a per-call chance to forget it, and the call site that
+    # forgot would be the one that wrote into somebody else's working tree.
+    # Absent --receipts, SHIPCHECK_RECEIPTS decides; absent both, nothing
+    # changes.
+    shipgate.set_receipts_override(getattr(args, "receipts", None))
 
     sub = args.gate_cmd
     try:
@@ -618,6 +634,16 @@ def main():
                        help="the git repo this artifact was built from; used "
                             "to check whether its safety is reproducible from "
                             "TRACKED config, and where receipts are written")
+        p.add_argument("--receipts", default=None, metavar="DIR",
+                       help="write and read receipts HERE instead of in the "
+                            "artifact's repo. Default (unset) is unchanged: "
+                            "<artifact repo>/.shipcheck-receipts, then "
+                            "<--project repo>/.shipcheck-receipts, then "
+                            "~/.config/shipcheck/receipts. Also settable as "
+                            "SHIPCHECK_RECEIPTS; the flag wins. Use it to ask "
+                            "the gate about an artifact inside a repo you must "
+                            "not dirty -- it REPLACES the list, so a receipt "
+                            "that lives in the repo is not read either.")
         p.add_argument("--json", action="store_true")
         p.add_argument("-v", "--verbose", action="store_true")
         return p
@@ -631,6 +657,11 @@ def main():
                     "and render the full gate verdict for each. exit 0 pass, "
                     "1 blocked, 2 nothing built (NOT CHECKED)")
     gp.add_argument("repo", help="the app repo, not the artifact")
+    gp.add_argument("--receipts", default=None, metavar="DIR",
+                    help="write and read receipts HERE instead of in the "
+                         "repo. `gate app` runs the full check, so it writes "
+                         "a ledger entry per artifact; this is how to run it "
+                         "against a tree you must leave clean.")
     gp.add_argument("--json", action="store_true")
     gp.add_argument("-v", "--verbose", action="store_true")
     gp.set_defaults(fn=cmd_gate, gate_cmd="app")
@@ -641,6 +672,12 @@ def main():
     gw.add_argument("repos", nargs="+",
                     help="one or more app repos. Every one gets a line, "
                          "including the ones with nothing built.")
+    gw.add_argument("--receipts", default=None, metavar="DIR",
+                    help="accepted for symmetry. `gate sweep` reads the "
+                         "artifact only and writes no receipt at all, so this "
+                         "changes nothing -- it exists so a wrapper can pass "
+                         "the same flag to every gate subcommand without "
+                         "having to know which ones write.")
     gw.add_argument("--json", action="store_true")
     gw.add_argument("-v", "--verbose", action="store_true")
     gw.set_defaults(fn=cmd_gate, gate_cmd="sweep")

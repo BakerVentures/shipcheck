@@ -121,6 +121,65 @@ import zlib
 RECEIPT_DIRNAME = ".shipcheck-receipts"
 HOME_RECEIPTS = os.path.expanduser("~/.config/shipcheck/receipts")
 
+# The one knob receipt_dirs() did not have, and the reason six rule families
+# could not be asked honestly.
+#
+# `gate check` derives its receipt directory from the ARTEFACT's own git
+# toplevel, so inspecting an .app that was built inside a repo writes
+# .shipcheck-receipts/ INTO that repo -- whatever --project says. On a machine
+# where several sessions share a checkout that is not a cosmetic problem:
+#   * it dirties the working tree, and the push verification refuses a dirty
+#     tree, so asking the gate a question blocks an unrelated push;
+#   * it leaves a file a concurrent session can sweep into its own commit,
+#     which is how a receipt once got committed in order to satisfy the check
+#     that the receipt exists.
+# The workaround was to copy the artefact out and inspect the copy. That stops
+# the write and makes GATE-SCENE-PROVENANCE-* permanently unanswerable, because
+# provenance is a question about the repo -- i.e. it converts a writing gate
+# into a gate that cannot fail, which is strictly worse.
+#
+# So: the caller may name the directory. Unset, nothing changes -- the default
+# list below is byte-for-byte what it always was.
+RECEIPTS_ENV = "SHIPCHECK_RECEIPTS"
+
+# Set by `--receipts DIR`. Outranks RECEIPTS_ENV, which outranks the default.
+_RECEIPTS_OVERRIDE = None
+
+
+def _clean_receipts_path(path):
+    """A usable absolute path, or None. An empty/blank value reads as unset.
+
+    Blank-is-unset matters because `SHIPCHECK_RECEIPTS=` in a wrapper script is
+    how an env var gets "cleared", and treating "" as a directory would put
+    receipts in the process's cwd -- a silent write into whatever tree the
+    caller happened to be standing in, which is the defect this knob removes.
+    """
+    if path is None:
+        return None
+    path = str(path).strip()
+    if not path:
+        return None
+    return os.path.abspath(os.path.expanduser(path))
+
+
+def set_receipts_override(path):
+    """Point receipts at one directory for the rest of this process.
+
+    Returns the resolved path, or None if `path` was blank/None -- in which
+    case any value already set is CLEARED, so passing the flag's default never
+    silently inherits a previous call.
+    """
+    global _RECEIPTS_OVERRIDE                              # noqa: PLW0603
+    _RECEIPTS_OVERRIDE = _clean_receipts_path(path)
+    return _RECEIPTS_OVERRIDE
+
+
+def receipts_override():
+    """The caller-chosen receipt directory, or None for today's behaviour."""
+    if _RECEIPTS_OVERRIDE:
+        return _RECEIPTS_OVERRIDE
+    return _clean_receipts_path(os.environ.get(RECEIPTS_ENV))
+
 # The iOS SDK major at which UIKit begins requiring UIScene adoption. A binary
 # linked against anything lower launches normally and is exempt -- this is the
 # FlirtGym must-not-fire case and the reason the check is gated on the linked
@@ -1092,7 +1151,22 @@ def receipt_dirs(project_root=None, artifact_path=None):
     and the machine that uploads are not the same machine here, and a receipt
     that lives only in ~/.config on the mini would block every legitimate
     upload from the laptop.
+
+    An override REPLACES the list rather than being prepended to it, and that
+    is the whole point: a list that still contains the repo is a list that can
+    still be written to, and "it usually writes somewhere else" is not an
+    isolation guarantee anybody can assert on. One directory, read and written,
+    named by the caller. The cost is stated rather than hidden -- a receipt
+    that legitimately lives in the repo or in the home store is NOT read while
+    an override is in force, so a caller who wants existing evidence to count
+    has to put it in the directory it named. Making the override read-wide and
+    write-narrow would mean a gate whose answer depends on a directory the
+    caller did not name, which is how a check ends up answering a question
+    nobody asked.
     """
+    override = receipts_override()
+    if override:
+        return [override]
     out = []
     for start in (project_root, os.path.dirname(artifact_path or "") or None):
         if not start:

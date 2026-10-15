@@ -1081,6 +1081,232 @@ def test_receipt_roundtrip_and_expiry(r):
         a2.cleanup()
 
 
+def _porcelain(repo):
+    return subprocess.run(["git", "-C", repo, "status", "--porcelain"],
+                          capture_output=True, text=True).stdout.strip()
+
+
+def test_receipt_dir_override(r):
+    """Where receipts go, and the gate a shared checkout could not be asked.
+
+    THE DEFECT THIS CLOSES, stated as the two things that were both true:
+
+      * `gate check` derives its receipt directory from the ARTIFACT's own git
+        toplevel, so asking it anything about an .app built inside a repo wrote
+        .shipcheck-receipts/ into that repo -- whatever --project said. On a
+        shared checkout that dirties a tree somebody else is pushing from, and
+        leaves a file a concurrent session can sweep into a commit.
+      * Avoiding that by copying the artifact out and inspecting the copy stops
+        the write and makes GATE-SCENE-PROVENANCE-* unanswerable, because
+        provenance is a question about the REPO. A gate that cannot fail is
+        worse than a gate that writes a file.
+
+    So neither half of that trade was acceptable, and the assertions below are
+    written to hold both ends down at once:
+
+        no evidence     -> the evidence rules FIRE          (it can fail)
+        evidence in DIR -> the same rules are SILENT        (it can pass)
+        either way      -> git status --porcelain is EMPTY  (it writes nothing)
+        provenance      -> answered, not skipped            (the point)
+
+    and one counter-case that makes the clean-tree assertion non-vacuous: the
+    same command WITHOUT the override must dirty the same repo. Without that,
+    "the tree is clean" would also pass against a gate that had not run.
+    """
+    print("\nReceipt directory override -- asking an evidence rule without "
+          "writing into the repo")
+
+    # ---- resolution order, in process. No toolchain needed. ---------------
+    env_dir = tempfile.mkdtemp(prefix="recpt-env-")
+    flag_dir = tempfile.mkdtemp(prefix="recpt-flag-")
+    # realpath: git --show-toplevel resolves /var -> /private/var on macOS, and
+    # a test that compared the unresolved path would fail for a reason that has
+    # nothing to do with what it is measuring.
+    repo0 = os.path.realpath(tempfile.mkdtemp(prefix="recpt-repo0-"))
+    try:
+        git_init(repo0, {"app.json": "{}"})
+        os.environ.pop(shipgate.RECEIPTS_ENV, None)
+        shipgate.set_receipts_override(None)
+
+        base = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("DEFAULT is unchanged: the repo first, the home store last",
+                base[0] == os.path.join(repo0, shipgate.RECEIPT_DIRNAME)
+                and base[-1] == shipgate.HOME_RECEIPTS, str(base))
+
+        os.environ[shipgate.RECEIPTS_ENV] = env_dir
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("%s REPLACES the list -- one directory, not a longer search "
+                "path (a list that still contains the repo can still be "
+                "written to)" % shipgate.RECEIPTS_ENV,
+                got == [env_dir], str(got))
+
+        shipgate.set_receipts_override(flag_dir)
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("--receipts outranks the environment", got == [flag_dir],
+                str(got))
+
+        shipgate.set_receipts_override(None)
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("clearing the flag falls back to the environment, it does not "
+                "stick", got == [env_dir], str(got))
+
+        os.environ[shipgate.RECEIPTS_ENV] = "   "
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("a BLANK value reads as unset, not as the current directory "
+                "-- `SHIPCHECK_RECEIPTS=` is how a wrapper clears it, and "
+                "treating '' as a path would write into whatever tree the "
+                "caller was standing in", got == base, str(got))
+
+        os.environ[shipgate.RECEIPTS_ENV] = os.path.join("~", "x-ship-recpt")
+        got = shipgate.receipt_dirs(repo0, None)
+        r.check("a ~ path is expanded and a relative one made absolute",
+                got == [os.path.expanduser("~/x-ship-recpt")], str(got))
+        os.environ.pop(shipgate.RECEIPTS_ENV, None)
+
+        # The ledger is the file that actually dirtied a tree, so it gets its
+        # own assertion rather than being assumed to follow receipt_dirs.
+        shipgate.set_receipts_override(flag_dir)
+        r.check("the gated-builds ledger follows the override too",
+                shipgate.ledger_path(repo0, os.path.join(repo0, "A.app"))
+                == os.path.join(flag_dir, shipgate.LEDGER_NAME))
+        shipgate.set_receipts_override(None)
+    finally:
+        os.environ.pop(shipgate.RECEIPTS_ENV, None)
+        shipgate.set_receipts_override(None)
+        for d in (env_dir, flag_dir, repo0):
+            shutil.rmtree(d, ignore_errors=True)
+
+    # ---- the whole point, through bin/shipcheck as a subprocess ------------
+    if not HAVE_MACHO_TOOLS or not HAVE_CLANG:
+        r.skip("gate check --receipts leaves the repo clean",
+               "needs a real Mach-O")
+        return
+
+    wt = os.path.dirname(HERE)
+    tmp = tempfile.mkdtemp(prefix="recpt-cli-")
+    home = tempfile.mkdtemp(prefix="recpt-home-")
+    try:
+        # A repo shaped like the real case: the .app lives in a gitignored
+        # build directory, and an untracked hand-written ios/Info.plist is the
+        # ONLY thing that explains the artifact's scene manifest. So the tree
+        # starts clean, provenance has a real answer, and the only thing that
+        # can dirty it is the gate itself.
+        repo = os.path.join(tmp, "shared-checkout")
+        prod = os.path.join(repo, "ios", "build", "dd", "Build", "Products",
+                            "Release-iphonesimulator")
+        os.makedirs(prod)
+        git_init(repo, {
+            "app.json": json.dumps({"expo": {"name": "Ov", "slug": "ov"}}),
+            ".gitignore": "ios/\n"})
+        os.makedirs(os.path.join(repo, "ios", "Ov"))
+        with open(os.path.join(repo, "ios", "Ov", "Info.plist"), "wb") as f:
+            plistlib.dump(dict({"CFBundleIdentifier": "x"},
+                               **SCENE_ADOPTED), f)
+        with Quiet():
+            app = make_app(prod, "Ov",
+                           dict(SCENE_ADOPTED,
+                                ITSAppUsesNonExemptEncryption=False),
+                           sdk="26.0", salt="ov")
+        open(os.path.join(app, "AppIcon60x60@2x.png"), "wb").close()
+        r.check("the fixture repo starts clean", _porcelain(repo) == "",
+                _porcelain(repo))
+
+        out = os.path.join(tmp, "receipts-out")
+        res = _cli(wt, ["gate", "check", app, "--project", repo,
+                        "--receipts", out, "--json"], home)
+        ids = {f["id"] for f in json.loads(res.stdout).get("findings", [])}
+
+        # RED: with no evidence anywhere, the evidence rules must fire. A rule
+        # that can only pass is the defect being removed here, not a feature.
+        r.check("with no receipt in DIR, GATE-LAUNCH-UNPROVEN FIRES",
+                "GATE-LAUNCH-UNPROVEN" in ids, str(sorted(ids)))
+        r.check("with no receipt in DIR, GATE-STRESS-NOT-RUN FIRES",
+                "GATE-STRESS-NOT-RUN" in ids, str(sorted(ids)))
+        r.check("and the attestation items are demanded",
+                any(i.startswith("GATE-ATTEST-MISSING-") for i in ids),
+                str(sorted(ids)))
+        r.check("gate check EXITS 1 on that, rather than printing it and "
+                "returning 0", res.returncode == 1, "rc=%d" % res.returncode)
+
+        # The rule that CLONING THE ARTIFACT OUT makes permanently
+        # unanswerable. Under the override the artifact stays where it is, so
+        # the question about the repo still has an answer.
+        r.check("GATE-SCENE-PROVENANCE-UNTRACKED is ANSWERED -- the rule that "
+                "becomes unanswerable when the artifact is copied out of its "
+                "repo to dodge the write",
+                "GATE-SCENE-PROVENANCE-UNTRACKED" in ids, str(sorted(ids)))
+        r.check("and it is not the 'I could not look' outcome wearing the "
+                "same hat", "GATE-SCENE-PROVENANCE-UNKNOWN" not in ids,
+                str(sorted(ids)))
+
+        # ...and none of that touched the repo.
+        r.check("git status --porcelain is EMPTY after asking the evidence "
+                "rules", _porcelain(repo) == "", _porcelain(repo))
+        r.check("no .shipcheck-receipts anywhere under the repo",
+                not any(shipgate.RECEIPT_DIRNAME in dirs
+                        for _b, dirs, _f in os.walk(repo)))
+        r.check("the ledger landed in DIR instead",
+                os.path.isfile(os.path.join(out, shipgate.LEDGER_NAME)))
+        r.check("and not in the home store either -- the override replaces "
+                "that too",
+                not os.path.isdir(os.path.join(home, ".config", "shipcheck",
+                                               "receipts")))
+
+        # GREEN: real receipts, in the directory the caller named.
+        shipgate.set_receipts_override(out)
+        try:
+            _full_receipts(app, repo)
+        finally:
+            shipgate.set_receipts_override(None)
+        r.check("writing the receipts put them in DIR, not in the repo",
+                _porcelain(repo) == "", _porcelain(repo))
+
+        res = _cli(wt, ["gate", "check", app, "--project", repo,
+                        "--receipts", out, "--json"], home)
+        ids2 = {f["id"] for f in json.loads(res.stdout).get("findings", [])}
+        r.check("with a REAL receipt in DIR, GATE-LAUNCH-UNPROVEN is silent",
+                "GATE-LAUNCH-UNPROVEN" not in ids2, str(sorted(ids2)))
+        r.check("and GATE-STRESS-NOT-RUN is silent",
+                "GATE-STRESS-NOT-RUN" not in ids2, str(sorted(ids2)))
+        r.check("and no attestation is still missing",
+                not any(i.startswith("GATE-ATTEST-MISSING-") for i in ids2),
+                str(sorted(ids2)))
+        r.check("the repo is STILL clean after the gate was satisfied",
+                _porcelain(repo) == "", _porcelain(repo))
+
+        # EXCLUSIVITY, stated as a test rather than only in a docstring: a
+        # receipt in the repo is NOT read while an override is in force. This
+        # is the cost of the design, and a cost nobody asserts on is a cost
+        # that turns into a surprise.
+        repo_store = os.path.join(repo, shipgate.RECEIPT_DIRNAME)
+        shutil.copytree(out, repo_store)
+        other = os.path.join(tmp, "receipts-elsewhere")
+        res = _cli(wt, ["gate", "check", app, "--project", repo,
+                        "--receipts", other, "--json"], home)
+        ids3 = {f["id"] for f in json.loads(res.stdout).get("findings", [])}
+        r.check("a receipt sitting in the repo is NOT read when DIR is named "
+                "-- the override replaces the list, it does not widen it",
+                "GATE-LAUNCH-UNPROVEN" in ids3, str(sorted(ids3)))
+
+        # And the counter-case that makes every 'porcelain is empty' assertion
+        # above mean something: the SAME command with no override dirties the
+        # SAME repo. Without this, a gate that silently did nothing would also
+        # have left the tree clean.
+        shutil.rmtree(repo_store, ignore_errors=True)
+        r.check("the fixture is clean again before the counter-case",
+                _porcelain(repo) == "", _porcelain(repo))
+        res = _cli(wt, ["gate", "check", app, "--project", repo, "--json"],
+                   home)
+        dirty = _porcelain(repo)
+        r.check("WITHOUT --receipts the same command DIRTIES the same repo -- "
+                "so the clean-tree assertions above are measuring something",
+                shipgate.RECEIPT_DIRNAME in dirty, dirty or "(clean)")
+        shutil.rmtree(repo_store, ignore_errors=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(home, ignore_errors=True)
+
+
 def test_attestations(r):
     if not HAVE_MACHO_TOOLS:
         r.skip("attestations", "no vtool/dwarfdump/otool on this machine")
@@ -2325,6 +2551,12 @@ def main():
     # ~/.config/shipcheck/receipts for a fixture app called "Round".
     sandbox = tempfile.mkdtemp(prefix="shipgate-selftest-receipts-")
     shipgate.HOME_RECEIPTS = sandbox
+    # ...and a SHIPCHECK_RECEIPTS inherited from the caller's shell would
+    # redirect every receipt in the suite, quietly changing what most of these
+    # assertions are measuring. The override is tested explicitly below; it is
+    # not allowed to arrive by accident.
+    os.environ.pop(shipgate.RECEIPTS_ENV, None)
+    shipgate.set_receipts_override(None)
     r = Results()
     test_scene_rules(r)
     test_scene_sdk_gate(r)
@@ -2333,6 +2565,7 @@ def main():
     test_provenance(r)
     test_receipt_binding(r)
     test_receipt_roundtrip_and_expiry(r)
+    test_receipt_dir_override(r)
     test_attestations(r)
     test_build_number_reuse(r)
     test_frame_measurement(r)
