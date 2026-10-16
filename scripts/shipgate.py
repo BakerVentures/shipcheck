@@ -67,11 +67,11 @@ the way that matters.
 
 The fix keeps the sim-build/device-build case working without keying on a
 version string. A receipt records the launched binary's LC_UUID *and* a
-fingerprint of the gate-relevant Info.plist keys. Matching is then three-valued:
+fingerprint of the gate-relevant inputs. Matching is then three-valued:
 
     exact    same LC_UUID                      -> accepted
     sibling  same bundle+version+build, other
-             UUID, and the gate-relevant plist
+             UUID, and the gate-relevant
              fingerprint AGREES                -> accepted (sim -> device)
     expired  version/build moved, or the
              fingerprint disagrees             -> rejected, loudly
@@ -80,6 +80,33 @@ The Vocabdrift pair is a `sibling` whose fingerprint disagrees, so it is
 rejected. A simulator and device build of the same commit agree on every key in
 the fingerprint, so that case still passes. A build number bump still expires
 everything, which is the existing behaviour and is correct.
+
+AND THE PLIST IS NOT THE WHOLE OF THE GATE-RELEVANT INPUT
+---------------------------------------------------------
+The first version of the fingerprint digested five Info.plist keys and nothing
+else. Every app here is React Native, where essentially all behaviour lives in
+a JavaScript bundle shipped inside the .app. So two binaries whose ENTIRE
+JavaScript differs -- one with a fix, one without -- produced an IDENTICAL
+fingerprint, `sibling`, and an ACCEPTED receipt. Measured on this machine: two
+preserved builds of one app at the same version+build, with byte-identical
+gate-relevant plist keys and the same plist fingerprint, ship JS bundles with
+different digests. A receipt earned on the good one vouched for the bad one,
+and `gate check` printed "proven (sibling build, keys agree)" for a binary that
+genuinely fails a hard-kill gate.
+
+So the fingerprint now covers the shipped JS bundle as well, hashed from its
+CONTENTS. The `sibling` branch keeps its meaning exactly -- same build,
+gate-relevant inputs identical -- and the SET of gate-relevant inputs is what
+grew. An artifact with no JS bundle (a native app) has a fingerprint that is
+byte-identical to the plist-only digest, so its receipts keep working
+unchanged.
+
+A receipt written before this change carries no bundle digest. Against a
+bundle-bearing artifact that receipt is `expired`, not `sibling`: it was earned
+without anyone ever looking at the JavaScript, so it is not evidence about the
+JavaScript. The permissive reading would keep the hole open for precisely the
+artifacts that matter -- every receipt in existence predates this, and every app
+here is React Native -- which is why it is refused instead.
 
 CRYING WOLF IS THE FAILURE MODE THAT MATTERS
 --------------------------------------------
@@ -205,6 +232,21 @@ FINGERPRINT_KEYS = (
     "ITSAppUsesNonExemptEncryption",
     "UIApplicationSceneManifest",
 )
+
+# The other half of the gate-relevant input, and the one that actually carries
+# the app's behaviour in a React Native build: the JavaScript bundle shipped at
+# the root of the .app. It is matched by SUFFIX rather than by the single name
+# `main.jsbundle`, because the name is set by the build and a bundle the gate
+# cannot see is exactly the defect this closes -- and every bundle found is
+# hashed, so an extra one cannot hide a changed one.
+#
+# Hashed by CONTENT. Not by size, not by mtime, not by name: two bundles of an
+# app with and without one guarded division are the same size to the byte, and
+# an mtime is a property of the filesystem rather than of the artifact. The hash
+# is also why the Hermes UTF-16LE string-encoding trap does not apply here --
+# nothing in this path reads the bundle as text or scans it for ASCII.
+JSBUNDLE_SUFFIX = ".jsbundle"
+_JS_CHUNK = 1 << 20
 
 # Linked system framework -> the purpose string(s) Apple's delivery check wants
 # if any of them satisfies it. THIS IS THE CHECK THAT CATCHES A RECORDED, REAL
@@ -378,6 +420,12 @@ class Artifact:
     def __init__(self, path):
         self.given = path
         self._tmp = None
+        # Memoised for the lifetime of THIS object, which is one gate run.
+        # Deliberately NOT a cache keyed on path+mtime+size: that would answer
+        # from a stale digest after a rebuild that reuses an mtime, which is
+        # this gate's own failure mode moved inside the fix. Measured cost says
+        # no such cache is needed -- see jsbundle_digest().
+        self._js_digest = ()
         self.app = self._resolve(path)
         self.plist_path = os.path.join(self.app, "Info.plist")
         self.plist = self._read_plist(self.plist_path)
@@ -663,13 +711,84 @@ class Artifact:
         except GateError:
             return None
 
-    def fingerprint(self):
-        """Digest of the gate-relevant plist keys. See RECEIPT BINDING."""
+    def jsbundles(self):
+        """Sorted relpaths of the JS bundles shipped at the root of the .app.
+
+        Empty for a native app, which is what keeps a native app's fingerprint
+        byte-identical to what it was before JS bundles were covered at all.
+        """
+        try:
+            names = os.listdir(self.app)
+        except OSError:
+            return []
+        return sorted(
+            n for n in names
+            if n.endswith(JSBUNDLE_SUFFIX)
+            and os.path.isfile(os.path.join(self.app, n)))
+
+    def jsbundle_digest(self):
+        """sha256 over the shipped JS bundle contents, or None if there is none.
+
+        None, not an empty-string digest: "this app ships no JavaScript" and
+        "this app ships JavaScript that hashes to nothing" are different claims,
+        and only the first one may leave the old behaviour untouched.
+
+        COST, measured on this machine over the five real bundles present:
+        14.88 MB total, largest 8.38 MB. sha256 ran at ~1.5 GB/s cold and
+        ~3 GB/s warm -- 5.5 ms for the largest bundle cold, 2.8 ms warm. One
+        gate run asks for the fingerprint about six times (launch, stress,
+        attest, facts, ledger), so the memo above turns ~33 ms into ~5 ms. That
+        is small enough that caching across runs buys nothing and would cost
+        the staleness risk, so there is no such cache.
+        """
+        if self._js_digest != ():
+            return self._js_digest
+        rels = self.jsbundles()
+        if not rels:
+            self._js_digest = None
+            return None
+        h = hashlib.sha256()
+        for rel in rels:
+            p = os.path.join(self.app, rel)
+            # The name and the length go into the hash as well as the bytes, so
+            # two bundles cannot be swapped or concatenated into agreement.
+            h.update(rel.encode("utf-8"))
+            h.update(b"\0")
+            h.update(("%d" % os.path.getsize(p)).encode("ascii"))
+            h.update(b"\0")
+            with open(p, "rb") as f:
+                for chunk in iter(lambda: f.read(_JS_CHUNK), b""):
+                    h.update(chunk)
+        self._js_digest = h.hexdigest()[:16]
+        return self._js_digest
+
+    def plist_fingerprint(self):
+        """Digest of the gate-relevant plist keys ALONE.
+
+        Kept separate so that when a receipt does not match, match_receipt can
+        say WHICH input moved. A verdict that blames the plist for a changed
+        JavaScript bundle is a correct refusal with a false reason, and a false
+        reason is how a real finding gets argued away.
+        """
         payload = {}
         for k in FINGERPRINT_KEYS:
             v = self.plist.get(k)
             payload[k] = _stable(v)
         blob = json.dumps(payload, sort_keys=True, ensure_ascii=True)
+        return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
+
+    def fingerprint(self):
+        """Digest of ALL the gate-relevant inputs. See RECEIPT BINDING.
+
+        For an app with no JS bundle this returns exactly plist_fingerprint(),
+        byte for byte, so a native app's existing receipts are unaffected.
+        """
+        js = self.jsbundle_digest()
+        pf = self.plist_fingerprint()
+        if js is None:
+            return pf
+        blob = json.dumps({"plist": pf, "jsbundle": js},
+                          sort_keys=True, ensure_ascii=True)
         return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
 
     def facts(self):
@@ -691,6 +810,9 @@ class Artifact:
             app=self.app, bundle_id=self.bundle_id, version=self.version,
             build=self.build, linked_sdk=sdk, minos=minos,
             binary_uuid=ident, fingerprint=self.fingerprint(),
+            plist_fingerprint=self.plist_fingerprint(),
+            jsbundle_digest=self.jsbundle_digest(),
+            jsbundles=self.jsbundles(),
             scene_manifest=present, scene_delegate=deleg,
             scene_config_count=n,
             usage_descriptions=sorted(self.usage_descriptions()),
@@ -934,6 +1056,8 @@ def ledger_append(artifact, project_root=None):
         row = dict(bundle_id=artifact.bundle_id, version=artifact.version,
                    build=artifact.build, binary_uuid=artifact.identity(),
                    fingerprint=artifact.fingerprint(),
+                   plist_fingerprint=artifact.plist_fingerprint(),
+                   jsbundle_digest=artifact.jsbundle_digest(),
                    app_path=os.path.abspath(artifact.app),
                    when=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
     except GateError:
@@ -971,15 +1095,58 @@ def match_receipt(artifact, receipt):
     if rf and rf == af:
         return ("sibling",
                 "receipt was earned on a different binary of the same build "
-                "(%s vs %s) whose gate-relevant Info.plist keys are identical "
-                "-- the simulator-build/device-build case"
+                "(%s vs %s) whose gate-relevant inputs -- the Info.plist keys "
+                "and the shipped JS bundle -- are identical: the "
+                "simulator-build/device-build case"
                 % (receipt.get("binary_uuid"), ident))
+
+    # The fingerprints differ. Say WHICH input moved, because "expired" with
+    # the wrong reason attached is a refusal nobody can act on. A receipt
+    # written before JS bundles were covered carries the plist-only digest in
+    # `fingerprint` and nothing else, so that field is its plist fingerprint.
+    a_js = artifact.jsbundle_digest()
+    a_plist = artifact.plist_fingerprint()
+    r_js = receipt.get("jsbundle_digest")
+    r_plist = receipt.get("plist_fingerprint") or rf
+    legacy = ("plist_fingerprint" not in receipt
+              and "jsbundle_digest" not in receipt)
+
+    if r_plist and r_plist != a_plist:
+        return ("expired",
+                "receipt was earned on a DIFFERENT BINARY (%s) of the same "
+                "version+build whose gate-relevant Info.plist keys DISAGREE "
+                "with this one (plist fingerprint %s vs %s). It is not "
+                "evidence about this artifact. This is the exact shape of "
+                "the receipt that vouched for a FIXED binary while a BROKEN "
+                "one of the same version+build was being checked."
+                % (receipt.get("binary_uuid"), r_plist, a_plist))
+
+    # The plist keys agree. Then the JS bundle is what moved.
+    if a_js is not None and legacy:
+        return ("expired",
+                "receipt was earned on a DIFFERENT BINARY (%s) of the same "
+                "version+build, and it PREDATES JS BUNDLE BINDING: it carries "
+                "no jsbundle digest, so nothing about it was ever checked "
+                "against this app's JavaScript -- which in a React Native "
+                "build is where essentially all of the behaviour lives. This "
+                "artifact's jsbundle digest is %s (%s). The receipt agrees on "
+                "every Info.plist key and is still not evidence about this "
+                "binary. Re-earn it on this artifact."
+                % (receipt.get("binary_uuid"), a_js,
+                   ", ".join(artifact.jsbundles())))
+    if a_js != r_js:
+        return ("expired",
+                "receipt was earned on a DIFFERENT BINARY (%s) of the same "
+                "version+build whose Info.plist keys AGREE but whose shipped "
+                "JS BUNDLE DIGEST DISAGREES (jsbundle %s vs %s). The plists "
+                "are identical and the JavaScript is not, so the receipt "
+                "proves something about other code than the code in this "
+                "artifact."
+                % (receipt.get("binary_uuid"), r_js, a_js))
     return ("expired",
             "receipt was earned on a DIFFERENT BINARY (%s) of the same "
-            "version+build whose gate-relevant Info.plist keys DISAGREE with "
-            "this one (fingerprint %s vs %s). It is not evidence about this "
-            "artifact. This is the exact shape of the Vocabdrift receipt that "
-            "vouched for a fixed binary while a broken one was being checked."
+            "version+build and its gate-relevant fingerprint disagrees with "
+            "this one (%s vs %s). It is not evidence about this artifact."
             % (receipt.get("binary_uuid"), rf, af))
 
 
@@ -2015,14 +2182,18 @@ def do_launch(artifact_path, udid=None, runtime="iOS-26", settle=10,
         payload = dict(
             kind="launch", bundle_id=art.bundle_id, version=art.version,
             build=art.build, binary_uuid=art.identity(),
-            fingerprint=art.fingerprint(), linked_sdk=art.load_versions()[0],
+            fingerprint=art.fingerprint(),
+            plist_fingerprint=art.plist_fingerprint(),
+            jsbundle_digest=art.jsbundle_digest(),
+            linked_sdk=art.load_versions()[0],
             scene_delegate=art.scene()[1], runtime=rt, device=udid, pid=pid,
             settle_seconds=settle, first_frame=frame,
             app_path=os.path.abspath(art.app),
             when=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             note=("Written only because the process was alive after %ds with "
-                  "no new crash report. Bound to binary_uuid + fingerprint, so "
-                  "it cannot vouch for a different binary of the same build."
+                  "no new crash report. Bound to binary_uuid + fingerprint "
+                  "(gate-relevant plist keys AND the shipped JS bundle), so it "
+                  "cannot vouch for a different binary of the same build."
                   % settle))
         paths = save_receipt(art, "launch", payload, project_root)
         for p in paths:
@@ -2041,6 +2212,8 @@ def _blank_run(art, kind):
         kind=kind, bundle_id=art.bundle_id, version=art.version,
         build=art.build, binary_uuid=art.identity(),
         fingerprint=art.fingerprint(),
+        plist_fingerprint=art.plist_fingerprint(),
+        jsbundle_digest=art.jsbundle_digest(),
         when=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
 
 

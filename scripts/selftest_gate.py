@@ -166,8 +166,15 @@ def real_macho(sdk="26.0", salt="", frameworks=()):
 
 
 def make_app(tmp, name="Fix", plist=None, exe_bytes=None, plugins=None,
-             sdk="26.0", salt=None, frameworks=()):
-    """A .app directory with a real Info.plist and a real Mach-O."""
+             sdk="26.0", salt=None, frameworks=(), jsbundle=None,
+             exe_name=None):
+    """A .app directory with a real Info.plist and a real Mach-O.
+
+    `jsbundle` writes those bytes to main.jsbundle at the bundle root, which is
+    where a React Native build ships the JavaScript that is the app. Omitting
+    it leaves a native-shaped bundle with no JS at all -- the must-not-fire
+    case for every rule that reads the bundle.
+    """
     if exe_bytes is None:
         exe_bytes = real_macho(sdk, salt if salt is not None else name,
                                frameworks)
@@ -185,8 +192,15 @@ def make_app(tmp, name="Fix", plist=None, exe_bytes=None, plugins=None,
     d.update(plist or {})
     with open(os.path.join(app, "Info.plist"), "wb") as f:
         plistlib.dump(d, f)
-    with open(os.path.join(app, name), "wb") as f:
+    # The executable has to be at the path CFBundleExecutable names, or
+    # Artifact() cannot find the Mach-O and every binary rule would be tested
+    # against its own error path.
+    with open(os.path.join(app, exe_name or d.get("CFBundleExecutable")
+                           or name), "wb") as f:
         f.write(exe_bytes)
+    if jsbundle is not None:
+        with open(os.path.join(app, "main.jsbundle"), "wb") as f:
+            f.write(jsbundle)
     for pname, pplist in (plugins or {}).items():
         pdir = os.path.join(app, "PlugIns", pname)
         os.makedirs(pdir, exist_ok=True)
@@ -893,6 +907,195 @@ def test_receipt_binding(r):
             a.cleanup()
 
 
+def _plist_only(art):
+    """The pre-change, plist-only fingerprint, computed independently here.
+
+    Used only when shipgate has no plist_fingerprint() -- i.e. when this test
+    is run against the code from before JS bundles were bound -- so that the
+    outcome assertions are reachable and report a wrong VERDICT instead of an
+    AttributeError.
+    """
+    import hashlib
+    payload = {}
+    for k in shipgate.FINGERPRINT_KEYS:
+        payload[k] = shipgate._stable(art.plist.get(k))
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=True)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
+
+
+def test_receipt_bundle_binding(r):
+    """A receipt earned on one JS bundle must not vouch for a different one.
+
+    The hole this closes, measured before it was closed: the fingerprint
+    digested five Info.plist keys and nothing else, so two binaries of one
+    React Native build whose ENTIRE JavaScript differed -- one with a fix, one
+    without -- produced an IDENTICAL fingerprint, matched as `sibling`, and the
+    receipt was ACCEPTED. `gate check` printed "proven (sibling build, keys
+    agree)" for a binary that genuinely failed its gate.
+
+    Fixtures are synthetic on purpose. The two bundles differ by one guard,
+    which is the realistic shape of the difference between a fixed build and a
+    broken one, and they are padded to the same length so nothing here can pass
+    by comparing sizes.
+    """
+    if not HAVE_MACHO_TOOLS:
+        r.skip("receipt JS-bundle binding", "no vtool/dwarfdump/otool here")
+        return
+    print("\nReceipt binding -- the shipped JS bundle is part of the proof")
+    with tempfile.TemporaryDirectory() as tmp:
+        shared = {"CFBundleIdentifier": "com.example.app",
+                  "CFBundleShortVersionString": "1.0.0",
+                  "CFBundleVersion": "7",
+                  "CFBundleExecutable": "App",
+                  # Pinned, or make_app sets CFBundleName from the fixture
+                  # label and the plists are no longer byte-identical. Caught
+                  # by the byte-identity assertion below failing.
+                  "CFBundleName": "App"}
+        shared.update(SCENE_ADOPTED)
+        pad = b"// pad\n" * 2000
+        js_fixed = b"var r=function(a,b){if(!b)return 0;return a/b};\n" + pad
+        js_broken = b"var r=function(a,b){return a/b};\n" + pad
+        # Padded to EQUAL LENGTH deliberately: a digest that happened to key on
+        # size would pass a same-size pair, so the fixture removes that way of
+        # being right by accident.
+        js_broken += b"/" * (len(js_fixed) - len(js_broken))
+        r.check("the two synthetic bundles are the same LENGTH, so nothing "
+                "can pass by comparing sizes",
+                len(js_fixed) == len(js_broken),
+                "%d vs %d" % (len(js_fixed), len(js_broken)))
+
+        def app(label, js, salt):
+            return shipgate.Artifact(make_app(
+                tmp, name=label, plist=shared, salt=salt, jsbundle=js,
+                exe_name="App"))
+
+        fixed = app("JsFixed", js_fixed, "jsfixedslice")
+        broken = app("JsBroken", js_broken, "jsbrokenslice")
+        device = app("JsDevice", js_fixed, "jsdeviceslice")
+        native = shipgate.Artifact(make_app(
+            tmp, name="JsNative", plist=shared, salt="nativeslice",
+            exe_name="App"))
+
+        with open(fixed.plist_path, "rb") as f1, \
+                open(broken.plist_path, "rb") as f2:
+            r.check("the fixed and broken fixtures have BYTE-IDENTICAL "
+                    "Info.plists", f1.read() == f2.read())
+        r.check("and are genuinely different binaries",
+                fixed.identity() != broken.identity())
+        # Every assertion about an OUTCOME below is reachable whether or not
+        # the bundle-aware methods exist, so that reverting the change makes
+        # this test report a wrong VERDICT rather than crash on a missing
+        # attribute. A test that dies before its own subject is an absence of
+        # evidence, not evidence.
+        bound = hasattr(shipgate.Artifact, "plist_fingerprint")
+        plist_fp = (lambda a: a.plist_fingerprint()) if bound else _plist_only
+        js_dig = ((lambda a: a.jsbundle_digest()) if bound
+                  else (lambda a: None))
+        r.check("and the plist-only fingerprint AGREES on both -- which is "
+                "exactly why the plist alone was not enough",
+                plist_fp(fixed) == plist_fp(broken), plist_fp(fixed))
+        r.check("the full fingerprint DISAGREES on them",
+                fixed.fingerprint() != broken.fingerprint(),
+                "%s vs %s" % (fixed.fingerprint(), broken.fingerprint()))
+
+        base = dict(bundle_id="com.example.app", version="1.0.0", build="7")
+        rec = dict(base, binary_uuid=fixed.identity(),
+                   fingerprint=fixed.fingerprint())
+        if bound:
+            rec["plist_fingerprint"] = plist_fp(fixed)
+            rec["jsbundle_digest"] = js_dig(fixed)
+
+        # --- MUST CATCH: the hole itself.
+        state, why = shipgate.match_receipt(broken, rec)
+        r.check("a receipt earned on one JS bundle is EXPIRED for a binary "
+                "shipping a different one, at the same version+build and with "
+                "identical plists", state == "expired",
+                "%s: %s" % (state, why[:90]))
+        r.check("and the reason names the JS BUNDLE, not the plist keys",
+                "JS BUNDLE DIGEST DISAGREES" in why
+                and "Info.plist keys AGREE" in why, why[:140])
+        r.check("and the reason carries both digests, so the refusal can be "
+                "checked by hand",
+                bool(js_dig(fixed)) and js_dig(fixed) in why
+                and js_dig(broken) in why, why[:140])
+
+        # --- MUST NOT FIRE (a): identical plist AND identical bundle.
+        state, why = shipgate.match_receipt(device, rec)
+        r.check("a DIFFERENT binary with the same plist and the same JS "
+                "bundle is still 'sibling' -- the simulator-build/"
+                "device-build case this branch exists for",
+                state == "sibling", "%s: %s" % (state, why[:90]))
+
+        # --- MUST NOT FIRE (b): an exact LC_UUID match short-circuits.
+        state, _w = shipgate.match_receipt(fixed, rec)
+        r.check("same binary -> 'exact'", state == "exact", state)
+        poisoned = dict(rec, fingerprint="deadbeefdeadbeef",
+                        plist_fingerprint="deadbeefdeadbeef",
+                        jsbundle_digest="deadbeefdeadbeef")
+        saved = {}
+        for nm in ("fingerprint", "plist_fingerprint", "jsbundle_digest"):
+            if hasattr(shipgate.Artifact, nm):
+                saved[nm] = getattr(shipgate.Artifact, nm)
+
+        def boom(self, *a, **k):
+            raise AssertionError("fingerprinting ran on an exact match")
+        try:
+            for nm in saved:
+                setattr(shipgate.Artifact, nm, boom)
+            try:
+                got, ok = shipgate.match_receipt(fixed, poisoned)[0], True
+            except AssertionError:
+                got, ok = "fingerprinted", False
+        finally:
+            for nm, fn in saved.items():
+                setattr(shipgate.Artifact, nm, fn)
+        r.check("'exact' short-circuits BEFORE anything is hashed -- with the "
+                "digest methods poisoned and the receipt's own fingerprints "
+                "deliberately wrong, the verdict is still 'exact'",
+                ok and got == "exact", got)
+
+        # --- MUST NOT FIRE (c): an artifact with no JS bundle at all.
+        r.check("the native fixture ships no .jsbundle",
+                not [n for n in os.listdir(native.app)
+                     if n.endswith(".jsbundle")])
+        r.check("a native artifact's fingerprint is EXACTLY its plist "
+                "fingerprint -- byte for byte what it was before JS bundles "
+                "were covered, so a native app's receipts are untouched",
+                native.fingerprint() == plist_fp(native),
+                native.fingerprint())
+        legacy_native = dict(base, binary_uuid="00000000-0000-0000-0000-0",
+                             fingerprint=plist_fp(native))
+        state, why = shipgate.match_receipt(native, legacy_native)
+        r.check("and a receipt predating this change still matches it -> "
+                "'sibling'", state == "sibling", "%s: %s" % (state, why[:80]))
+
+        # --- the legacy decision, asserted rather than described.
+        legacy_rn = dict(base, binary_uuid="00000000-0000-0000-0000-0",
+                         fingerprint=plist_fp(broken))
+        state, why = shipgate.match_receipt(broken, legacy_rn)
+        r.check("a receipt with NO bundle digest is 'expired' against a "
+                "bundle-bearing artifact -- the strict reading, chosen because "
+                "the permissive one keeps the hole open for exactly the "
+                "artifacts that have a bundle", state == "expired",
+                "%s: %s" % (state, why[:90]))
+        r.check("and it says the receipt PREDATES JS BUNDLE BINDING rather "
+                "than blaming the plist",
+                "PREDATES JS BUNDLE BINDING" in why
+                and "Info.plist keys DISAGREE" not in why, why[:140])
+
+        # --- and the digest reads the CONTENT, not the name or the size.
+        same_len = shipgate.Artifact(make_app(
+            tmp, name="JsSameLen", plist=shared, salt="samelenslice",
+            jsbundle=js_broken, exe_name="App"))
+        r.check("two artifacts shipping the SAME bundle bytes have the same "
+                "digest (the digest is of content, so a rebuild that does not "
+                "change the JS does not expire a receipt)",
+                bool(js_dig(same_len))
+                and js_dig(same_len) == js_dig(broken), js_dig(same_len))
+        for a in (fixed, broken, device, native, same_len):
+            a.cleanup()
+
+
 def test_receipt_roundtrip_and_expiry(r):
     if not HAVE_MACHO_TOOLS:
         r.skip("receipts on disk", "no vtool/dwarfdump/otool on this machine")
@@ -1341,6 +1544,7 @@ def main():
     test_plist_checks_fire_and_stay_silent(r)
     test_provenance(r)
     test_receipt_binding(r)
+    test_receipt_bundle_binding(r)
     test_receipt_roundtrip_and_expiry(r)
     test_attestations(r)
     test_build_number_reuse(r)
