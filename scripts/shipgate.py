@@ -426,7 +426,7 @@ ARCH_PREFERENCE = ("arm64", "arm64e", "x86_64")
 # measured on this toolchain (Xcode 27.0):
 #
 #   plutil -extract CFBundleSupportedPlatforms  <raw>  Info.plist  ->  1
-#   plutil -extract CFBundleSupportedPlatforms.0 raw    Info.plist  ->  iPhoneSimulator
+#   plutil -extract CFBundleSupportedPlatforms.0 raw    Info.plist  ->  iPhoneSimulator  # secret-scan:allow
 #
 # (the first line is written with <raw> on purpose: scan_for_count_bug below
 # greps the portfolio for the literal form, and a comment showing the bug

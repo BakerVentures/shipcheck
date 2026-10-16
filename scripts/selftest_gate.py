@@ -204,7 +204,7 @@ def real_macho_arch(arch, sdk="26.0", salt="", frameworks=()):
             pr = subprocess.run(
                 ["xcrun", "--sdk", "iphonesimulator", "clang",
                  "-target", "%s-apple-ios16.4-simulator" % arch,
-                 "-isysroot", sysroot, "-mios-simulator-version-min=16.4",
+                 "-isysroot", sysroot, "-mios-simulator-version-min=16.4",  # secret-scan:allow
                  "-Wl,-platform_version,ios-simulator,16.4," + sdk]
                 + fw_args + [csrc, "-o", out],
                 capture_output=True, text=True, timeout=300)
@@ -218,7 +218,7 @@ def real_macho_arch(arch, sdk="26.0", salt="", frameworks=()):
     return _FAT_CACHE[key]
 
 
-def fat_macho(slices, sdk="26.0", salt=""):
+def fat_macho(slices, sdk="26.0", salt=""):  # secret-scan:allow
     """A real universal Mach-O. `slices` is {arch: (framework, ...)}.
 
     Built with the real `lipo`, from real per-architecture clang output, so
@@ -1206,7 +1206,7 @@ def test_receipt_dir_override(r):
             app = make_app(prod, "Ov",
                            dict(SCENE_ADOPTED,
                                 ITSAppUsesNonExemptEncryption=False),
-                           sdk="26.0", salt="ov")
+                           sdk="26.0", salt="ov")  # secret-scan:allow
         open(os.path.join(app, "AppIcon60x60@2x.png"), "wb").close()
         r.check("the fixture repo starts clean", _porcelain(repo) == "",
                 _porcelain(repo))
@@ -1612,9 +1612,9 @@ def test_arch_discipline_linkage(r):
     SLICE_FID = "BIN-FRAMEWORK-LINKAGE-SLICE-DISAGREEMENT"
 
     disagree = fat_macho({"x86_64": ("CoreMotion",), "arm64": ()},
-                         sdk="26.0", salt="dis")
+                         sdk="26.0", salt="dis")  # secret-scan:allow
     agree = fat_macho({"x86_64": ("CoreMotion",), "arm64": ("CoreMotion",)},
-                      sdk="26.0", salt="agr")
+                      sdk="26.0", salt="agr")  # secret-scan:allow
     if disagree is None or agree is None:
         r.skip("arch discipline needs real Mach-O slices",
                "clang/lipo could not build a fat fixture here")
@@ -1718,9 +1718,9 @@ def test_arch_discipline_exit_status(r):
         r.skip("exit status on a fat fixture", "needs clang/lipo/otool")
         return
     disagree = fat_macho({"x86_64": ("CoreMotion",), "arm64": ()},
-                         sdk="26.0", salt="dis")
+                         sdk="26.0", salt="dis")  # secret-scan:allow
     agree_clean = fat_macho({"x86_64": (), "arm64": ()},
-                            sdk="26.0", salt="cln")
+                            sdk="26.0", salt="cln")  # secret-scan:allow
     if disagree is None or agree_clean is None:
         r.skip("exit status on a fat fixture", "clang/lipo unavailable")
         return
@@ -1811,10 +1811,10 @@ def test_receipt_arch_binding(r):
         r.skip("receipt arch binding needs real Mach-O slices",
                "otool/clang/lipo unavailable; mocking dwarfdump tests the mock")
         return
-    fat = fat_macho({"x86_64": (), "arm64": ()}, sdk="26.0", salt="rb")
+    fat = fat_macho({"x86_64": (), "arm64": ()}, sdk="26.0", salt="rb")  # secret-scan:allow
     thin_x = thin_of(fat, "x86_64")
     thin_a = thin_of(fat, "arm64")
-    other = fat_macho({"x86_64": (), "arm64": ()}, sdk="26.0", salt="rb2")
+    other = fat_macho({"x86_64": (), "arm64": ()}, sdk="26.0", salt="rb2")  # secret-scan:allow
     if not all((fat, thin_x, thin_a, other)):
         r.skip("receipt arch binding needs real Mach-O slices",
                "clang/lipo could not build the fixtures")
@@ -2061,7 +2061,7 @@ def test_plutil_array_extract(r):
         planted_hits = shipgate.scan_for_count_bug(tmp)
         r.check("MUTATION TEST: the guard goes RED on a planted copy of the "
                 "broken line", len(planted_hits) == 1, str(planted_hits))
-        FIXED = ("plutil -extract " + "CFBundleSupportedPlatforms.0"
+        FIXED = ("plutil -extract " + "CFBundleSupportedPlatforms.0"  # secret-scan:allow
                  + " " + "raw" + " -o - \"$1\"")
         with open(os.path.join(planted, "bad-gate.sh"), "w",
                   encoding="utf-8") as f:
@@ -2532,7 +2532,7 @@ def test_gate_app_entrypoint(r):
             # `high` -- the exact severity that used to exit 0.
             bad_app = make_app(prod, "AppDefective",
                                {"ITSAppUsesNonExemptEncryption": False},
-                               sdk="26.0", salt="am", frameworks=("CoreMotion",))
+                               sdk="26.0", salt="am", frameworks=("CoreMotion",))  # secret-scan:allow
         open(os.path.join(bad_app, "AppIcon60x60@2x.png"), "wb").close()
         with open(os.path.join(bad_app, "PrivacyInfo.xcprivacy"), "wb") as f:
             plistlib.dump({"NSPrivacyTracking": False,
@@ -2561,7 +2561,7 @@ def test_gate_app_entrypoint(r):
                 gprod, "AppFit",
                 {"ITSAppUsesNonExemptEncryption": False,
                  "NSMotionUsageDescription": "Fixture does not use motion."},
-                sdk="26.0", salt="am", frameworks=("CoreMotion",))
+                sdk="26.0", salt="am", frameworks=("CoreMotion",))  # secret-scan:allow
         open(os.path.join(good_app, "AppIcon60x60@2x.png"), "wb").close()
         with open(os.path.join(good_app, "PrivacyInfo.xcprivacy"), "wb") as f:
             plistlib.dump({"NSPrivacyTracking": False,
@@ -2601,7 +2601,7 @@ def test_gate_app_entrypoint(r):
         with Quiet():
             twin = make_app(second, "AppFit",
                             {"ITSAppUsesNonExemptEncryption": False},
-                            sdk="26.0", salt="twin", frameworks=("CoreMotion",))
+                            sdk="26.0", salt="twin", frameworks=("CoreMotion",))  # secret-scan:allow
         open(os.path.join(twin, "AppIcon60x60@2x.png"), "wb").close()
         with open(os.path.join(twin, "PrivacyInfo.xcprivacy"), "wb") as f:
             plistlib.dump({"NSPrivacyTracking": False,
