@@ -14,6 +14,8 @@ Code plugin where the user's own Claude does that work.
     shipcheck refresh            re-fetch policy corpus and diff
     shipcheck corpus             show what the cached corpus contains
 
+    shipcheck gate app <repo>          ONE COMMAND PER APP -- find the
+                                       artifact(s) and give the full verdict
     shipcheck gate check <artifact>    THE SUBMISSION GATE -- requires evidence
     shipcheck gate sweep <repo>...     which apps has the gate actually SEEN?
     shipcheck gate inspect <artifact>  what the built binary actually says
@@ -21,13 +23,24 @@ Code plugin where the user's own Claude does that work.
     shipcheck gate stress <artifact>   the abuse patterns that found real bugs
     shipcheck gate attest <artifact>   record what a tool cannot check
 
-`gate check` and `gate sweep` exit 1 on any finding at critical OR high --
-see shipgate.BLOCKING_SEVERITIES for which rules those are and why. `scan`
-exits 1 on critical only, and takes a `fail-on` setting; the gate does not.
+`gate app`, `gate check` and `gate sweep` exit 1 on any finding at critical OR
+high -- see shipgate.BLOCKING_SEVERITIES for which rules those are and why.
+`scan` exits 1 on critical only, and takes a `fail-on` setting; the gate does
+not. `gate app` additionally exits **2** when the repo has no built artifact,
+because "I could not look" is not the same answer as "I looked and it is bad",
+and a caller that cannot tell them apart reads silence as safety.
 
 `scan` reads config and source: useful, and not sufficient. `gate` reads the
 BUILT ARTIFACT and requires proof that it was run. Nothing is submitted until
 `gate check` passes -- see scripts/shipgate.py for why, at length.
+
+By default the gate keeps its receipts in the artifact's own repo, which is
+what makes them committable and portable between the machine that builds and
+the machine that uploads. `--receipts DIR` (or SHIPCHECK_RECEIPTS=DIR) puts
+them somewhere else instead, for the case where the artifact lives in a repo
+the caller must leave clean -- a shared checkout, or anything mid-push. It
+replaces the search list rather than extending it, so nothing is read from the
+repo either, and the default with the flag unset is unchanged.
 
 Standard library only. Python 3.9+.
 """
@@ -202,6 +215,14 @@ def cmd_gate(args):
     """The submission gate. Binary evidence, a launch proof, a stress pass."""
     import shipgate                                        # noqa: PLC0415
 
+    # Where receipts are written and read, for every gate subcommand that
+    # touches one. Resolved HERE, once, before any rule runs: a per-call
+    # argument would be a per-call chance to forget it, and the call site that
+    # forgot would be the one that wrote into somebody else's working tree.
+    # Absent --receipts, SHIPCHECK_RECEIPTS decides; absent both, nothing
+    # changes.
+    shipgate.set_receipts_override(getattr(args, "receipts", None))
+
     sub = args.gate_cmd
     try:
         if sub == "inspect":
@@ -234,7 +255,15 @@ def cmd_gate(args):
                 ("version", "%s (%s)" % (facts["version"], facts["build"])),
                 ("linked SDK", facts["linked_sdk"]),
                 ("min OS", facts["minos"]),
-                ("binary UUID", facts["binary_uuid"]),
+                ("binary UUID", "%s  (%s slice)"
+                 % (facts["binary_uuid"], facts.get("binary_arch") or "?")),
+                ("slices (LC_UUID per arch)",
+                 ", ".join("%s=%s" % (a, facts["binary_uuids"][a])
+                           for a in sorted(facts.get("binary_uuids") or {}))
+                 or "(unreadable)"),
+                ("build type", "%s  (%s)" % (facts.get("build_type"),
+                                             facts.get("build_type_how"))),
+                ("read from arch", facts.get("binary_arch") or "?"),
                 ("plist fingerprint", facts["fingerprint"]),
                 ("scene manifest", "yes" if facts["scene_manifest"] else "no"),
                 ("scene delegate", facts["scene_delegate"] or c("31", "NONE")),
@@ -299,6 +328,124 @@ def cmd_gate(args):
             return shipgate.record_attest(
                 args.artifact, args.item, args.result, args.note, args.by,
                 project_root=args.project)
+
+        # ------------------------------------------------------------ app
+        if sub == "app":
+            # ONE COMMAND PER APP. `check` needs the .app path, which means
+            # the caller has to go and find it first -- and a caller who
+            # guesses wrong gets a confident verdict on the wrong binary.
+            # That is not hypothetical here: running the published per-app
+            # command at the root of the rigsheet monorepo generated a binary
+            # called `rigsheet.app` that is not Rigsheet, and had it built, a
+            # verdict would have been published for an app that does not
+            # exist. So this subcommand takes the REPO, finds every artifact
+            # in it, and renders `check` for each -- and if there is more than
+            # one it says so and evaluates them all rather than picking.
+            #
+            # It is a composition of gate_sweep + gate_check, deliberately
+            # adding no new rule: the rules live in shipgate.py, and the exit
+            # status comes from shipgate.blocking_findings, the single
+            # definition added on fix/gate-exit-status-2026-10-15. A fifth
+            # inline `== "critical"` comparison here would reintroduce the
+            # exact bug that branch exists to fix.
+            repo = os.path.abspath(args.repo)
+            entries = shipgate.gate_sweep([repo])
+            e = entries[0]
+            arts = e["artifacts"]
+            name = os.path.basename(repo.rstrip("/"))
+
+            if not arts:
+                # No artifact. Exit 2, not 0 and not 1: "I could not look" is
+                # a different answer from "I looked and it is bad", and a
+                # caller that cannot tell them apart will read silence as
+                # safety. A sweep did exactly that for four apps for a week.
+                f = e["findings"][0]
+                if args.json:
+                    print(json.dumps(dict(project=repo, artifacts=[],
+                                          verdict="UNEVALUATED",
+                                          findings=e["findings"]),
+                                     indent=2, default=str))
+                    return 2
+                print()
+                print("  %s  %s" % (c("1;31", "UNEVALUATED"), c("1", name)))
+                print("      %s" % f["id"])
+                print("      %s" % wrap(f["evidence"], 80, 6))
+                print()
+                print("  %s" % c("1;31", "exit 2 -- NOT CHECKED, which is not "
+                                         "clean."))
+                print("  %s" % c("2", "No build is run for you: builds are "
+                                      "expensive and a gate that silently "
+                                      "builds"))
+                print("  %s" % c("2", "is a gate that changes its own "
+                                      "subject. " + f["fix"].split(".")[0]
+                                 + "."))
+                print()
+                return 2
+
+            app_consumed = None
+            if getattr(args, "consumed_builds", None):
+                app_consumed = {b.strip() for b in args.consumed_builds.split(",")
+                                if b.strip()}
+            results = []
+            for a in arts:
+                results.append((a["path"], shipgate.gate_check(
+                    a["path"], repo,
+                    approved=getattr(args, "approved_version", None),
+                    consumed_builds=app_consumed)))
+            if args.json:
+                print(json.dumps(dict(project=repo,
+                                      artifacts=[dict(path=pa, result=r)
+                                                 for pa, r in results]),
+                                 indent=2, default=str))
+                return 1 if any(r["blocking"] for _pa, r in results) else 0
+
+            print()
+            print("  %s  %s" % (c("1", "shipcheck gate app"), c("1", name)))
+            if len(results) > 1:
+                # Two binaries of the same app have carried the identical
+                # version and build number on this machine, twice in one day,
+                # and a launch proof earned on one was accepted for the other.
+                # So: evaluate every one, and key the output on the UUID.
+                print("  %s" % c("33", "%d artifacts in this repo. All %d are "
+                                       "evaluated and none is chosen for you:"
+                                 % (len(results), len(results))))
+                print("  %s" % c("2", "a version and build number do not "
+                                      "identify a binary."))
+            print()
+            worst = 0
+            for pa, r in results:
+                f = r["facts"]
+                blockers = shipgate.blocking_findings(r["findings"])
+                verdict = r["verdict"]
+                badge = (c("32", "PASS   ") if not blockers
+                         else c("1;31", "BLOCKED"))
+                print("  %s  %s  %s" % (
+                    badge, os.path.basename(pa),
+                    c("2", "%s+%s  sdk %s  uuid %s"
+                      % (f["version"], f["build"], f["linked_sdk"],
+                         "%s/%s" % ((f["binary_uuid"] or "?")[:8],
+                                    f.get("binary_arch") or "?")))))
+                print("          %s" % c("2", pa))
+                for fd in sorted(r["findings"],
+                                 key=lambda x: ORDER.index(
+                                     x.get("severity", "info"))):
+                    mark = ("*" if fd.get("severity")
+                            in shipgate.BLOCKING_SEVERITIES else " ")
+                    print("        %s %-8s %s" % (mark, fd["severity"],
+                                                  fd["id"]))
+                if not r["findings"]:
+                    print("          %s" % c("2", "no findings"))
+                print("          verdict %s, %d blocking" % (verdict,
+                                                             len(blockers)))
+                print()
+                if blockers:
+                    worst = 1
+            print("  %s   %s" % (
+                c("31", "exit 1") if worst else c("32", "exit 0"),
+                c("2", "* = fails the gate (severity in %s)"
+                  % ", ".join(shipgate.BLOCKING_SEVERITIES))))
+            print()
+            return worst
 
         # ---------------------------------------------------------- sweep
         if sub == "sweep":
@@ -375,13 +522,21 @@ def cmd_gate(args):
         print("  %s  %s  %s" % (c("1", "shipcheck gate"),
                                 os.path.basename(f["app"]),
                                 c("2", "%s+%s" % (f["version"], f["build"]))))
-        print("  %s" % c("2", "SDK %s · binary %s · %s"
+        print("  %s" % c("2", "SDK %s · binary %s (%s slice) · %s"
                          % (f["linked_sdk"], (f["binary_uuid"] or "?")[:8],
+                            f.get("binary_arch") or "?",
                             f["fingerprint"])))
+        # Which architecture and which build type this verdict came from.
+        # BUILD-STANDARD.md §3.6: the simulator build is a PROXY for the
+        # device link set and the proxy has never been tested. A verdict that
+        # does not say which one it read invites exactly that mistake.
+        prov_colour = "33" if f.get("build_type") == "simulator" else "2"
+        print("  %s" % c(prov_colour, f.get("provenance") or "measured on: ?"))
         print()
         ev = res["evidence"]
         label = {"exact": c("32", "proven (this binary)"),
-                 "sibling": c("32", "proven (sibling build, keys agree)"),
+                 "sibling": c("33", "proven (SIBLING build, no slice in "
+                                    "common, plist keys agree)"),
                  "absent": c("31", "no evidence"),
                  "expired": c("31", "expired / wrong binary"),
                  "config": c("32", "tracked config"),
@@ -492,6 +647,16 @@ def main():
                        help="the git repo this artifact was built from; used "
                             "to check whether its safety is reproducible from "
                             "TRACKED config, and where receipts are written")
+        p.add_argument("--receipts", default=None, metavar="DIR",
+                       help="write and read receipts HERE instead of in the "
+                            "artifact's repo. Default (unset) is unchanged: "
+                            "<artifact repo>/.shipcheck-receipts, then "
+                            "<--project repo>/.shipcheck-receipts, then "
+                            "~/.config/shipcheck/receipts. Also settable as "
+                            "SHIPCHECK_RECEIPTS; the flag wins. Use it to ask "
+                            "the gate about an artifact inside a repo you must "
+                            "not dirty -- it REPLACES the list, so a receipt "
+                            "that lives in the repo is not read either.")
         p.add_argument("--json", action="store_true")
         p.add_argument("-v", "--verbose", action="store_true")
         return p
@@ -518,12 +683,48 @@ def main():
                          "was never approved.")
     gc.set_defaults(fn=cmd_gate, gate_cmd="check")
 
+    gp = gsub.add_parser(
+        "app", help="ONE COMMAND PER APP: find this repo's built artifact(s) "
+                    "and render the full gate verdict for each. exit 0 pass, "
+                    "1 blocked, 2 nothing built (NOT CHECKED)")
+    gp.add_argument("repo", help="the app repo, not the artifact")
+    gp.add_argument("--receipts", default=None, metavar="DIR",
+                    help="write and read receipts HERE instead of in the "
+                         "repo. `gate app` runs the full check, so it writes "
+                         "a ledger entry per artifact; this is how to run it "
+                         "against a tree you must leave clean.")
+    # The same missing input `gate check` takes (Gate 2.1, ITMS-90062). `gate
+    # app` composes gate_check per artifact, so without these it silently
+    # fell back to the live itunes.apple.com lookup for every artifact it
+    # evaluates -- unreachable in a sandboxed run, and the honest answer to
+    # "I could not look" is GATE-APPROVED-VERSION-UNKNOWN, which blocks. One
+    # command per app still needs to be told what App Store Connect shows.
+    gp.add_argument("--approved-version", default=None, metavar="X",
+                    help="the version App Store Connect shows as approved "
+                         "for this app, or the literal `none` if it shows "
+                         "nothing approved. Overrides the public lookup, "
+                         "because an approved-but-unreleased version is "
+                         "invisible to it.")
+    gp.add_argument("--consumed-builds", default=None, metavar="1,2,3",
+                    help="CFBundleVersion values already accepted for this "
+                         "app, from App Store Connect -> TestFlight/Activity. "
+                         "Comma separated.")
+    gp.add_argument("--json", action="store_true")
+    gp.add_argument("-v", "--verbose", action="store_true")
+    gp.set_defaults(fn=cmd_gate, gate_cmd="app")
+
     gw = gsub.add_parser(
         "sweep", help="which apps has the gate actually seen? an app with no "
                       "built artifact is reported as BLOCKING, not omitted")
     gw.add_argument("repos", nargs="+",
                     help="one or more app repos. Every one gets a line, "
                          "including the ones with nothing built.")
+    gw.add_argument("--receipts", default=None, metavar="DIR",
+                    help="accepted for symmetry. `gate sweep` reads the "
+                         "artifact only and writes no receipt at all, so this "
+                         "changes nothing -- it exists so a wrapper can pass "
+                         "the same flag to every gate subcommand without "
+                         "having to know which ones write.")
     gw.add_argument("--json", action="store_true")
     gw.add_argument("-v", "--verbose", action="store_true")
     gw.set_defaults(fn=cmd_gate, gate_cmd="sweep")
