@@ -1481,8 +1481,13 @@ def test_exit_status_mapping(r):
             d_app = make_app(repo_d, "CheckBad", {}, sdk="26.0", salt="cm",
                              frameworks=("CoreMotion",))
         _full_receipts(d_app, repo_d)
+        # `--approved-version none` is the operator input Gate 2.1 asks for:
+        # these fixture bundle ids have never been on the App Store, which is
+        # exactly what "none" states. Supplying it also keeps this selftest
+        # OFF THE NETWORK, so a failure here is never Apple's lookup having a
+        # bad minute.
         res = _cli(wt, ["gate", "check", d_app, "--project", repo_d,
-                        "--json"], home)
+                        "--approved-version", "none", "--json"], home)
         got = json.loads(res.stdout)
         sevs = sorted({f["severity"] for f in got["findings"]})
         r.check("with receipts IN ORDER, the defective binary's findings are "
@@ -1512,7 +1517,7 @@ def test_exit_status_mapping(r):
                            "NSPrivacyTrackingDomains": []}, f)
         _full_receipts(c_app, repo_c)
         res = _cli(wt, ["gate", "check", c_app, "--project", repo_c,
-                        "--json"], home)
+                        "--approved-version", "none", "--json"], home)
         got = json.loads(res.stdout)
         r.check("gate check EXITS 0 on a clean binary with its receipts in "
                 "order (must-not-fire)",
@@ -1524,6 +1529,111 @@ def test_exit_status_mapping(r):
                 not os.path.isdir(os.path.expanduser(
                     "~/.config/shipcheck/receipts/fixture-leak")),
                 "sanity")
+
+        # ---- Gate 2.1's missing input: the PREVIOUSLY APPROVED version -----
+        # ITMS-90062 compares this build's CFBundleShortVersionString against
+        # the last version Apple approved, which is not on this machine. The
+        # local reuse ledger cannot know it. Everything below runs against the
+        # same clean fixture whose receipts are in order and which exits 0
+        # above, so any non-zero here is attributable to this rule alone.
+        #
+        # The fixture's version is make_app's default. Read it rather than
+        # assume it, so these assertions cannot drift silently.
+        import plistlib as _pl                            # noqa: PLC0415
+        with open(os.path.join(c_app, "Info.plist"), "rb") as fh:
+            _p = _pl.load(fh)
+        ours, oursb = _p["CFBundleShortVersionString"], _p["CFBundleVersion"]
+        # A version strictly BELOW and one strictly ABOVE the fixture's own,
+        # derived from it and then CHECKED to really be below/above -- a
+        # hand-written "lower" that is actually equal would make the
+        # must-not-fire assertion below pass for the wrong reason, which is
+        # how the first version of this block went wrong.
+        _parts = [int(x) for x in ours.split(".")]
+        lower = ".".join(str(x) for x in (_parts[:-1] + [_parts[-1] - 1])) \
+            if _parts[-1] > 0 else "0.0.1"
+        higher = ".".join(str(x) for x in ([_parts[0] + 1] + _parts[1:]))
+        assert shipgate.compare_versions(lower, ours) == -1, (lower, ours)
+        assert shipgate.compare_versions(higher, ours) == 1, (higher, ours)
+
+        def _gc(*extra):
+            rr = _cli(wt, ["gate", "check", c_app, "--project", repo_c,
+                           "--json"] + list(extra), home)
+            return rr, json.loads(rr.stdout)
+
+        def _ids(g, prefix):
+            return [f["id"] for f in g["findings"]
+                    if f["id"].startswith(prefix)]
+
+        rr, g = _gc("--approved-version", ours)
+        r.check("ITMS-90062: version EQUAL to the approved one is refused, "
+                "and the finding is critical",
+                "BIN-VERSION-NOT-ABOVE-APPROVED" in _ids(g, "BIN-VERSION")
+                and any(f["severity"] == "critical" for f in g["findings"]
+                        if f["id"] == "BIN-VERSION-NOT-ABOVE-APPROVED"),
+                str([(f["severity"], f["id"]) for f in g["findings"]]))
+        r.check("and the PROCESS EXITS 1 on it, which is the half that gets "
+                "skipped",
+                rr.returncode == 1, "rc=%d" % rr.returncode)
+        r.check("and it names ITMS-90186 too, because an equal version also "
+                "means a closed train",
+                any("ITMS-90186" in f["evidence"] for f in g["findings"]
+                    if f["id"] == "BIN-VERSION-NOT-ABOVE-APPROVED"),
+                "evidence text")
+
+        rr, g = _gc("--approved-version", higher)
+        r.check("ITMS-90062: version LOWER than the approved one is refused",
+                "BIN-VERSION-NOT-ABOVE-APPROVED" in _ids(g, "BIN-VERSION")
+                and rr.returncode == 1,
+                "rc=%d %s" % (rr.returncode, _ids(g, "BIN-VERSION")))
+        r.check("and it says LOWER rather than 'not higher than', so the two "
+                "cases are distinguishable in the report",
+                any("LOWER than" in f["title"] for f in g["findings"]
+                    if f["id"] == "BIN-VERSION-NOT-ABOVE-APPROVED"),
+                "title text")
+
+        rr, g = _gc("--approved-version", lower)
+        r.check("MUST-NOT-FIRE: a version strictly ABOVE the approved one is "
+                "silent, and the process exits 0",
+                not _ids(g, "BIN-VERSION") and rr.returncode == 0,
+                "rc=%d %s" % (rr.returncode, _ids(g, "BIN-VERSION")))
+
+        rr, g = _gc("--approved-version", "none",
+                    "--consumed-builds", "%s,999" % oursb)
+        r.check("a CFBundleVersion in App Store Connect's consumed list is "
+                "refused, critically, and exits 1",
+                "BIN-BUILD-NUMBER-CONSUMED" in _ids(g, "BIN-BUILD-NUMBER")
+                and rr.returncode == 1,
+                "rc=%d %s" % (rr.returncode, _ids(g, "BIN-BUILD-NUMBER")))
+
+        rr, g = _gc("--approved-version", "none", "--consumed-builds", "999")
+        r.check("MUST-NOT-FIRE: a build number NOT in that list is silent "
+                "(otherwise the rule would just be 'always fail')",
+                not _ids(g, "BIN-BUILD-NUMBER-CONSUMED")
+                and rr.returncode == 0,
+                "rc=%d %s" % (rr.returncode, _ids(g, "BIN-BUILD-NUMBER")))
+
+        rr, g = _gc("--approved-version", "1.0-rc1")
+        r.check("an unparseable approved version is REPORTED, never silently "
+                "treated as equal or as lower",
+                "GATE-APPROVED-VERSION-UNPARSEABLE"
+                in _ids(g, "GATE-APPROVED") and rr.returncode == 1,
+                "rc=%d %s" % (rr.returncode, _ids(g, "GATE-APPROVED")))
+
+        rr, g = _gc()
+        r.check("with NO input and a dead lookup endpoint, the gate BLOCKS "
+                "rather than passing -- 'I could not check' must not read as "
+                "'it is fine'",
+                bool(_ids(g, "GATE-APPROVED")) and rr.returncode != 0,
+                "rc=%d %s" % (rr.returncode, _ids(g, "GATE-APPROVED")))
+
+        # compare_versions, in process, because the ordering is the whole rule
+        for a, b, want in (("1.0", "1.0.0", 0), ("1.0.3", "1.0.2", 1),
+                           ("1.0.2", "1.0.2", 0), ("1.0.1", "1.0.2", -1),
+                           ("1.0.10", "1.0.9", 1), ("1.0.2", "1.0", 1),
+                           ("1.0.2-beta", "1.0.2", None), ("", "1.0", None)):
+            r.check("compare_versions(%r, %r) == %r" % (a, b, want),
+                    shipgate.compare_versions(a, b) == want,
+                    repr(shipgate.compare_versions(a, b)))
         del bad_app
 
 
