@@ -382,10 +382,16 @@ def cmd_gate(args):
                 print()
                 return 2
 
+            app_consumed = None
+            if getattr(args, "consumed_builds", None):
+                app_consumed = {b.strip() for b in args.consumed_builds.split(",")
+                                if b.strip()}
             results = []
             for a in arts:
-                results.append((a["path"],
-                                shipgate.gate_check(a["path"], repo)))
+                results.append((a["path"], shipgate.gate_check(
+                    a["path"], repo,
+                    approved=getattr(args, "approved_version", None),
+                    consumed_builds=app_consumed)))
             if args.json:
                 print(json.dumps(dict(project=repo,
                                       artifacts=[dict(path=pa, result=r)
@@ -687,6 +693,22 @@ def main():
                          "repo. `gate app` runs the full check, so it writes "
                          "a ledger entry per artifact; this is how to run it "
                          "against a tree you must leave clean.")
+    # The same missing input `gate check` takes (Gate 2.1, ITMS-90062). `gate
+    # app` composes gate_check per artifact, so without these it silently
+    # fell back to the live itunes.apple.com lookup for every artifact it
+    # evaluates -- unreachable in a sandboxed run, and the honest answer to
+    # "I could not look" is GATE-APPROVED-VERSION-UNKNOWN, which blocks. One
+    # command per app still needs to be told what App Store Connect shows.
+    gp.add_argument("--approved-version", default=None, metavar="X",
+                    help="the version App Store Connect shows as approved "
+                         "for this app, or the literal `none` if it shows "
+                         "nothing approved. Overrides the public lookup, "
+                         "because an approved-but-unreleased version is "
+                         "invisible to it.")
+    gp.add_argument("--consumed-builds", default=None, metavar="1,2,3",
+                    help="CFBundleVersion values already accepted for this "
+                         "app, from App Store Connect -> TestFlight/Activity. "
+                         "Comma separated.")
     gp.add_argument("--json", action="store_true")
     gp.add_argument("-v", "--verbose", action="store_true")
     gp.set_defaults(fn=cmd_gate, gate_cmd="app")

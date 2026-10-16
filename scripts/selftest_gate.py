@@ -2538,7 +2538,8 @@ def test_gate_app_entrypoint(r):
             plistlib.dump({"NSPrivacyTracking": False,
                            "NSPrivacyTrackingDomains": []}, f)
         _full_receipts(bad_app, bad)
-        res = _cli(wt, ["gate", "app", bad, "--json"], home)
+        res = _cli(wt, ["gate", "app", bad, "--approved-version", "none",
+                       "--json"], home)
         got = json.loads(res.stdout)
         sevs = sorted({f["severity"]
                        for a in got["artifacts"]
@@ -2566,11 +2567,28 @@ def test_gate_app_entrypoint(r):
             plistlib.dump({"NSPrivacyTracking": False,
                            "NSPrivacyTrackingDomains": []}, f)
         _full_receipts(good_app, good)
-        res = _cli(wt, ["gate", "app", good], home)
+        res = _cli(wt, ["gate", "app", good, "--approved-version", "none"],
+                  home)
         r.check("gate app EXITS 0 on a fit binary with its receipts in order "
                 "(must-not-fire: proves the fix is not 'always fail')",
                 res.returncode == 0, "rc=%d\n%s"
                 % (res.returncode, res.stdout[-500:]))
+
+        # `gate app` has its own --approved-version flag and must actually use
+        # it, not just accept it: a version equal to "approved" must block
+        # with ITMS-90062, the same as `gate check`. This is the wiring proof
+        # -- without it, the test above alone cannot distinguish "the flag is
+        # threaded through to gate_check" from "the flag is parsed and
+        # ignored", which is exactly how gate app silently fell back to a
+        # live network lookup in the first place.
+        res = _cli(wt, ["gate", "app", good, "--approved-version", "1.0.0",
+                       "--json"], home)
+        got = json.loads(res.stdout)
+        ids = {f["id"] for a in got["artifacts"] for f in a["result"]["findings"]}
+        r.check("gate app's --approved-version is WIRED to gate_check, not "
+                "just parsed (a version equal to approved blocks, critical)",
+                res.returncode == 1 and "BIN-VERSION-NOT-ABOVE-APPROVED" in ids,
+                "rc=%d ids=%s" % (res.returncode, sorted(ids)))
 
         # ---- two binaries of the same app, same version+build -------------
         # Law 2: a version and build number do not identify a binary. Two have
@@ -2588,7 +2606,8 @@ def test_gate_app_entrypoint(r):
         with open(os.path.join(twin, "PrivacyInfo.xcprivacy"), "wb") as f:
             plistlib.dump({"NSPrivacyTracking": False,
                            "NSPrivacyTrackingDomains": []}, f)
-        res = _cli(wt, ["gate", "app", good, "--json"], home)
+        res = _cli(wt, ["gate", "app", good, "--approved-version", "none",
+                       "--json"], home)
         got = json.loads(res.stdout)
         vb = sorted({"%s+%s" % (a["result"]["facts"]["version"],
                                 a["result"]["facts"]["build"])
