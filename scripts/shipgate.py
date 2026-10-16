@@ -1662,7 +1662,7 @@ def check_binary(artifact, project_root=None):
 # credentials -- which is the same endpoint Apple's refusal is comparing
 # against:
 #
-#   https://itunes.apple.com/lookup?bundleId=<id>
+#   https://itunes.apple.com/lookup?bundleId=<id>   # secret-scan:allow (placeholder, no token)
 #
 # WHY THREE QUERIES AND A CACHE-BUSTER. A single query has handed a stale
 # version to three separate workers on this machine (one of them got "1.0"
