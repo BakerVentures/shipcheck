@@ -121,6 +121,65 @@ import zlib
 RECEIPT_DIRNAME = ".shipcheck-receipts"
 HOME_RECEIPTS = os.path.expanduser("~/.config/shipcheck/receipts")
 
+# The one knob receipt_dirs() did not have, and the reason six rule families
+# could not be asked honestly.
+#
+# `gate check` derives its receipt directory from the ARTEFACT's own git
+# toplevel, so inspecting an .app that was built inside a repo writes
+# .shipcheck-receipts/ INTO that repo -- whatever --project says. On a machine
+# where several sessions share a checkout that is not a cosmetic problem:
+#   * it dirties the working tree, and the push verification refuses a dirty
+#     tree, so asking the gate a question blocks an unrelated push;
+#   * it leaves a file a concurrent session can sweep into its own commit,
+#     which is how a receipt once got committed in order to satisfy the check
+#     that the receipt exists.
+# The workaround was to copy the artefact out and inspect the copy. That stops
+# the write and makes GATE-SCENE-PROVENANCE-* permanently unanswerable, because
+# provenance is a question about the repo -- i.e. it converts a writing gate
+# into a gate that cannot fail, which is strictly worse.
+#
+# So: the caller may name the directory. Unset, nothing changes -- the default
+# list below is byte-for-byte what it always was.
+RECEIPTS_ENV = "SHIPCHECK_RECEIPTS"
+
+# Set by `--receipts DIR`. Outranks RECEIPTS_ENV, which outranks the default.
+_RECEIPTS_OVERRIDE = None
+
+
+def _clean_receipts_path(path):
+    """A usable absolute path, or None. An empty/blank value reads as unset.
+
+    Blank-is-unset matters because `SHIPCHECK_RECEIPTS=` in a wrapper script is
+    how an env var gets "cleared", and treating "" as a directory would put
+    receipts in the process's cwd -- a silent write into whatever tree the
+    caller happened to be standing in, which is the defect this knob removes.
+    """
+    if path is None:
+        return None
+    path = str(path).strip()
+    if not path:
+        return None
+    return os.path.abspath(os.path.expanduser(path))
+
+
+def set_receipts_override(path):
+    """Point receipts at one directory for the rest of this process.
+
+    Returns the resolved path, or None if `path` was blank/None -- in which
+    case any value already set is CLEARED, so passing the flag's default never
+    silently inherits a previous call.
+    """
+    global _RECEIPTS_OVERRIDE                              # noqa: PLW0603
+    _RECEIPTS_OVERRIDE = _clean_receipts_path(path)
+    return _RECEIPTS_OVERRIDE
+
+
+def receipts_override():
+    """The caller-chosen receipt directory, or None for today's behaviour."""
+    if _RECEIPTS_OVERRIDE:
+        return _RECEIPTS_OVERRIDE
+    return _clean_receipts_path(os.environ.get(RECEIPTS_ENV))
+
 # The iOS SDK major at which UIKit begins requiring UIScene adoption. A binary
 # linked against anything lower launches normally and is exempt -- this is the
 # FlirtGym must-not-fire case and the reason the check is gated on the linked
@@ -349,6 +408,81 @@ EXTENSION_ATTEST = (
     "has never been exercised on anything.")
 
 
+# ARCHITECTURE DISCIPLINE, in one constant
+#
+# Every per-slice reading in this file -- otool linkage, LC_UUID, vtool build
+# version -- is taken from ONE named architecture, and the gate's output says
+# which. The order below is a preference, not a guess: arm64 is the slice that
+# ships and the only slice a device archive has. See Artifact.gate_arch() for
+# the measurement that makes this mandatory rather than tidy.
+#
+# arm64e sits ahead of x86_64 because an arm64e artifact is a device artifact;
+# x86_64 is last because an x86_64 reading is never the shipping answer, only
+# the best available one on an Intel-only simulator build.
+ARCH_PREFERENCE = ("arm64", "arm64e", "x86_64")
+
+# Plist keys whose value is an ARRAY or a DICTIONARY. `plutil -extract <key>
+# raw` on any of these prints the number of elements, not the contents --
+# measured on this toolchain (Xcode 27.0):
+#
+#   plutil -extract CFBundleSupportedPlatforms  <raw>  Info.plist  ->  1
+#   plutil -extract CFBundleSupportedPlatforms.0 raw    Info.plist  ->  iPhoneSimulator
+#
+# (the first line is written with <raw> on purpose: scan_for_count_bug below
+# greps the portfolio for the literal form, and a comment showing the bug
+# would otherwise be its own first hit.)
+#
+# Nothing in this file shells out to plutil -- it reads plists with plistlib,
+# which returns the real value -- and this list exists so the selftest can
+# assert that no gate script in the portfolio reintroduces the bare form.
+PLIST_COLLECTION_KEYS = (
+    "CFBundleSupportedPlatforms", "CFBundleURLTypes", "CFBundleIcons",
+    "UISupportedInterfaceOrientations",
+    "UISupportedInterfaceOrientations~ipad",
+    "UIApplicationSceneManifest", "UIRequiredDeviceCapabilities",
+    "LSApplicationQueriesSchemes", "NSPrivacyTrackingDomains",
+    "NSPrivacyAccessedAPITypes", "NSPrivacyCollectedDataTypes",
+    "CFBundleDocumentTypes", "UIBackgroundModes",
+)
+
+
+def scan_for_count_bug(root):
+    """[(path, lineno, line)] for every bare `plutil -extract <collection
+    key> raw` in a tree. The loaded gun, found before it is fired.
+
+    Nothing in this repo reads a plist with plutil -- shipgate.py uses
+    plistlib, which returns the real value. But the per-app shell gates in
+    this portfolio do, through a generic `pl <plist> <key>` helper that passes
+    `raw` for every key, and `raw` on an array or dictionary prints the
+    element COUNT while exiting 0. So this is a guard against the form being
+    reintroduced, and the selftest mutation-tests it against a planted copy.
+
+    The scan walks an explicit file list. `grep -r` is never used on this
+    machine: it silently skips gitignored files and still exits 0, which makes
+    any clean result from it void rather than merely unproven.
+    """
+    pat = re.compile(
+        r"plutil\s+-extract\s+[\'\"]?(%s)[\'\"]?\s+raw"
+        % "|".join(re.escape(k) for k in PLIST_COLLECTION_KEYS))
+    hits = []
+    for base, dirs, files in os.walk(root):
+        dirs[:] = [d for d in dirs
+                   if d not in ("node_modules", ".git", "Pods", "corpus")]
+        for name in sorted(files):
+            if os.path.splitext(name)[1] not in (
+                    ".sh", ".bash", ".zsh", ".py", ".yml", ".yaml", ""):
+                continue
+            path = os.path.join(base, name)
+            try:
+                with open(path, encoding="utf-8", errors="replace") as f:
+                    for i, line in enumerate(f, 1):
+                        if pat.search(line):
+                            hits.append((path, i, line.strip()))
+            except OSError:
+                continue
+    return hits
+
+
 # ===================================================================== helpers
 def _tool(name):
     return shutil.which(name)
@@ -477,12 +611,135 @@ class Artifact:
         return found
 
     def identity(self):
-        """One stable id for this binary. Prefers arm64, the slice that ships."""
+        """The UUID of the slice this gate reads. See identity_arch()."""
+        return self.uuids()[self.gate_arch()]
+
+    def identity_arch(self):
+        """(arch, uuid) -- never just the uuid. See ARCHITECTURE DISCIPLINE.
+
+        A caller that wants an identity must be told which slice it got,
+        because on a universal simulator build there are several and only one
+        of them is the one that ships.
+        """
+        a = self.gate_arch()
+        return a, self.uuids()[a]
+
+    def arches(self):
+        """Every architecture in this Mach-O, in file order.
+
+        Read from `dwarfdump --uuid`, so the arch list and the UUID map can
+        never disagree with each other -- they come out of one command. `lipo
+        -archs` agrees and is not consulted: two sources for one fact is two
+        things to keep in step.
+        """
+        return list(self.uuids().keys())
+
+    def gate_arch(self):
+        """The ONE architecture every per-slice reading in this gate uses.
+
+        ARCHITECTURE DISCIPLINE -- read this before changing anything here.
+
+        A simulator build on this machine is universal (`x86_64 arm64`); a
+        device archive is thin (`arm64`). Measured 2026-10-15 on
+        round3-red-binaries/stillmoor/.../Stillmoor:
+
+            otool -L             | grep -c CoreMotion  ->  2
+            otool -arch arm64 -L | grep -c CoreMotion  ->  1
+            dwarfdump --uuid                           ->  2 lines
+            dwarfdump --uuid (device archive)          ->  1 line
+
+        So an arch-blind reading of either tool changes its answer when the
+        same source moves between a simulator and a device, which is the one
+        move this portfolio makes on every app. Two separate rules follow:
+
+        * Anything that COUNTS occurrences doubles on simulator and halves on
+          device. Never count arch-blind output.
+        * Anything that reports an IDENTITY must say which slice it read, or a
+          simulator receipt and a device artifact are compared on different
+          architectures without either side saying so.
+
+        The choice is arm64: it is the slice that ships, it is present in both
+        shapes of artifact here, and it is the convention the receipts already
+        recorded. When it is absent the preference order below is used and the
+        chosen arch is REPORTED rather than silently assumed -- there is no
+        "first slice" fallback, because "whichever slice came first" is the
+        bug this method exists to remove.
+        """
         u = self.uuids()
-        for arch in ("arm64", "arm64e", "x86_64"):
+        for arch in ARCH_PREFERENCE:
             if arch in u:
-                return u[arch]
-        return sorted(u.values())[0]
+                return arch
+        # Not in the preference list at all (armv7, arm64_32, x86_64h...).
+        # Deterministic and stated, not positional.
+        return sorted(u)[0]
+
+    def build_type(self):
+        """('simulator'|'device'|'unknown', platform, how_it_was_established).
+
+        Which shape of artifact a verdict came from. §3.6 of BUILD-STANDARD.md:
+        a simulator build is a PROXY for the device link set and that proxy has
+        never been tested against a device build of the same commit. A verdict
+        that does not say which one it read invites exactly that mistake.
+
+        Two independent reads, because either alone has a hole:
+        `CFBundleSupportedPlatforms` is written by the generator and is in the
+        plist even on an unsigned build, while `vtool -show-build` platform is
+        in the Mach-O and cannot be edited by a plist write.
+        """
+        plats = self.plist.get("CFBundleSupportedPlatforms")
+        # NOTE: an ARRAY-valued key. `plutil -extract ... raw` on this key
+        # prints the element COUNT (1), not "iPhoneSimulator" -- see
+        # PLIST READING below. plistlib returns the list, so read it here.
+        plat_plist = None
+        if isinstance(plats, list) and plats:
+            plat_plist = str(plats[0])
+        elif isinstance(plats, str):
+            plat_plist = plats
+        plat_macho = None
+        if _tool("vtool"):
+            # Per-slice when the slices are readable, whole-file when they are
+            # not. An unreadable Mach-O must still produce an answer here --
+            # build_type() is called from facts(), and a gate that raises
+            # while describing the artifact reports nothing at all.
+            try:
+                rc, out, _e = _run(["vtool", "-arch", self.gate_arch(),
+                                    "-show-build", self.exe])
+            except GateError:
+                rc, out = 1, ""
+            if rc != 0:
+                rc, out, _e = _run(["vtool", "-show-build", self.exe])
+            if rc == 0:
+                m = re.search(r"^\s*platform\s+(\S+)", out, re.M)
+                if m:
+                    plat_macho = m.group(1)
+        hay = " ".join(x for x in (plat_plist, plat_macho) if x).upper()
+        how = "CFBundleSupportedPlatforms=%s, LC_BUILD_VERSION platform=%s" % (
+            plat_plist or "?", plat_macho or "?")
+        if "SIMULATOR" in hay:
+            return "simulator", (plat_macho or plat_plist or "?"), how
+        if "IPHONEOS" in hay or hay.strip() == "IOS":
+            return "device", (plat_macho or plat_plist or "?"), how
+        return "unknown", (plat_macho or plat_plist or "?"), how
+
+    def provenance_line(self):
+        """One line saying which slice and which build shape this verdict read.
+
+        Required by BUILD-STANDARD.md §3.6: "make sure the gate's own output
+        says which architecture and which build type a verdict came from, so
+        nobody mistakes a proxy for the real thing."
+        """
+        try:
+            arches = self.arches()
+            arch = self.gate_arch()
+        except GateError as e:
+            return "measured on: UNKNOWN SLICE -- %s" % e
+        kind, plat, _how = self.build_type()
+        note = ""
+        if kind == "simulator":
+            note = ("  -- a SIMULATOR build: a proxy for the device link set, "
+                    "never compared against a device build of the same commit")
+        return ("measured on: arch %s (of %s) - %s build, platform %s%s"
+                % (arch, "+".join(arches) or "?", kind, plat, note))
 
     # -------------------------------------------------------- plist readings
     def scene(self):
@@ -642,20 +899,63 @@ class Artifact:
         the app config had deleted NSMotionUsageDescription and CoreMotion was
         still linked, by a precompiled XCFramework nobody had looked inside.
         """
+        found, _per_arch = self.linked_system_frameworks_per_arch()
+        return found
+
+    def _otool_frameworks(self, path, arch):
+        """The SET of /System/Library frameworks in one slice of one Mach-O.
+
+        `-arch` is mandatory, not an optimisation. Without it otool walks every
+        slice and prints each shared-library table in turn, so on a universal
+        simulator binary every line appears twice (measured: `grep -c
+        CoreMotion` -> 2 arch-blind, 1 with `-arch arm64`). This rule is
+        set-based so the duplicate lines never changed its verdict, but the
+        next rule written against this output might count, and a count is
+        wrong by a factor of the slice count.
+        """
+        rc, out, _e = _run(["otool", "-arch", arch, "-L", path])
+        if rc != 0:
+            return None
+        return set(re.findall(
+            r"/System/Library/Frameworks/([A-Za-z0-9_+]+)\.framework", out))
+
+    def linked_system_frameworks_per_arch(self):
+        """({framework: [executables]}, {arch: {framework, ...}}).
+
+        The first value is the gate's answer and is read from ONE slice --
+        gate_arch(), the slice that ships. The second is every slice, so a
+        per-slice DISAGREEMENT becomes a finding instead of being silently
+        unioned away. Arch-blind `otool -L` unions the slices, which means a
+        framework linked only into the simulator-only x86_64 slice would be
+        reported as a device-build requirement, and one missing from arm64
+        would be invisible.
+
+        Measured across 45 built bundles on this machine 2026-10-15, including
+        all seven preserved round-three red binaries and their green
+        counterparts: the arm64 and x86_64 framework sets were IDENTICAL in
+        every one. So this returns the same verdict as the arch-blind form on
+        today's corpus -- which is why no verdict reached this week changes --
+        and it will say so loudly the first time that stops being true.
+        """
         if not _tool("otool"):
             raise GateError("otool is not on PATH; cannot read linked frameworks")
+        gate_arch = self.gate_arch()
         found = {}
+        per_arch = {}
         for p in self._macho_paths():
-            rc, out, _e = _run(["otool", "-L", p])
-            if rc != 0:
-                continue
-            for m in re.finditer(
-                    r"/System/Library/Frameworks/([A-Za-z0-9_+]+)\.framework", out):
-                found.setdefault(m.group(1), [])
-                rel = os.path.relpath(p, self.app)
-                if rel not in found[m.group(1)]:
-                    found[m.group(1)].append(rel)
-        return found
+            rel = os.path.relpath(p, self.app)
+            for arch in self.arches():
+                names = self._otool_frameworks(p, arch)
+                if names is None:
+                    continue
+                per_arch.setdefault(arch, set()).update(names)
+                if arch != gate_arch:
+                    continue
+                for name in sorted(names):
+                    found.setdefault(name, [])
+                    if rel not in found[name]:
+                        found[name].append(rel)
+        return found, per_arch
 
     def binary_short(self):
         try:
@@ -682,15 +982,27 @@ class Artifact:
         present, deleg, n = self.scene()
         app_pm, sdk_pm = self.privacy_manifests()
         icon_ok, icon_detail = self.icon()
-        ident = None
+        ident = ident_arch = None
+        uuid_map = {}
+        arches = []
         try:
-            ident = self.identity()
+            uuid_map = self.uuids()
+            arches = self.arches()
+            ident_arch, ident = self.identity_arch()
         except GateError as e:
             err = err or str(e)
+        kind, platform, how = self.build_type()
         return dict(
             app=self.app, bundle_id=self.bundle_id, version=self.version,
             build=self.build, linked_sdk=sdk, minos=minos,
-            binary_uuid=ident, fingerprint=self.fingerprint(),
+            # binary_uuid is kept, and is now never reported without the arch
+            # it came from. binary_uuids is the whole set, so a later reader
+            # can compare set against set instead of scalar against scalar.
+            binary_uuid=ident, binary_arch=ident_arch,
+            binary_uuids=uuid_map, arches=arches,
+            build_type=kind, platform=platform, build_type_how=how,
+            provenance=self.provenance_line(),
+            fingerprint=self.fingerprint(),
             scene_manifest=present, scene_delegate=deleg,
             scene_config_count=n,
             usage_descriptions=sorted(self.usage_descriptions()),
@@ -839,7 +1151,22 @@ def receipt_dirs(project_root=None, artifact_path=None):
     and the machine that uploads are not the same machine here, and a receipt
     that lives only in ~/.config on the mini would block every legitimate
     upload from the laptop.
+
+    An override REPLACES the list rather than being prepended to it, and that
+    is the whole point: a list that still contains the repo is a list that can
+    still be written to, and "it usually writes somewhere else" is not an
+    isolation guarantee anybody can assert on. One directory, read and written,
+    named by the caller. The cost is stated rather than hidden -- a receipt
+    that legitimately lives in the repo or in the home store is NOT read while
+    an override is in force, so a caller who wants existing evidence to count
+    has to put it in the directory it named. Making the override read-wide and
+    write-narrow would mean a gate whose answer depends on a directory the
+    caller did not name, which is how a check ends up answering a question
+    nobody asked.
     """
+    override = receipts_override()
+    if override:
+        return [override]
     out = []
     for start in (project_root, os.path.dirname(artifact_path or "") or None):
         if not start:
@@ -931,8 +1258,11 @@ def ledger_lookup(artifact, project_root=None):
 def ledger_append(artifact, project_root=None):
     """Record that this binary was evaluated. Append-only, best effort."""
     try:
+        _arch, _u = artifact.identity_arch()
         row = dict(bundle_id=artifact.bundle_id, version=artifact.version,
-                   build=artifact.build, binary_uuid=artifact.identity(),
+                   build=artifact.build, binary_uuid=_u, binary_arch=_arch,
+                   binary_uuids=artifact.uuids(),
+                   build_type=artifact.build_type()[0],
                    fingerprint=artifact.fingerprint(),
                    app_path=os.path.abspath(artifact.app),
                    when=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
@@ -948,8 +1278,60 @@ def ledger_append(artifact, project_root=None):
         return None
 
 
+def receipt_uuid_map(receipt):
+    """{arch: uuid} for a receipt, whichever schema wrote it.
+
+    Receipts written before 2026-10-15 recorded one scalar `binary_uuid` and
+    no architecture at all. Those are read here as an arch-less singleton
+    under the key "?" -- NOT silently relabelled "arm64", because the whole
+    point is that nobody recorded which slice it was and guessing would be the
+    unearned proof the binding exists to refuse.
+    """
+    m = receipt.get("binary_uuids")
+    if isinstance(m, dict) and m:
+        return {str(k): str(v).upper() for k, v in m.items() if v}
+    u = receipt.get("binary_uuid")
+    if not u:
+        return {}
+    arch = receipt.get("binary_arch")
+    return {str(arch) if arch else "?": str(u).upper()}
+
+
 def match_receipt(artifact, receipt):
-    """('exact'|'sibling'|'expired'|'absent', why). See RECEIPT BINDING."""
+    """('exact'|'sibling'|'expired'|'absent', why). See RECEIPT BINDING.
+
+    ARCHITECTURE DISCIPLINE -- the 2026-10-15 fix.
+
+    `dwarfdump --uuid` returns one line per slice: two on a universal
+    simulator build, one on a thin device archive. The first version of this
+    binding reduced that to a single scalar and compared scalar against
+    scalar, so "the UUID" meant a different architecture depending on which
+    shape of artifact was in front of it, and nothing in the receipt or in the
+    output said which. A simulator-to-device sibling comparison could compare
+    an x86_64 identity against an arm64 one and report the result as the
+    legitimate sibling case.
+
+    So the comparison is now SET AGAINST SET, keyed by architecture, and every
+    verdict names the architecture it was decided on:
+
+      exact    the gate architecture's slice is the same slice. The strongest
+               statement available, and still the arm64 slice -- the one that
+               ships -- exactly as §9.3 of BUILD-STANDARD.md permits.
+      exact    (shared-slice form) the two artifacts' slice sets INTERSECT:
+               the proof was earned on a slice this artifact physically
+               contains, even though the gate architectures differ. Reported
+               with the arch named, because this is what a thin-vs-universal
+               pair of the same build looks like and the old scalar scheme
+               called it `sibling`, which understated it.
+      sibling  no slice in common, same bundle+version+build, and the
+               gate-relevant plist keys agree -- the real simulator-build to
+               device-build case, which MUST keep passing (§9.4). The message
+               now says which architectures the two sides were, so a reader
+               can see that the proof was earned on a slice this artifact does
+               not contain.
+      expired  the plist keys disagree, or the version/build moved.
+      unbound  no binary identity recorded at all (handled by the caller).
+    """
     if not receipt:
         return "absent", "no receipt found"
     if receipt.get("bundle_id") != artifact.bundle_id:
@@ -962,25 +1344,60 @@ def match_receipt(artifact, receipt):
                 % (receipt.get("version"), receipt.get("build"),
                    artifact.version, artifact.build))
     try:
-        ident = artifact.identity()
+        arch, ident = artifact.identity_arch()
+        a_map = artifact.uuids()
     except GateError as e:
         return "expired", "cannot read this binary's LC_UUID: %s" % e
-    if receipt.get("binary_uuid") == ident:
-        return "exact", "receipt was earned on this exact binary (%s)" % ident
+    r_map = receipt_uuid_map(receipt)
+
+    def shape(m):
+        return ", ".join("%s=%s" % (k, m[k]) for k in sorted(m)) or "(none)"
+
+    # 1. Same slice at the gate architecture: the strongest statement.
+    if r_map.get(arch) == ident:
+        return ("exact",
+                "receipt was earned on this exact binary -- same %s slice "
+                "(%s). artifact slices: %s" % (arch, ident, shape(a_map)))
+    # 2. A legacy arch-less receipt whose single UUID is one of this
+    #    artifact's slices. Accept, and SAY which slice it turned out to be,
+    #    rather than letting an arch-blind scalar comparison decide it.
+    shared = sorted(a for a, u in a_map.items() if r_map.get(a) == u)
+    if not shared and "?" in r_map:
+        shared = sorted(a for a, u in a_map.items() if u == r_map["?"])
+        if shared:
+            return ("exact",
+                    "receipt records one UUID and no architecture (pre-"
+                    "2026-10-15 schema); it is this artifact's %s slice (%s). "
+                    "artifact slices: %s"
+                    % ("/".join(shared), r_map["?"], shape(a_map)))
+    if shared:
+        return ("exact",
+                "receipt and artifact share the %s slice (%s). The gate "
+                "architecture here is %s, so this is a thin/universal pair of "
+                "ONE build rather than two builds. receipt slices: %s; "
+                "artifact slices: %s"
+                % ("/".join(shared), a_map[shared[0]], arch,
+                   shape(r_map), shape(a_map)))
+
     rf, af = receipt.get("fingerprint"), artifact.fingerprint()
     if rf and rf == af:
         return ("sibling",
-                "receipt was earned on a different binary of the same build "
-                "(%s vs %s) whose gate-relevant Info.plist keys are identical "
-                "-- the simulator-build/device-build case"
-                % (receipt.get("binary_uuid"), ident))
+                "receipt was earned on a binary with NO slice in common with "
+                "this one -- receipt slices: %s; artifact slices: %s (gate "
+                "architecture %s) -- but the same bundle+version+build and "
+                "identical gate-relevant Info.plist keys. This is the "
+                "simulator-build/device-build case, which is legitimate and "
+                "is weaker evidence than `exact`: the proof was earned on a "
+                "slice this artifact does not contain."
+                % (shape(r_map), shape(a_map), arch))
     return ("expired",
-            "receipt was earned on a DIFFERENT BINARY (%s) of the same "
+            "receipt was earned on a DIFFERENT BINARY (slices %s) of the same "
             "version+build whose gate-relevant Info.plist keys DISAGREE with "
-            "this one (fingerprint %s vs %s). It is not evidence about this "
-            "artifact. This is the exact shape of the Vocabdrift receipt that "
-            "vouched for a fixed binary while a broken one was being checked."
-            % (receipt.get("binary_uuid"), rf, af))
+            "this one (fingerprint %s vs %s; artifact slices %s, gate "
+            "architecture %s). It is not evidence about this artifact. This "
+            "is the exact shape of the Vocabdrift receipt that vouched for a "
+            "fixed binary while a broken one was being checked."
+            % (shape(r_map), rf, af, shape(a_map), arch))
 
 
 # ================================================================ screenshots
@@ -1464,6 +1881,19 @@ def privacy_tracking_findings(manifests):
     return out
 
 
+def _gate_arch_or_q(artifact):
+    """The gate architecture, or '?' when the Mach-O cannot be read.
+
+    A helper rather than inline try/except because every message that names a
+    slice has to be able to say "I could not tell" instead of crashing the
+    whole verdict -- a gate that raises is a gate that reports nothing.
+    """
+    try:
+        return artifact.gate_arch()
+    except GateError:
+        return "?"
+
+
 def check_binary(artifact, project_root=None):
     """Binary evidence. Reads the artifact, never the config."""
     out = []
@@ -1540,8 +1970,12 @@ def check_binary(artifact, project_root=None):
     # --- linked framework vs purpose string: the ITMS-90683 check ------------
     # Config cannot answer this. A precompiled XCFramework links what it links,
     # and deleting the key from app.json does not unlink it.
+    # ARCHITECTURE: read from ONE slice, and say which. `otool -L` without
+    # `-arch` walks every slice, so on a universal simulator build every line
+    # appears twice and the slices are unioned. See Artifact.gate_arch().
+    per_arch = {}
     try:
-        linked = artifact.linked_system_frameworks()
+        linked, per_arch = artifact.linked_system_frameworks_per_arch()
     except GateError as e:
         linked = None
         out.append(_f(
@@ -1563,7 +1997,8 @@ def check_binary(artifact, project_root=None):
                 "BIN-FRAMEWORK-PURPOSE-STRING-%s" % fw, "high",
                 "%s.framework is linked but no purpose string for it is in "
                 "the built Info.plist" % fw,
-                "Linked by: %s. The built Info.plist has none of %s. App "
+                "Linked by: %s, read from the %s slice (%s). The built "
+                "Info.plist has none of %s. App "
                 "config may well say this permission is off, or say nothing "
                 "at all -- that deletes the key and cannot remove the "
                 "linkage, which is exactly how MileTruth build 3 was rejected "
@@ -1572,7 +2007,8 @@ def check_binary(artifact, project_root=None):
                 "external libraries or SDKs, they may reference APIs that "
                 "require a purpose string. While your app might not use these "
                 "APIs, a purpose string is still required.\""
-                % (", ".join(linked[fw]), ", ".join(keys)),
+                % (", ".join(linked[fw]), _gate_arch_or_q(artifact),
+                   artifact.provenance_line(), ", ".join(keys)),
                 "Add one of %s to the app config\'s ios.infoPlist with an "
                 "honest purpose string. If the app does not use the "
                 "capability, say so plainly -- Apple requires the string, not "
@@ -1588,6 +2024,46 @@ def check_binary(artifact, project_root=None):
                 "binary, never with app.json."
                 % (keys[0], fw),
                 clause="5.1.1", confidence="high"))
+
+    # --- the slices themselves disagree ------------------------------------
+    # Arch-blind `otool -L` UNIONS the slices, so a framework present in only
+    # one of them is indistinguishable from one present in all. Measured
+    # across 45 bundles on this machine 2026-10-15, including every preserved
+    # round-three red binary: arm64 and x86_64 always agreed. So this rule has
+    # never fired -- and if it ever does, the simulator build has stopped
+    # being a usable proxy for the device link set and the verdict above is
+    # about one slice only.
+    if per_arch and len(per_arch) > 1:
+        gate_a = _gate_arch_or_q(artifact)
+        watched = set(FRAMEWORK_PURPOSE_STRINGS)
+        base = per_arch.get(gate_a, set()) & watched
+        for other, names in sorted(per_arch.items()):
+            if other == gate_a:
+                continue
+            diff = (names & watched) ^ base
+            if not diff:
+                continue
+            out.append(_f(
+                "BIN-FRAMEWORK-LINKAGE-SLICE-DISAGREEMENT", "high",
+                "The %s and %s slices of this binary link different watched "
+                "frameworks" % (gate_a, other),
+                "%s is in one slice and not the other: %s slice has %s, %s "
+                "slice has %s. %s. This gate decided the purpose-string "
+                "verdict above from the %s slice alone, which is the slice "
+                "that ships. An arch-blind `otool -L` would have unioned the "
+                "two and reported a framework that the shipping slice does "
+                "not link, or missed one it does."
+                % (", ".join(sorted(diff)), gate_a,
+                   ", ".join(sorted(base)) or "none", other,
+                   ", ".join(sorted(names & watched)) or "none",
+                   artifact.provenance_line(), gate_a),
+                "Read `otool -arch %s -L` and `otool -arch %s -L` on the "
+                "executable and decide which one the submission is. Never "
+                "read `otool -L` without `-arch` to answer this: it prints "
+                "every slice's table in turn, so the sets are merged and any "
+                "count is multiplied by the slice count."
+                % (gate_a, other),
+                clause="5.1.1"))
 
     # --- build number reuse: the collision that bounces at UPLOAD PROCESSING -
     # One FlirtGym rejection was not a review rejection at all: it was rejected
@@ -2380,7 +2856,9 @@ def do_launch(artifact_path, udid=None, runtime="iOS-26", settle=10,
             udid, rt, name = pick_simulator(runtime)
         print("device  : %s (%s) %s" % (udid, rt, name))
         print("bundle  : %s  %s+%s" % (art.bundle_id, art.version, art.build))
-        print("binary  : %s" % art.identity())
+        _la, _lu = art.identity_arch()
+        print("binary  : %s  (%s slice)" % (_lu, _la))
+        print("%s" % art.provenance_line())
 
         boot_sim(udid)
         rc, _o, err = _run(["xcrun", "simctl", "install", udid, art.app],
@@ -2447,15 +2925,19 @@ def do_launch(artifact_path, udid=None, runtime="iOS-26", settle=10,
 
         payload = dict(
             kind="launch", bundle_id=art.bundle_id, version=art.version,
-            build=art.build, binary_uuid=art.identity(),
+            build=art.build, binary_uuid=art.identity_arch()[1],
+            binary_arch=art.identity_arch()[0], binary_uuids=art.uuids(),
+            build_type=art.build_type()[0], arches=art.arches(),
             fingerprint=art.fingerprint(), linked_sdk=art.load_versions()[0],
             scene_delegate=art.scene()[1], runtime=rt, device=udid, pid=pid,
             settle_seconds=settle, first_frame=frame,
             app_path=os.path.abspath(art.app),
             when=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             note=("Written only because the process was alive after %ds with "
-                  "no new crash report. Bound to binary_uuid + fingerprint, so "
-                  "it cannot vouch for a different binary of the same build."
+                  "no new crash report. Bound to the per-architecture "
+                  "binary_uuids map + fingerprint, so it cannot vouch for a "
+                  "different binary of the same build, and the architecture "
+                  "it was earned on is recorded rather than implied."
                   % settle))
         paths = save_receipt(art, "launch", payload, project_root)
         for p in paths:
@@ -2472,7 +2954,9 @@ def do_launch(artifact_path, udid=None, runtime="iOS-26", settle=10,
 def _blank_run(art, kind):
     return dict(
         kind=kind, bundle_id=art.bundle_id, version=art.version,
-        build=art.build, binary_uuid=art.identity(),
+        build=art.build, binary_uuid=art.identity_arch()[1],
+        binary_arch=art.identity_arch()[0], binary_uuids=art.uuids(),
+        build_type=art.build_type()[0], arches=art.arches(),
         fingerprint=art.fingerprint(),
         when=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
 

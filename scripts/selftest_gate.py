@@ -165,6 +165,114 @@ def real_macho(sdk="26.0", salt="", frameworks=()):
     return _MACHO_CACHE[key]
 
 
+_FAT_CACHE = {}
+
+
+def real_macho_arch(arch, sdk="26.0", salt="", frameworks=()):
+    """A GENUINE Mach-O for ONE named architecture.
+
+    real_macho() above always targets arm64. This takes the architecture, so
+    a FAT binary whose slices genuinely differ can be assembled with `lipo`.
+    That is the only way to test the architecture discipline honestly: the
+    defect being tested is "the answer changes with the slice", and a fixture
+    whose slices are identical cannot show it.
+    """
+    key = (arch, sdk, salt, tuple(frameworks))
+    if key in _FAT_CACHE:
+        return _FAT_CACHE[key]
+    if not shutil.which("xcrun"):
+        _FAT_CACHE[key] = None
+        return None
+    try:
+        sysroot = subprocess.run(
+            ["xcrun", "--sdk", "iphonesimulator", "--show-sdk-path"],
+            capture_output=True, text=True, timeout=120).stdout.strip()
+        if not sysroot or not os.path.isdir(sysroot):
+            _FAT_CACHE[key] = None
+            return None
+        with tempfile.TemporaryDirectory() as d:
+            csrc = os.path.join(d, "t.c")
+            ident = re.sub(r"[^0-9A-Za-z_]", "_", salt or "x")
+            with open(csrc, "w", encoding="utf-8") as f:
+                f.write("int marker_%s(void){return %d;}\n"
+                        % (ident, len(salt or "")))
+                f.write("int main(void){return 0;}\n")
+            out = os.path.join(d, "bin")
+            fw_args = []
+            for nm in frameworks:
+                fw_args += ["-framework", nm]
+            pr = subprocess.run(
+                ["xcrun", "--sdk", "iphonesimulator", "clang",
+                 "-target", "%s-apple-ios16.4-simulator" % arch,
+                 "-isysroot", sysroot, "-mios-simulator-version-min=16.4",
+                 "-Wl,-platform_version,ios-simulator,16.4," + sdk]
+                + fw_args + [csrc, "-o", out],
+                capture_output=True, text=True, timeout=300)
+            if pr.returncode != 0 or not os.path.isfile(out):
+                _FAT_CACHE[key] = None
+                return None
+            with open(out, "rb") as f:
+                _FAT_CACHE[key] = f.read()
+    except (OSError, subprocess.SubprocessError):
+        _FAT_CACHE[key] = None
+    return _FAT_CACHE[key]
+
+
+def fat_macho(slices, sdk="26.0", salt=""):
+    """A real universal Mach-O. `slices` is {arch: (framework, ...)}.
+
+    Built with the real `lipo`, from real per-architecture clang output, so
+    `otool -L`, `otool -arch <a> -L` and `dwarfdump --uuid` all behave exactly
+    as they do on a build out of Xcode: one LC_UUID and one shared-library
+    table per slice.
+    """
+    if not shutil.which("lipo"):
+        return None
+    parts = {}
+    for arch, fws in slices.items():
+        b = real_macho_arch(arch, sdk, "%s-%s" % (salt, arch), fws)
+        if b is None:
+            return None
+        parts[arch] = b
+    with tempfile.TemporaryDirectory() as d:
+        files = []
+        for arch, b in sorted(parts.items()):
+            fp = os.path.join(d, arch)
+            with open(fp, "wb") as f:
+                f.write(b)
+            files.append(fp)
+        out = os.path.join(d, "fat")
+        pr = subprocess.run(["lipo", "-create"] + files + ["-output", out],
+                            capture_output=True, text=True, timeout=120)
+        if pr.returncode != 0 or not os.path.isfile(out):
+            return None
+        with open(out, "rb") as f:
+            return f.read()
+
+
+def thin_of(fat_bytes, arch):
+    """`lipo -thin <arch>` of a fat binary. The slice, byte for byte.
+
+    This is what makes the receipt-binding cases real rather than argued: the
+    thin copy's LC_UUID IS one of the fat copy's LC_UUIDs, because it is
+    literally the same slice. Any binding scheme that reduces a universal
+    binary to one scalar identity cannot see that relationship.
+    """
+    if fat_bytes is None or not shutil.which("lipo"):
+        return None
+    with tempfile.TemporaryDirectory() as d:
+        src = os.path.join(d, "fat")
+        dst = os.path.join(d, "thin")
+        with open(src, "wb") as f:
+            f.write(fat_bytes)
+        pr = subprocess.run(["lipo", "-thin", arch, src, "-output", dst],
+                            capture_output=True, text=True, timeout=120)
+        if pr.returncode != 0 or not os.path.isfile(dst):
+            return None
+        with open(dst, "rb") as f:
+            return f.read()
+
+
 def make_app(tmp, name="Fix", plist=None, exe_bytes=None, plugins=None,
              sdk="26.0", salt=None, frameworks=()):
     """A .app directory with a real Info.plist and a real Mach-O."""
@@ -973,6 +1081,232 @@ def test_receipt_roundtrip_and_expiry(r):
         a2.cleanup()
 
 
+def _porcelain(repo):
+    return subprocess.run(["git", "-C", repo, "status", "--porcelain"],
+                          capture_output=True, text=True).stdout.strip()
+
+
+def test_receipt_dir_override(r):
+    """Where receipts go, and the gate a shared checkout could not be asked.
+
+    THE DEFECT THIS CLOSES, stated as the two things that were both true:
+
+      * `gate check` derives its receipt directory from the ARTIFACT's own git
+        toplevel, so asking it anything about an .app built inside a repo wrote
+        .shipcheck-receipts/ into that repo -- whatever --project said. On a
+        shared checkout that dirties a tree somebody else is pushing from, and
+        leaves a file a concurrent session can sweep into a commit.
+      * Avoiding that by copying the artifact out and inspecting the copy stops
+        the write and makes GATE-SCENE-PROVENANCE-* unanswerable, because
+        provenance is a question about the REPO. A gate that cannot fail is
+        worse than a gate that writes a file.
+
+    So neither half of that trade was acceptable, and the assertions below are
+    written to hold both ends down at once:
+
+        no evidence     -> the evidence rules FIRE          (it can fail)
+        evidence in DIR -> the same rules are SILENT        (it can pass)
+        either way      -> git status --porcelain is EMPTY  (it writes nothing)
+        provenance      -> answered, not skipped            (the point)
+
+    and one counter-case that makes the clean-tree assertion non-vacuous: the
+    same command WITHOUT the override must dirty the same repo. Without that,
+    "the tree is clean" would also pass against a gate that had not run.
+    """
+    print("\nReceipt directory override -- asking an evidence rule without "
+          "writing into the repo")
+
+    # ---- resolution order, in process. No toolchain needed. ---------------
+    env_dir = tempfile.mkdtemp(prefix="recpt-env-")
+    flag_dir = tempfile.mkdtemp(prefix="recpt-flag-")
+    # realpath: git --show-toplevel resolves /var -> /private/var on macOS, and
+    # a test that compared the unresolved path would fail for a reason that has
+    # nothing to do with what it is measuring.
+    repo0 = os.path.realpath(tempfile.mkdtemp(prefix="recpt-repo0-"))
+    try:
+        git_init(repo0, {"app.json": "{}"})
+        os.environ.pop(shipgate.RECEIPTS_ENV, None)
+        shipgate.set_receipts_override(None)
+
+        base = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("DEFAULT is unchanged: the repo first, the home store last",
+                base[0] == os.path.join(repo0, shipgate.RECEIPT_DIRNAME)
+                and base[-1] == shipgate.HOME_RECEIPTS, str(base))
+
+        os.environ[shipgate.RECEIPTS_ENV] = env_dir
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("%s REPLACES the list -- one directory, not a longer search "
+                "path (a list that still contains the repo can still be "
+                "written to)" % shipgate.RECEIPTS_ENV,
+                got == [env_dir], str(got))
+
+        shipgate.set_receipts_override(flag_dir)
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("--receipts outranks the environment", got == [flag_dir],
+                str(got))
+
+        shipgate.set_receipts_override(None)
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("clearing the flag falls back to the environment, it does not "
+                "stick", got == [env_dir], str(got))
+
+        os.environ[shipgate.RECEIPTS_ENV] = "   "
+        got = shipgate.receipt_dirs(repo0, os.path.join(repo0, "A.app"))
+        r.check("a BLANK value reads as unset, not as the current directory "
+                "-- `SHIPCHECK_RECEIPTS=` is how a wrapper clears it, and "
+                "treating '' as a path would write into whatever tree the "
+                "caller was standing in", got == base, str(got))
+
+        os.environ[shipgate.RECEIPTS_ENV] = os.path.join("~", "x-ship-recpt")
+        got = shipgate.receipt_dirs(repo0, None)
+        r.check("a ~ path is expanded and a relative one made absolute",
+                got == [os.path.expanduser("~/x-ship-recpt")], str(got))
+        os.environ.pop(shipgate.RECEIPTS_ENV, None)
+
+        # The ledger is the file that actually dirtied a tree, so it gets its
+        # own assertion rather than being assumed to follow receipt_dirs.
+        shipgate.set_receipts_override(flag_dir)
+        r.check("the gated-builds ledger follows the override too",
+                shipgate.ledger_path(repo0, os.path.join(repo0, "A.app"))
+                == os.path.join(flag_dir, shipgate.LEDGER_NAME))
+        shipgate.set_receipts_override(None)
+    finally:
+        os.environ.pop(shipgate.RECEIPTS_ENV, None)
+        shipgate.set_receipts_override(None)
+        for d in (env_dir, flag_dir, repo0):
+            shutil.rmtree(d, ignore_errors=True)
+
+    # ---- the whole point, through bin/shipcheck as a subprocess ------------
+    if not HAVE_MACHO_TOOLS or not HAVE_CLANG:
+        r.skip("gate check --receipts leaves the repo clean",
+               "needs a real Mach-O")
+        return
+
+    wt = os.path.dirname(HERE)
+    tmp = tempfile.mkdtemp(prefix="recpt-cli-")
+    home = tempfile.mkdtemp(prefix="recpt-home-")
+    try:
+        # A repo shaped like the real case: the .app lives in a gitignored
+        # build directory, and an untracked hand-written ios/Info.plist is the
+        # ONLY thing that explains the artifact's scene manifest. So the tree
+        # starts clean, provenance has a real answer, and the only thing that
+        # can dirty it is the gate itself.
+        repo = os.path.join(tmp, "shared-checkout")
+        prod = os.path.join(repo, "ios", "build", "dd", "Build", "Products",
+                            "Release-iphonesimulator")
+        os.makedirs(prod)
+        git_init(repo, {
+            "app.json": json.dumps({"expo": {"name": "Ov", "slug": "ov"}}),
+            ".gitignore": "ios/\n"})
+        os.makedirs(os.path.join(repo, "ios", "Ov"))
+        with open(os.path.join(repo, "ios", "Ov", "Info.plist"), "wb") as f:
+            plistlib.dump(dict({"CFBundleIdentifier": "x"},
+                               **SCENE_ADOPTED), f)
+        with Quiet():
+            app = make_app(prod, "Ov",
+                           dict(SCENE_ADOPTED,
+                                ITSAppUsesNonExemptEncryption=False),
+                           sdk="26.0", salt="ov")
+        open(os.path.join(app, "AppIcon60x60@2x.png"), "wb").close()
+        r.check("the fixture repo starts clean", _porcelain(repo) == "",
+                _porcelain(repo))
+
+        out = os.path.join(tmp, "receipts-out")
+        res = _cli(wt, ["gate", "check", app, "--project", repo,
+                        "--receipts", out, "--json"], home)
+        ids = {f["id"] for f in json.loads(res.stdout).get("findings", [])}
+
+        # RED: with no evidence anywhere, the evidence rules must fire. A rule
+        # that can only pass is the defect being removed here, not a feature.
+        r.check("with no receipt in DIR, GATE-LAUNCH-UNPROVEN FIRES",
+                "GATE-LAUNCH-UNPROVEN" in ids, str(sorted(ids)))
+        r.check("with no receipt in DIR, GATE-STRESS-NOT-RUN FIRES",
+                "GATE-STRESS-NOT-RUN" in ids, str(sorted(ids)))
+        r.check("and the attestation items are demanded",
+                any(i.startswith("GATE-ATTEST-MISSING-") for i in ids),
+                str(sorted(ids)))
+        r.check("gate check EXITS 1 on that, rather than printing it and "
+                "returning 0", res.returncode == 1, "rc=%d" % res.returncode)
+
+        # The rule that CLONING THE ARTIFACT OUT makes permanently
+        # unanswerable. Under the override the artifact stays where it is, so
+        # the question about the repo still has an answer.
+        r.check("GATE-SCENE-PROVENANCE-UNTRACKED is ANSWERED -- the rule that "
+                "becomes unanswerable when the artifact is copied out of its "
+                "repo to dodge the write",
+                "GATE-SCENE-PROVENANCE-UNTRACKED" in ids, str(sorted(ids)))
+        r.check("and it is not the 'I could not look' outcome wearing the "
+                "same hat", "GATE-SCENE-PROVENANCE-UNKNOWN" not in ids,
+                str(sorted(ids)))
+
+        # ...and none of that touched the repo.
+        r.check("git status --porcelain is EMPTY after asking the evidence "
+                "rules", _porcelain(repo) == "", _porcelain(repo))
+        r.check("no .shipcheck-receipts anywhere under the repo",
+                not any(shipgate.RECEIPT_DIRNAME in dirs
+                        for _b, dirs, _f in os.walk(repo)))
+        r.check("the ledger landed in DIR instead",
+                os.path.isfile(os.path.join(out, shipgate.LEDGER_NAME)))
+        r.check("and not in the home store either -- the override replaces "
+                "that too",
+                not os.path.isdir(os.path.join(home, ".config", "shipcheck",
+                                               "receipts")))
+
+        # GREEN: real receipts, in the directory the caller named.
+        shipgate.set_receipts_override(out)
+        try:
+            _full_receipts(app, repo)
+        finally:
+            shipgate.set_receipts_override(None)
+        r.check("writing the receipts put them in DIR, not in the repo",
+                _porcelain(repo) == "", _porcelain(repo))
+
+        res = _cli(wt, ["gate", "check", app, "--project", repo,
+                        "--receipts", out, "--json"], home)
+        ids2 = {f["id"] for f in json.loads(res.stdout).get("findings", [])}
+        r.check("with a REAL receipt in DIR, GATE-LAUNCH-UNPROVEN is silent",
+                "GATE-LAUNCH-UNPROVEN" not in ids2, str(sorted(ids2)))
+        r.check("and GATE-STRESS-NOT-RUN is silent",
+                "GATE-STRESS-NOT-RUN" not in ids2, str(sorted(ids2)))
+        r.check("and no attestation is still missing",
+                not any(i.startswith("GATE-ATTEST-MISSING-") for i in ids2),
+                str(sorted(ids2)))
+        r.check("the repo is STILL clean after the gate was satisfied",
+                _porcelain(repo) == "", _porcelain(repo))
+
+        # EXCLUSIVITY, stated as a test rather than only in a docstring: a
+        # receipt in the repo is NOT read while an override is in force. This
+        # is the cost of the design, and a cost nobody asserts on is a cost
+        # that turns into a surprise.
+        repo_store = os.path.join(repo, shipgate.RECEIPT_DIRNAME)
+        shutil.copytree(out, repo_store)
+        other = os.path.join(tmp, "receipts-elsewhere")
+        res = _cli(wt, ["gate", "check", app, "--project", repo,
+                        "--receipts", other, "--json"], home)
+        ids3 = {f["id"] for f in json.loads(res.stdout).get("findings", [])}
+        r.check("a receipt sitting in the repo is NOT read when DIR is named "
+                "-- the override replaces the list, it does not widen it",
+                "GATE-LAUNCH-UNPROVEN" in ids3, str(sorted(ids3)))
+
+        # And the counter-case that makes every 'porcelain is empty' assertion
+        # above mean something: the SAME command with no override dirties the
+        # SAME repo. Without this, a gate that silently did nothing would also
+        # have left the tree clean.
+        shutil.rmtree(repo_store, ignore_errors=True)
+        r.check("the fixture is clean again before the counter-case",
+                _porcelain(repo) == "", _porcelain(repo))
+        res = _cli(wt, ["gate", "check", app, "--project", repo, "--json"],
+                   home)
+        dirty = _porcelain(repo)
+        r.check("WITHOUT --receipts the same command DIRTIES the same repo -- "
+                "so the clean-tree assertions above are measuring something",
+                shipgate.RECEIPT_DIRNAME in dirty, dirty or "(clean)")
+        shutil.rmtree(repo_store, ignore_errors=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(home, ignore_errors=True)
+
+
 def test_attestations(r):
     if not HAVE_MACHO_TOOLS:
         r.skip("attestations", "no vtool/dwarfdump/otool on this machine")
@@ -1229,6 +1563,513 @@ def test_purpose_strings(r):
             for a in (bad, good, none):
                 a.cleanup()
 
+
+
+# =========================================================== arch discipline
+# THE THREE MEASUREMENT BUGS OF 2026-10-15
+#
+# All three have the same shape: a command whose output changes when the same
+# source moves between a simulator build (universal, x86_64+arm64) and a device
+# build (thin arm64) -- which is the one move this portfolio makes on every
+# single app -- read by a check that never named the architecture it wanted.
+#
+#   otool -L            | grep -c CoreMotion  ->  2   (universal simulator)
+#   otool -arch arm64 -L| grep -c CoreMotion  ->  1
+#   otool -L            | grep -c CoreMotion  ->  1   (thin device)
+#   dwarfdump --uuid                          ->  2 lines / 1 line
+#   plutil -extract <array-key> raw           ->  the element COUNT
+#
+# Every assertion below is against a REAL Mach-O: per-architecture clang
+# output assembled with the real `lipo`. A mock cannot show the defect,
+# because the defect IS the per-slice behaviour of the real tools.
+
+def test_arch_discipline_linkage(r):
+    """BUG 1: otool read arch-blind unions the slices and doubles every count.
+
+    The fixture is the condition the broken form gets WRONG, and it cannot be
+    argued about: ONE C source, linked for x86_64 WITH -framework CoreMotion
+    and for arm64 WITHOUT, assembled into one fat binary with `lipo`.
+
+      arch-blind `otool -L`  sees CoreMotion  -> demands NSMotionUsageDescription
+      `otool -arch arm64 -L` does not         -> demands nothing
+
+    arm64 is the slice that ships. So the arch-blind form raises ITMS-90683 on
+    a binary whose shipping slice does not link the framework at all: a false
+    blocking finding, on the rule built from the only rejection Apple has ever
+    put in writing.
+
+    And the must-not-fire half, because a rule that fires on everything is
+    indistinguishable from a rule that works: a fat binary whose slices AGREE
+    must produce no slice-disagreement finding, and its purpose-string verdict
+    must be unchanged.
+    """
+    print("\nBUG 1 -- otool and the universal binary (ITMS-90683 rule)")
+    if not HAVE_MACHO_TOOLS or not HAVE_CLANG or not shutil.which("lipo"):
+        r.skip("arch discipline needs real Mach-O slices",
+               "otool/clang/lipo unavailable; a faked otool would test the fake")
+        return
+    FID = "BIN-FRAMEWORK-PURPOSE-STRING-CoreMotion"
+    SLICE_FID = "BIN-FRAMEWORK-LINKAGE-SLICE-DISAGREEMENT"
+
+    disagree = fat_macho({"x86_64": ("CoreMotion",), "arm64": ()},
+                         sdk="26.0", salt="dis")
+    agree = fat_macho({"x86_64": ("CoreMotion",), "arm64": ("CoreMotion",)},
+                      sdk="26.0", salt="agr")
+    if disagree is None or agree is None:
+        r.skip("arch discipline needs real Mach-O slices",
+               "clang/lipo could not build a fat fixture here")
+        return
+
+    with tempfile.TemporaryDirectory() as tmp:
+        with Quiet():
+            dis = shipgate.Artifact(make_app(
+                tmp, "ArchDis", dict(SCENE_ADOPTED), exe_bytes=disagree))
+            agr = shipgate.Artifact(make_app(
+                tmp, "ArchAgr", dict(SCENE_ADOPTED), exe_bytes=agree))
+        try:
+            # ---- the fixture is genuinely what the docstring claims -------
+            blind = subprocess.run(["otool", "-L", dis.exe],
+                                   capture_output=True, text=True)
+            a64 = subprocess.run(["otool", "-arch", "arm64", "-L", dis.exe],
+                                 capture_output=True, text=True)
+            x64 = subprocess.run(["otool", "-arch", "x86_64", "-L", dis.exe],
+                                 capture_output=True, text=True)
+            r.check("fixture: arch-blind otool SEES CoreMotion (the union)",
+                    "CoreMotion.framework" in blind.stdout)
+            r.check("fixture: the arm64 slice -- the one that ships -- does "
+                    "NOT link CoreMotion",
+                    "CoreMotion.framework" not in a64.stdout)
+            r.check("fixture: the x86_64 slice does",
+                    "CoreMotion.framework" in x64.stdout)
+
+            # ---- OLD behaviour, reconstructed from the real command -------
+            # This is the exact expression the gate used before today: one
+            # arch-blind otool, regex for the framework name.
+            old_union = set(re.findall(
+                r"/System/Library/Frameworks/([A-Za-z0-9_+]+)\.framework",
+                blind.stdout))
+            r.check("OLD (arch-blind) reading would demand a motion string: "
+                    "CoreMotion is in its set",
+                    "CoreMotion" in old_union, str(sorted(old_union)))
+
+            # ---- NEW behaviour --------------------------------------------
+            new_set, per_arch = dis.linked_system_frameworks_per_arch()
+            r.check("NEW reading is taken from the arm64 slice, so CoreMotion "
+                    "is NOT in its set",
+                    "CoreMotion" not in new_set, str(sorted(new_set)))
+            r.check("NEW reading still reports the x86_64 slice separately, "
+                    "so the disagreement is not lost",
+                    "CoreMotion" in per_arch.get("x86_64", set()),
+                    str({k: sorted(v) for k, v in per_arch.items()}))
+
+            with Quiet():
+                dis_ids = {f["id"] for f in shipgate.check_binary(dis)[0]}
+                agr_ids = {f["id"] for f in shipgate.check_binary(agr)[0]}
+            r.check("the gate does NOT raise ITMS-90683 for a framework only "
+                    "the simulator-only slice links (the old form did)",
+                    FID not in dis_ids, str(sorted(dis_ids)))
+            r.check("it raises the slice DISAGREEMENT instead -- the finding "
+                    "the union silently hid",
+                    SLICE_FID in dis_ids, str(sorted(dis_ids)))
+
+            # ---- MUST-NOT-FIRE -------------------------------------------
+            r.check("MUST-NOT-FIRE: slices that agree raise no disagreement",
+                    SLICE_FID not in agr_ids, str(sorted(agr_ids)))
+            r.check("MUST-NOT-FIRE: and a framework linked in BOTH slices "
+                    "with no purpose string still fires ITMS-90683 -- the fix "
+                    "is not 'stop checking'",
+                    FID in agr_ids, str(sorted(agr_ids)))
+
+            # ---- the count, which is the headline measurement ------------
+            n_blind = len(re.findall(r"CoreMotion\.framework", 
+                                     subprocess.run(
+                                         ["otool", "-L", agr.exe],
+                                         capture_output=True,
+                                         text=True).stdout))
+            n_arch = len(re.findall(r"CoreMotion\.framework",
+                                    subprocess.run(
+                                        ["otool", "-arch", "arm64", "-L",
+                                         agr.exe], capture_output=True,
+                                        text=True).stdout))
+            r.check("a COUNT over arch-blind output is 2 on a universal "
+                    "binary and 1 per slice -- the doubling, measured",
+                    n_blind == 2 and n_arch == 1,
+                    "blind=%d arch=%d" % (n_blind, n_arch))
+
+            # ---- the gate says which slice and which build shape ---------
+            prov = dis.provenance_line()
+            r.check("the gate's own output names the architecture AND the "
+                    "build type the verdict came from",
+                    "arm64" in prov and "simulator" in prov, prov)
+        finally:
+            for a in (dis, agr):
+                a.cleanup()
+
+
+def test_arch_discipline_exit_status(r):
+    """BUG 1, asserted on the EXIT STATUS of the real command.
+
+    104 assertions stayed green here once while the tool exited 0 on a real
+    defect, so the in-process checks above are not the proof. These run
+    bin/shipcheck in a subprocess and look at nothing but `$?`.
+    """
+    print("\nBUG 1 -- bin/shipcheck EXIT STATUS on a per-slice disagreement")
+    if not HAVE_MACHO_TOOLS or not HAVE_CLANG or not shutil.which("lipo"):
+        r.skip("exit status on a fat fixture", "needs clang/lipo/otool")
+        return
+    disagree = fat_macho({"x86_64": ("CoreMotion",), "arm64": ()},
+                         sdk="26.0", salt="dis")
+    agree_clean = fat_macho({"x86_64": (), "arm64": ()},
+                            sdk="26.0", salt="cln")
+    if disagree is None or agree_clean is None:
+        r.skip("exit status on a fat fixture", "clang/lipo unavailable")
+        return
+    wt = os.path.dirname(HERE)
+    with tempfile.TemporaryDirectory() as tmp:
+        home = os.path.join(tmp, "home")
+        os.makedirs(home)
+        repo = os.path.join(tmp, "repo-slice")
+        prod = os.path.join(repo, "ios", "build", "dd", "Build", "Products",
+                            "Release-iphonesimulator")
+        os.makedirs(prod)
+        with Quiet():
+            make_app(prod, "SliceDis", {}, exe_bytes=disagree)
+        res = _cli(wt, ["gate", "sweep", repo, "--json"], home)
+        ids = set()
+        try:
+            for e in json.loads(res.stdout):
+                ids |= {f["id"] for f in e["findings"]}
+        except ValueError:
+            pass
+        r.check("gate sweep --json EXITS 1 on a per-slice linkage "
+                "disagreement", res.returncode == 1,
+                "rc=%d ids=%s" % (res.returncode, sorted(ids)))
+        r.check("and the reason in the JSON is the slice disagreement, not a "
+                "false purpose-string finding",
+                "BIN-FRAMEWORK-LINKAGE-SLICE-DISAGREEMENT" in ids
+                and "BIN-FRAMEWORK-PURPOSE-STRING-CoreMotion" not in ids,
+                str(sorted(ids)))
+
+        # MUST-NOT-FIRE: without this, "always exit 1" passes the above.
+        clean = os.path.join(tmp, "repo-clean")
+        cprod = os.path.join(clean, "ios", "build", "dd", "Build", "Products",
+                             "Release-iphonesimulator")
+        os.makedirs(cprod)
+        # The icon and privacy manifest are supplied because this fixture has
+        # to be clean for reasons OTHER than the slice rule -- otherwise "exit
+        # 0" could never be reached and the must-not-fire half would be
+        # untestable. Export compliance is deliberately left out, so the
+        # fixture still carries a MEDIUM finding: exit 0 here is "nothing
+        # blocking", not "nothing found at all".
+        with Quiet():
+            ok_app = make_app(cprod, "SliceOk", {}, exe_bytes=agree_clean)
+        open(os.path.join(ok_app, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(ok_app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        res = _cli(wt, ["gate", "sweep", clean, "--json"], home)
+        ids2 = set()
+        try:
+            for e in json.loads(res.stdout):
+                ids2 |= {f["id"] for f in e["findings"]}
+        except ValueError:
+            pass
+        r.check("gate sweep EXITS 0 on a fat binary whose slices agree and "
+                "link nothing watched, so the rule is not 'always fail'",
+                res.returncode == 0,
+                "rc=%d ids=%s" % (res.returncode, sorted(ids2)))
+
+
+def test_receipt_arch_binding(r):
+    """BUG 2: the build identifier is per-slice, and the binding was scalar.
+
+    `dwarfdump --uuid` prints one line per slice: two on a universal simulator
+    build, one on a thin device archive. The first binding reduced that to one
+    scalar and compared scalar against scalar, so "the UUID" meant a different
+    architecture depending on the shape of the artifact in front of it, and
+    nothing in the receipt said which.
+
+    The condition the broken form gets wrong, built with the real `lipo`:
+
+        F  = fat      (x86_64 = Ux, arm64 = Ua)
+        Tx = lipo -thin x86_64 F      -- its ONLY slice is Ux, byte for byte
+        Ta = lipo -thin arm64  F      -- its ONLY slice is Ua
+
+    A receipt earned on Tx records Ux. Pointed at F:
+      OLD  picks F's arm64 Ua, sees Ua != Ux, falls through to `sibling` and
+           reports it as "the simulator-build/device-build case" -- which is
+           false. Tx's slice is physically inside F; they are ONE build.
+      NEW  compares set against set, finds the shared x86_64 slice, and
+           answers `exact`, naming the architecture.
+
+    Both legitimate cases from receipt-binding-2026-10-15.md must survive:
+    a genuine sibling (different build, plist keys agree) stays accepted, and
+    a genuinely foreign binary (plist keys disagree) stays refused.
+    """
+    print("\nBUG 2 -- LC_UUID is per-slice (receipt binding)")
+    if not HAVE_MACHO_TOOLS or not HAVE_CLANG or not shutil.which("lipo"):
+        r.skip("receipt arch binding needs real Mach-O slices",
+               "otool/clang/lipo unavailable; mocking dwarfdump tests the mock")
+        return
+    fat = fat_macho({"x86_64": (), "arm64": ()}, sdk="26.0", salt="rb")
+    thin_x = thin_of(fat, "x86_64")
+    thin_a = thin_of(fat, "arm64")
+    other = fat_macho({"x86_64": (), "arm64": ()}, sdk="26.0", salt="rb2")
+    if not all((fat, thin_x, thin_a, other)):
+        r.skip("receipt arch binding needs real Mach-O slices",
+               "clang/lipo could not build the fixtures")
+        return
+
+    # All five bundles carry the SAME bundle id, version and build on purpose:
+    # that is the condition under which a receipt can be confused at all, and
+    # it is the condition the Nearvo 1.0.0+9 pair was actually in. Each lives
+    # in its own directory so they cannot overwrite one another -- the first
+    # version of this test put three of them at one path and silently tested
+    # the last one three times.
+    PL = dict(list(SCENE_ADOPTED.items())
+              + [("CFBundleIdentifier", "com.example.rb")])
+    # The foreign bundle differs on a FINGERPRINT key -- the scene manifest --
+    # because that is what makes the two bundles genuinely different subjects.
+    # An earlier draft changed NSMotionUsageDescription, which is not in
+    # FINGERPRINT_KEYS, so the "foreign" fixture had the same fingerprint and
+    # the assertion was testing nothing. The suite caught it by failing.
+    PL_OTHER_KEYS = dict(list(PL.items())
+                         + [("UIApplicationSceneManifest",
+                             {"UIApplicationSupportsMultipleScenes": False,
+                              "UISceneConfigurations": {}})])
+
+    def sub(tmp, tag):
+        d = os.path.join(tmp, tag)
+        os.makedirs(d, exist_ok=True)
+        return d
+
+    with tempfile.TemporaryDirectory() as tmp:
+        with Quiet():
+            F = shipgate.Artifact(make_app(sub(tmp, "fat"), "Rb", PL,
+                                           exe_bytes=fat))
+            TX = shipgate.Artifact(make_app(sub(tmp, "thinx"), "Rb", PL,
+                                            exe_bytes=thin_x))
+            TA = shipgate.Artifact(make_app(sub(tmp, "thina"), "Rb", PL,
+                                            exe_bytes=thin_a))
+            # A genuine sibling: a DIFFERENT build, same gate-relevant plist
+            # keys, no slice in common. This is the real simulator->device
+            # case and it MUST stay accepted.
+            SIB = shipgate.Artifact(make_app(sub(tmp, "sib"), "Rb", PL,
+                                             exe_bytes=other))
+            # A genuinely foreign binary: the plist keys disagree.
+            FOREIGN = shipgate.Artifact(make_app(sub(tmp, "foreign"), "Rb",
+                                                 PL_OTHER_KEYS,
+                                                 exe_bytes=other))
+        try:
+            # ---- the fixture relationship is real, not asserted -----------
+            fu, xu, au = F.uuids(), TX.uuids(), TA.uuids()
+            r.check("fixture: the fat binary has TWO LC_UUIDs, one per slice",
+                    len(fu) == 2, str(fu))
+            r.check("fixture: each thin copy has ONE, and it IS the fat "
+                    "binary's slice of that architecture",
+                    list(xu) == ["x86_64"] and list(au) == ["arm64"]
+                    and xu["x86_64"] == fu["x86_64"]
+                    and au["arm64"] == fu["arm64"],
+                    "%s / %s / %s" % (fu, xu, au))
+            r.check("fixture: the gate architecture differs between them -- "
+                    "arm64 on the fat binary, x86_64 on the thin one",
+                    F.gate_arch() == "arm64" and TX.gate_arch() == "x86_64",
+                    "%s / %s" % (F.gate_arch(), TX.gate_arch()))
+
+            base = dict(bundle_id=F.bundle_id, version=F.version,
+                        build=F.build, fingerprint=F.fingerprint())
+
+            # ---- OLD scheme, run rather than described --------------------
+            def old_match(artifact, receipt):
+                """The pre-2026-10-15 comparison, verbatim in behaviour:
+                one scalar identity per side, arm64-preferring, no arch
+                recorded or compared."""
+                u = artifact.uuids()
+                ident = None
+                for a in ("arm64", "arm64e", "x86_64"):
+                    if a in u:
+                        ident = u[a]
+                        break
+                if ident is None:
+                    ident = sorted(u.values())[0]
+                if receipt.get("binary_uuid") == ident:
+                    return "exact"
+                if receipt.get("fingerprint") == artifact.fingerprint():
+                    return "sibling"
+                return "expired"
+
+            # A receipt genuinely earned on the x86_64 slice.
+            rx = dict(base, binary_uuid=xu["x86_64"])
+            r.check("OLD: a receipt earned on the x86_64 slice, checked "
+                    "against the universal binary that CONTAINS that slice, "
+                    "is called `sibling` -- 'a different binary of the same "
+                    "build'. It is the same build and the same slice.",
+                    old_match(F, rx) == "sibling", old_match(F, rx))
+            state, why = shipgate.match_receipt(F, rx)
+            r.check("NEW: the same receipt is `exact`, and says which slice "
+                    "the two share", state == "exact" and "x86_64" in why,
+                    "%s -- %s" % (state, why))
+
+            # Reverse direction: earned on the universal binary's arm64 slice,
+            # pointed at the thin x86_64 copy, which does NOT contain it.
+            ra = dict(base, binary_uuid=au["arm64"], binary_arch="arm64")
+            r.check("OLD: a receipt earned on the arm64 slice, pointed at a "
+                    "binary with NO arm64 slice at all, is also `sibling` -- "
+                    "the same word for the opposite situation",
+                    old_match(TX, ra) == "sibling", old_match(TX, ra))
+            state, why = shipgate.match_receipt(TX, ra)
+            r.check("NEW: that case is still accepted as `sibling` (it is a "
+                    "legitimate pairing) but the message now NAMES both slice "
+                    "sets, so the two situations are distinguishable",
+                    state == "sibling" and "arm64" in why and "x86_64" in why,
+                    "%s -- %s" % (state, why))
+
+            # ---- MUST-KEEP-WORKING: the two cases already proven ---------
+            rfat = dict(base, binary_uuid=fu["arm64"], binary_arch="arm64",
+                        binary_uuids=fu)
+            state, why = shipgate.match_receipt(F, rfat)
+            r.check("MUST-KEEP: a receipt earned on this exact binary is "
+                    "still `exact`", state == "exact", "%s -- %s" % (state, why))
+
+            rsib = dict(bundle_id=SIB.bundle_id, version=SIB.version,
+                        build=SIB.build, fingerprint=SIB.fingerprint(),
+                        binary_uuids=SIB.uuids(), binary_arch="arm64",
+                        binary_uuid=SIB.uuids()["arm64"])
+            state, why = shipgate.match_receipt(F, rsib)
+            r.check("MUST-KEEP: the legitimate simulator->device sibling "
+                    "(different build, no shared slice, plist keys agree) is "
+                    "still ACCEPTED as `sibling`",
+                    state == "sibling", "%s -- %s" % (state, why))
+
+            rforeign = dict(bundle_id=FOREIGN.bundle_id,
+                            version=FOREIGN.version, build=FOREIGN.build,
+                            fingerprint=FOREIGN.fingerprint(),
+                            binary_uuids=FOREIGN.uuids(),
+                            binary_uuid=FOREIGN.uuids()["arm64"])
+            state, why = shipgate.match_receipt(F, rforeign)
+            r.check("MUST-KEEP: a genuinely foreign binary (plist keys "
+                    "DISAGREE) is still REFUSED as `expired`",
+                    state == "expired", "%s -- %s" % (state, why))
+
+            rbump = dict(base, binary_uuids=fu, build="999999")
+            state, _why = shipgate.match_receipt(F, rbump)
+            r.check("MUST-KEEP: a receipt renamed to another build number is "
+                    "still refused", state == "expired", state)
+
+            # ---- the receipt now records the architecture -----------------
+            facts = F.facts()
+            r.check("a receipt written from here records the WHOLE per-arch "
+                    "UUID map and the arch its scalar came from",
+                    facts["binary_uuids"] == fu
+                    and facts["binary_arch"] == "arm64"
+                    and facts["binary_uuid"] == fu["arm64"],
+                    str({k: facts.get(k) for k in
+                         ("binary_uuid", "binary_arch", "binary_uuids")}))
+            r.check("and a pre-2026-10-15 receipt is read as arch-UNKNOWN, "
+                    "not relabelled arm64",
+                    shipgate.receipt_uuid_map(
+                        dict(binary_uuid=au["arm64"])) == {"?": au["arm64"]},
+                    str(shipgate.receipt_uuid_map(
+                        dict(binary_uuid=au["arm64"]))))
+        finally:
+            for a in (F, TX, TA, SIB, FOREIGN):
+                a.cleanup()
+
+
+def test_plutil_array_extract(r):
+    """BUG 3: `plutil -extract <array-key> raw` prints the element COUNT.
+
+    Measured on this toolchain, not recalled. A gate written that way is
+    comparing a plist value against "1" and will match nothing, forever,
+    silently -- and `plutil` exits 0 while doing it, so an exit-status check
+    does not save you.
+
+    Two halves:
+      1. the behaviour itself, on a real bundle, both directions;
+      2. a guard: no script in this repo may read a known collection-valued
+         key with the bare `raw` form. Mutation-tested below -- the guard is
+         run against a planted copy of the broken line and must go red.
+    """
+    print("\nBUG 3 -- plutil -extract on an array key returns a count")
+    if not shutil.which("plutil"):
+        r.skip("plutil behaviour", "plutil not on PATH")
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        with Quiet():
+            app = make_app(tmp, "PlArr", {
+                "CFBundleSupportedPlatforms": ["iPhoneSimulator"],
+                "NSPrivacyTrackingDomains": ["a.example", "b.example"],
+            })
+        plist = os.path.join(app, "Info.plist")
+
+        def px(keypath, fmt="raw"):
+            p = subprocess.run(
+                ["plutil", "-extract", keypath, fmt, "-o", "-", plist],
+                capture_output=True, text=True)
+            return p.returncode, p.stdout.strip()
+
+        rc_raw, out_raw = px("CFBundleSupportedPlatforms")
+        rc_idx, out_idx = px("CFBundleSupportedPlatforms.0")
+        rc_xml, out_xml = px("CFBundleSupportedPlatforms", "xml1")
+        r.check("OLD form: `-extract CFBundleSupportedPlatforms raw` prints "
+                "the COUNT (1), not iPhoneSimulator -- and EXITS 0",
+                out_raw == "1" and rc_raw == 0,
+                "rc=%d out=%r" % (rc_raw, out_raw))
+        rc2_raw, out2_raw = px("NSPrivacyTrackingDomains")
+        r.check("and on a 2-element array it prints 2, so the bug is the "
+                "count and not the literal string '1'",
+                out2_raw == "2", "out=%r" % out2_raw)
+        r.check("NEW form A: an explicit index gives the value",
+                out_idx == "iPhoneSimulator" and rc_idx == 0,
+                "rc=%d out=%r" % (rc_idx, out_idx))
+        r.check("NEW form B: xml1 gives the value",
+                "iPhoneSimulator" in out_xml and rc_xml == 0,
+                "rc=%d out=%r" % (rc_xml, out_xml))
+
+        # The gate reads plists with plistlib, which returns the real value.
+        # If it had used the broken form, build_type() would have compared
+        # "1" and fallen through to "unknown".
+        with Quiet():
+            art = shipgate.Artifact(app)
+        try:
+            kind, _plat, how = art.build_type()
+            r.check("the gate reads CFBundleSupportedPlatforms as a VALUE: it "
+                    "says 'simulator', which the count form could never reach",
+                    kind == "simulator" and "iPhoneSimulator" in how,
+                    "%s / %s" % (kind, how))
+        finally:
+            art.cleanup()
+
+    # ---- the guard, and its mutation test ----------------------------------
+    wt = os.path.dirname(HERE)
+    hits = shipgate.scan_for_count_bug(wt)
+    r.check("no script in this repo reads a collection-valued plist key with "
+            "the bare `-extract ... raw` form",
+            hits == [], str(hits))
+    with tempfile.TemporaryDirectory() as tmp:
+        planted = os.path.join(tmp, "scripts")
+        os.makedirs(planted)
+        # Assembled from pieces so this suite's own source does not contain
+        # the literal the guard greps for -- otherwise the guard's real
+        # assertion above would hit its own test fixture.
+        BROKEN = ("plutil -extract " + "CFBundleSupportedPlatforms"
+                  + " " + "raw" + " -o - \"$1\"")
+        with open(os.path.join(planted, "bad-gate.sh"), "w",
+                  encoding="utf-8") as f:
+            f.write("#!/bin/bash\nP=$(%s)\n" % BROKEN
+                    + '[ "$P" = "iPhoneOS" ] || exit 1\n')
+        planted_hits = shipgate.scan_for_count_bug(tmp)
+        r.check("MUTATION TEST: the guard goes RED on a planted copy of the "
+                "broken line", len(planted_hits) == 1, str(planted_hits))
+        FIXED = ("plutil -extract " + "CFBundleSupportedPlatforms.0"
+                 + " " + "raw" + " -o - \"$1\"")
+        with open(os.path.join(planted, "bad-gate.sh"), "w",
+                  encoding="utf-8") as f:
+            f.write("#!/bin/bash\nP=$(%s)\n" % FIXED)
+        r.check("MUST-NOT-FIRE: the guard is silent on the indexed form, so "
+                "it is not 'flag every plutil call'",
+                shipgate.scan_for_count_bug(tmp) == [],
+                str(shipgate.scan_for_count_bug(tmp)))
 
 def test_sweep_coverage(r):
     """gate sweep: an app with NO built artifact is a BLOCKING finding.
@@ -1637,6 +2478,136 @@ def test_exit_status_mapping(r):
         del bad_app
 
 
+def test_gate_app_entrypoint(r):
+    """`gate app <repo>`: one command per app, and its exit status.
+
+    Every assertion here runs bin/shipcheck AS A SUBPROCESS and asserts on the
+    return code. That is not a style preference. The bug this suite's
+    test_exit_status_mapping was written for -- the sweep that printed six real
+    ITMS-90683 findings and returned 0 -- was invisible to 104 assertions
+    because every one of them called the function in process. A new entry point
+    inherits the same risk, so it gets the same proof.
+
+    Three states, three distinct codes, because collapsing any two of them is
+    how "not checked" gets read as "clean":
+
+        0  evaluated and fit
+        1  evaluated and blocked
+        2  NOT CHECKED -- nothing built, so no binary rule ran at all
+    """
+    print("\ngate app: one command per app, and the three exit codes")
+    wt = os.path.dirname(HERE)
+    tmp = tempfile.mkdtemp(prefix="gate-app-")
+    home = tempfile.mkdtemp(prefix="gate-app-home-")
+    try:
+        # ---- exit 2: a real repo with nothing built -------------------------
+        empty = os.path.join(tmp, "nothing-built")
+        os.makedirs(empty)
+        git_init(empty, {"app.json": "{}"})
+        res = _cli(wt, ["gate", "app", empty], home)
+        r.check("gate app EXITS 2 on a repo with no artifact -- not 0, and "
+                "not 1: 'I could not look' is its own answer",
+                res.returncode == 2, "rc=%d\n%s"
+                % (res.returncode, res.stdout[-400:]))
+        r.check("and says UNEVALUATED in as many words, so a reader cannot "
+                "mistake it for a pass",
+                "UNEVALUATED" in res.stdout and "not clean" in res.stdout,
+                res.stdout[-200:])
+        res = _cli(wt, ["gate", "app", empty, "--json"], home)
+        r.check("--json agrees with the text path on the exit code",
+                res.returncode == 2, "rc=%d" % res.returncode)
+        r.check("and no build was run for us -- the repo is still empty",
+                not os.path.isdir(os.path.join(empty, "ios", "build")),
+                "a gate that silently builds changes its own subject")
+
+        # ---- exit 1: a binary with a blocking finding ----------------------
+        bad = os.path.join(tmp, "defective")
+        prod = os.path.join(bad, "ios", "build", "dd", "Build", "Products",
+                            "Release-iphonesimulator")
+        os.makedirs(prod)
+        git_init(bad, {"app.json": "{}"})
+        with Quiet():
+            # Links CoreMotion with NO NSMotionUsageDescription: ITMS-90683,
+            # the only rejection Apple has ever put in writing here, and
+            # `high` -- the exact severity that used to exit 0.
+            bad_app = make_app(prod, "AppDefective",
+                               {"ITSAppUsesNonExemptEncryption": False},
+                               sdk="26.0", salt="am", frameworks=("CoreMotion",))
+        open(os.path.join(bad_app, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(bad_app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        _full_receipts(bad_app, bad)
+        res = _cli(wt, ["gate", "app", bad, "--json"], home)
+        got = json.loads(res.stdout)
+        sevs = sorted({f["severity"]
+                       for a in got["artifacts"]
+                       for f in a["result"]["findings"]})
+        r.check("the defective fixture's findings are high-only, so exit 1 "
+                "cannot be earned by a critical instead",
+                "critical" not in sevs and "high" in sevs, str(sevs))
+        r.check("gate app EXITS 1 on it", res.returncode == 1,
+                "rc=%d sevs=%s" % (res.returncode, sevs))
+
+        # ---- exit 0: must-not-fire ----------------------------------------
+        good = os.path.join(tmp, "fit")
+        gprod = os.path.join(good, "ios", "build", "dd", "Build", "Products",
+                             "Release-iphonesimulator")
+        os.makedirs(gprod)
+        git_init(good, {"app.json": "{}"})
+        with Quiet():
+            good_app = make_app(
+                gprod, "AppFit",
+                {"ITSAppUsesNonExemptEncryption": False,
+                 "NSMotionUsageDescription": "Fixture does not use motion."},
+                sdk="26.0", salt="am", frameworks=("CoreMotion",))
+        open(os.path.join(good_app, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(good_app, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        _full_receipts(good_app, good)
+        res = _cli(wt, ["gate", "app", good], home)
+        r.check("gate app EXITS 0 on a fit binary with its receipts in order "
+                "(must-not-fire: proves the fix is not 'always fail')",
+                res.returncode == 0, "rc=%d\n%s"
+                % (res.returncode, res.stdout[-500:]))
+
+        # ---- two binaries of the same app, same version+build -------------
+        # Law 2: a version and build number do not identify a binary. Two have
+        # carried the same stamp on this machine, twice in one day, and a proof
+        # earned on one was accepted for the other. `gate app` must evaluate
+        # BOTH and must not pick.
+        second = os.path.join(good, "ios", "build", "dd2", "Build", "Products",
+                              "Release-iphonesimulator")
+        os.makedirs(second)
+        with Quiet():
+            twin = make_app(second, "AppFit",
+                            {"ITSAppUsesNonExemptEncryption": False},
+                            sdk="26.0", salt="twin", frameworks=("CoreMotion",))
+        open(os.path.join(twin, "AppIcon60x60@2x.png"), "wb").close()
+        with open(os.path.join(twin, "PrivacyInfo.xcprivacy"), "wb") as f:
+            plistlib.dump({"NSPrivacyTracking": False,
+                           "NSPrivacyTrackingDomains": []}, f)
+        res = _cli(wt, ["gate", "app", good, "--json"], home)
+        got = json.loads(res.stdout)
+        vb = sorted({"%s+%s" % (a["result"]["facts"]["version"],
+                                a["result"]["facts"]["build"])
+                     for a in got["artifacts"]})
+        uuids = sorted({a["result"]["facts"]["binary_uuid"]
+                        for a in got["artifacts"]})
+        r.check("both binaries are evaluated, not one of them chosen",
+                len(got["artifacts"]) == 2, str(len(got["artifacts"])))
+        r.check("they carry ONE version+build between them and TWO uuids -- "
+                "which is the whole argument for binding to the uuid",
+                len(vb) == 1 and len(uuids) == 2, "%s / %s" % (vb, uuids))
+        r.check("and the defective twin drags the exit status to 1, so a fit "
+                "sibling cannot vouch for it",
+                res.returncode == 1, "rc=%d" % res.returncode)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(home, ignore_errors=True)
+
+
 def test_real_binaries(r, enabled):
     print("\nReal binaries on this machine (the Mach-O half cannot be "
           "synthesised honestly)")
@@ -1690,6 +2661,12 @@ def main():
     # ~/.config/shipcheck/receipts for a fixture app called "Round".
     sandbox = tempfile.mkdtemp(prefix="shipgate-selftest-receipts-")
     shipgate.HOME_RECEIPTS = sandbox
+    # ...and a SHIPCHECK_RECEIPTS inherited from the caller's shell would
+    # redirect every receipt in the suite, quietly changing what most of these
+    # assertions are measuring. The override is tested explicitly below; it is
+    # not allowed to arrive by accident.
+    os.environ.pop(shipgate.RECEIPTS_ENV, None)
+    shipgate.set_receipts_override(None)
     r = Results()
     test_scene_rules(r)
     test_scene_sdk_gate(r)
@@ -1698,6 +2675,7 @@ def main():
     test_provenance(r)
     test_receipt_binding(r)
     test_receipt_roundtrip_and_expiry(r)
+    test_receipt_dir_override(r)
     test_attestations(r)
     test_build_number_reuse(r)
     test_frame_measurement(r)
@@ -1706,8 +2684,14 @@ def main():
     test_privacy_tracking_consistency(r)
     test_privacy_rules_reach_the_bundle(r)
     test_purpose_strings(r)
+    # The three measurement bugs of 2026-10-15.
+    test_arch_discipline_linkage(r)
+    test_arch_discipline_exit_status(r)
+    test_receipt_arch_binding(r)
+    test_plutil_array_extract(r)
     test_sweep_coverage(r)
     test_exit_status_mapping(r)
+    test_gate_app_entrypoint(r)
     test_real_binaries(r, args.artifacts)
 
     shutil.rmtree(sandbox, ignore_errors=True)

@@ -1,5 +1,69 @@
 # Changelog
 
+## Unreleased: `gate app <repo>` — one command per app (2026-10-15)
+
+`gate check` answers "is THIS artifact fit to submit?" and needs the `.app`
+path, which means the caller has to find it first. A caller who guesses wrong
+gets a confident verdict on the wrong binary, and that is not hypothetical:
+running the published per-app command at the root of the `rigsheet` monorepo
+made `expo prebuild` treat the root as an Expo app and would have produced a
+binary called `rigsheet.app` **that is not Rigsheet**. A verdict would have
+been published for an app that does not exist.
+
+`gate app <repo>` takes the repo, finds every artifact under it, and renders
+`check` for each. It adds **no new rule** — the rules stay in `shipgate.py`
+and the exit status comes from `shipgate.blocking_findings`, the single
+definition added below. A fifth inline `severity == "critical"` comparison in
+a new entry point would have reintroduced the exact bug that fix exists for.
+
+Three states, three exit codes, because collapsing any two of them is how
+"not checked" gets read as "clean":
+
+| | |
+|---|---|
+| `0` | evaluated and fit |
+| `1` | evaluated and blocked |
+| **`2`** | **NOT CHECKED — nothing is built, so no binary rule ran at all** |
+
+It does not build for you. A gate that silently builds changes its own
+subject, and on 2026-10-15 a session rebuilt an app mid-task and destroyed the
+binary a finding rested on.
+
+**Two binaries, one version+build.** If a repo holds more than one artifact,
+all of them are evaluated and none is chosen, and the output is keyed on
+`LC_UUID`. Two binaries have carried the identical version and build stamp on
+this machine twice in one day, and a launch proof earned on one was accepted
+for the other. There is an assertion for exactly this: one version+build, two
+UUIDs, and the defective twin drags the exit status to 1 so a fit sibling
+cannot vouch for it.
+
+**Proven by mutation, not by inspection.** Ten new assertions in
+`scripts/selftest_gate.py::test_gate_app_entrypoint`, every one of which runs
+`bin/shipcheck` **as a subprocess** and asserts on nothing but the return code.
+Both directions were run:
+
+- revert the no-artifact branch to `return 0` → **2 assertions fail, suite
+  exits 1**.
+- revert `BLOCKING_SEVERITIES` to `("critical",)` → **7 assertions fail**, two
+  of them the new `gate app` ones, suite exits 1.
+- restore either → **131 checks, all pass, exit 0**.
+
+The must-not-fire case is there too: a fit binary with its receipts in order
+exits 0, so "always fail" would not have passed.
+
+### Note on branches, since the rules briefly lived on two
+
+`fix/gate-purpose-string-coverage-2026-10-15` and
+`fix/gate-exit-status-2026-10-15` both carry the privacy-manifest and
+purpose-string rules, after a session swept the first branch's work into the
+second's commit. They are **not** divergent: verified with
+`git merge-base --is-ancestor`, the purpose-string branch is a strict ancestor
+of the exit-status branch, which is 8 commits ahead of `master` and 0 behind.
+So `fix/gate-exit-status-2026-10-15` is the superset and the only one that
+needs landing; this work is branched from it rather than from `master`, so
+landing it brings the exit-status fix with it. Landing the purpose-string
+branch separately afterwards would be a no-op, not a revert.
+
 ## Unreleased: the gate's exit status, which read only `critical` (2026-10-15)
 
 **A sweep over two genuinely defective repos printed six `high`
