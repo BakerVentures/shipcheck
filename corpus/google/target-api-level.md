@@ -3,7 +3,7 @@ shipcheck_source_id: target-api-level
 title: "Meet Google Play's target API level requirement"
 url: https://support.google.com/googleplay/android-developer/answer/11926878
 final_url: https://support.google.com/googleplay/android-developer/answer/11926878?hl=en
-fetched_at: 2026-10-12T15:33:43+00:00
+fetched_at: 2026-10-19T13:24:37+00:00
 sha256: 75acee404deaba5da032e3887d8aaf33b60f52c9bd9c0950ccedd84f2ea1c4cf
 vendor: google
 ---

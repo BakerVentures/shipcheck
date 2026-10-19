@@ -1,4 +1,4 @@
-<!-- source=expo-apple-privacy clause=including-required-reasons-for-expo-sdk-packages-and-other-t url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-10-12T15:33:41+00:00 -->
+<!-- source=expo-apple-privacy clause=including-required-reasons-for-expo-sdk-packages-and-other-t url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-10-19T13:24:34+00:00 -->
 
 ### Including required reasons for Expo SDK packages and other third-party libraries
 

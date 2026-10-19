@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=tasks-to-prepare-for-release url=https://developer.android.com/studio/publish/preparing fetched=2026-10-12T15:33:47+00:00 -->
+<!-- source=prepare-for-release clause=tasks-to-prepare-for-release url=https://developer.android.com/studio/publish/preparing fetched=2026-10-19T13:24:40+00:00 -->
 
 ## Tasks to prepare for release
 

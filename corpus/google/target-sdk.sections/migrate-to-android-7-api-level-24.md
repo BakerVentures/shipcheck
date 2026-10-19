@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=migrate-to-android-7-api-level-24 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-10-12T15:33:49+00:00 -->
+<!-- source=target-sdk clause=migrate-to-android-7-api-level-24 url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-10-19T13:24:43+00:00 -->
 
 ### Migrate to Android 7 (API level 24)
 

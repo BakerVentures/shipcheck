@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=preparing-for-review url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-12T15:33:26+00:00 -->
+<!-- source=app-review-overview clause=preparing-for-review url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-19T13:24:19+00:00 -->
 
 ## Preparing for review
 

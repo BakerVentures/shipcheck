@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=prominent-disclosure-consent-requirement url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-10-12T15:33:43+00:00 -->
+<!-- source=user-data-policy clause=prominent-disclosure-consent-requirement url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-10-19T13:24:37+00:00 -->
 
 ## Prominent Disclosure & Consent Requirement
 

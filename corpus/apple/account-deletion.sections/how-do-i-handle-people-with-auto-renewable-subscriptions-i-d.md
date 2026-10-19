@@ -1,4 +1,4 @@
-<!-- source=account-deletion clause=how-do-i-handle-people-with-auto-renewable-subscriptions-i-d url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-12T15:33:40+00:00 -->
+<!-- source=account-deletion clause=how-do-i-handle-people-with-auto-renewable-subscriptions-i-d url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-19T13:24:34+00:00 -->
 
 ### How do I handle people with auto-renewable subscriptions? I don't want to accidentally charge someone after they've deleted their account.
 

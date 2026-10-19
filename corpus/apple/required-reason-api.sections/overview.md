@@ -1,4 +1,4 @@
-<!-- source=required-reason-api clause=overview url=https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api fetched=2026-10-12T15:33:26+00:00 -->
+<!-- source=required-reason-api clause=overview url=https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api fetched=2026-10-19T13:24:20+00:00 -->
 
 ## Overview
 

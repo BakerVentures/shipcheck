@@ -1,4 +1,4 @@
-<!-- source=tn3183 clause=add-an-accessed-api-type-reasons-key url=https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest fetched=2026-10-12T15:33:27+00:00 -->
+<!-- source=tn3183 clause=add-an-accessed-api-type-reasons-key url=https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest fetched=2026-10-19T13:24:20+00:00 -->
 
 ## Add an accessed API type reasons key
 

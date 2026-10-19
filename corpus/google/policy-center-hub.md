@@ -3,8 +3,8 @@ shipcheck_source_id: policy-center-hub
 title: "Play Console Help: Policy Center hub"
 url: https://support.google.com/googleplay/android-developer/topic/9858052
 final_url: https://support.google.com/googleplay/android-developer/topic/9858052?hl=en
-fetched_at: 2026-10-12T15:33:42+00:00
-sha256: cf980c78b16521d1fc54e23877c203e3c320273071066c4567944224e5372734
+fetched_at: 2026-10-19T13:24:35+00:00
+sha256: 7bffead4429d02ef4323e3d4173028cf0fbaedef023d958912f7add555a961ee
 vendor: google
 note: "Added in Phase 0: navigable, server-rendered index of the Developer Program Policies."
 ---
@@ -92,6 +92,7 @@ Your innovation is what drives our shared success, but with it comes responsibil
 - [Android Emoji Policy](/googleplay/android-developer/answer/11190644?hl=en&ref_topic=9876660)
 - [Android Instant Apps](/googleplay/android-developer/answer/9900182?hl=en&ref_topic=9876660)
 - [Android TV](/googleplay/android-developer/answer/15284283?hl=en&ref_topic=9876660)
+- [Android XR](/googleplay/android-developer/answer/18787425?hl=en&ref_topic=9876660)
 - [Wear OS](/googleplay/android-developer/answer/15284673?hl=en&ref_topic=9876660)
 
 ## Families

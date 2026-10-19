@@ -1,4 +1,4 @@
-<!-- source=account-deletion clause=i-manually-delete-accounts-and-this-takes-time-does-account- url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-12T15:33:40+00:00 -->
+<!-- source=account-deletion clause=i-manually-delete-accounts-and-this-takes-time-does-account- url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-19T13:24:34+00:00 -->
 
 ### I manually delete accounts and this takes time. Does account deletion need to be immediate and automatic?
 

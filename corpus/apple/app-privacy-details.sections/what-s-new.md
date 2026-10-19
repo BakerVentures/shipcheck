@@ -1,4 +1,4 @@
-<!-- source=app-privacy-details clause=what-s-new url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-10-12T15:33:27+00:00 -->
+<!-- source=app-privacy-details clause=what-s-new url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-10-19T13:24:21+00:00 -->
 
 ## What’s new
 

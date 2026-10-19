@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-12T15:33:49+00:00",
+  "generated_at": "2026-10-19T13:24:43+00:00",
   "generator": "shipcheck/fetch_corpus.py",
   "source_count": 36,
   "failure_count": 1,
@@ -21,7 +21,7 @@
       "requested_url": "https://developer.apple.com/support/offering-account-deletion-in-your-app/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:40+00:00",
+      "fetched_at": "2026-10-19T13:24:34+00:00",
       "sha256": "64f2a6b8af93cd2bf04e6fc43cdefa0655635a4f42694a9876d7b0cec96df5cf",
       "chars": 6304,
       "path": "apple/account-deletion.md",
@@ -77,7 +77,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/reference/age-ratings",
       "substituted_from": "https://developer.apple.com/help/app-store-connect/reference/age-ratings-definitions",
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:39+00:00",
+      "fetched_at": "2026-10-19T13:24:32+00:00",
       "sha256": "20d6e65811ae8ee3b1294ccfb41f89ea5b2fdcaa62ad6576a7c49953501773c9",
       "chars": 14923,
       "path": "apple/age-ratings.md",
@@ -182,7 +182,7 @@
       "requested_url": "https://developer.apple.com/app-store/app-privacy-details/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:27+00:00",
+      "fetched_at": "2026-10-19T13:24:21+00:00",
       "sha256": "439133326f78d19c8472f5c24ec97d8cde8321192f986766568707862d3c23ae",
       "chars": 20669,
       "path": "apple/app-privacy-details.md",
@@ -273,7 +273,7 @@
       "requested_url": "https://developer.apple.com/distribute/app-review/",
       "substituted_from": "https://developer.apple.com/app-store/review/",
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:26+00:00",
+      "fetched_at": "2026-10-19T13:24:19+00:00",
       "sha256": "8e79ebdc061401bae09604be116d96b2908b056e3cb75da08c0944535677314b",
       "chars": 15493,
       "path": "apple/app-review-overview.md",
@@ -504,12 +504,12 @@
       "requested_url": "https://developer.apple.com/app-store/review/guidelines/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:26+00:00",
-      "sha256": "a8323f4cb5cb9610fb0330818178853939fcdad8053e3eefffae5800293e0dce",
-      "chars": 96622,
+      "fetched_at": "2026-10-19T13:24:19+00:00",
+      "sha256": "bc217dbaacb428e283e8ea91b7d708af5eb6718670fdffd7c35250ce8f067450",
+      "chars": 97442,
       "path": "apple/asrg.md",
       "sections_dir": "apple/asrg.sections",
-      "section_count": 137,
+      "section_count": 139,
       "sections": [
         {
           "anchor": "1.1",
@@ -571,8 +571,8 @@
           "anchor": "1.2",
           "title": "User-Generated Content",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#user-generated-content",
-          "chars": 1824,
-          "sha256": "056006111a6cdc88"
+          "chars": 2132,
+          "sha256": "e611221ababcb511"
         },
         {
           "anchor": "1.2.1",
@@ -676,8 +676,8 @@
           "anchor": "2.3.1",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.3.1",
-          "chars": 1027,
-          "sha256": "80ad97b79c9a7323"
+          "chars": 887,
+          "sha256": "6db964b67336c8b4"
         },
         {
           "anchor": "2.3.2",
@@ -690,8 +690,8 @@
           "anchor": "2.3.3",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.3.3",
-          "chars": 305,
-          "sha256": "430489a1bd4a3754"
+          "chars": 428,
+          "sha256": "9d0ff44b0e2c3f6c"
         },
         {
           "anchor": "2.3.4",
@@ -711,8 +711,8 @@
           "anchor": "2.3.6",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.3.6",
-          "chars": 483,
-          "sha256": "5776b90004aa4001"
+          "chars": 486,
+          "sha256": "9260f05839ac4159"
         },
         {
           "anchor": "2.3.7",
@@ -746,8 +746,8 @@
           "anchor": "2.3.11",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.3.11",
-          "chars": 350,
-          "sha256": "79bb709a7dbe9ed8"
+          "chars": 355,
+          "sha256": "abcdcd838bdf9d53"
         },
         {
           "anchor": "2.3.12",
@@ -762,6 +762,13 @@
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.3.13",
           "chars": 698,
           "sha256": "a708efabea0e7137"
+        },
+        {
+          "anchor": "2.3.14",
+          "title": "",
+          "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.3.14",
+          "chars": 716,
+          "sha256": "e6aac56ef2bfc820"
         },
         {
           "anchor": "2.4",
@@ -802,8 +809,8 @@
           "anchor": "2.4.5",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.4.5",
-          "chars": 1768,
-          "sha256": "ba5d682c438de1cc"
+          "chars": 1775,
+          "sha256": "094ea130171b8374"
         },
         {
           "anchor": "2.5",
@@ -886,15 +893,15 @@
           "anchor": "2.5.11",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.5.11",
-          "chars": 973,
-          "sha256": "e976706dc43ead5e"
+          "chars": 976,
+          "sha256": "c4770ff0561fc79d"
         },
         {
           "anchor": "2.5.12",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.5.12",
-          "chars": 558,
-          "sha256": "95dc473f3d21ff6e"
+          "chars": 564,
+          "sha256": "7fcee904b7eefbb4"
         },
         {
           "anchor": "2.5.13",
@@ -935,8 +942,15 @@
           "anchor": "2.5.18",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.5.18",
-          "chars": 1032,
-          "sha256": "9442d66704dbe36b"
+          "chars": 1041,
+          "sha256": "8aae0f38ba2c7991"
+        },
+        {
+          "anchor": "2.5.19",
+          "title": "",
+          "deep_link": "https://developer.apple.com/app-store/review/guidelines/#2.5.19",
+          "chars": 362,
+          "sha256": "83403b720dedeb7a"
         },
         {
           "anchor": "3.1",
@@ -956,8 +970,8 @@
           "anchor": "3.1.1a",
           "title": "(a) Link to Other Purchase Methods",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#link-to-other-purchase-methods",
-          "chars": 2707,
-          "sha256": "caf32c8dce75652d"
+          "chars": 1690,
+          "sha256": "4cb79fd0cc1199f8"
         },
         {
           "anchor": "3.1.2",
@@ -970,8 +984,8 @@
           "anchor": "3.1.2a",
           "title": "Permissible uses",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#permissible-uses",
-          "chars": 3206,
-          "sha256": "f1d8390ae2d42b44"
+          "chars": 3217,
+          "sha256": "f115a00ad8c64d92"
         },
         {
           "anchor": "3.1.2b",
@@ -1034,7 +1048,7 @@
           "title": "(f) Free Stand-alone Apps",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#free-stand-alone-apps",
           "chars": 296,
-          "sha256": "9ff76009940b790f"
+          "sha256": "1cefcb0910790454"
         },
         {
           "anchor": "3.1.3g",
@@ -1047,15 +1061,15 @@
           "anchor": "3.1.4",
           "title": "Hardware-Specific Content",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#hardware-specific-content",
-          "chars": 649,
-          "sha256": "9f87ce94914f4d94"
+          "chars": 652,
+          "sha256": "d1396c953442b78a"
         },
         {
           "anchor": "3.1.5",
           "title": "Cryptocurrencies",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#cryptocurrencies",
-          "chars": 1081,
-          "sha256": "5d03dbdb6b592929"
+          "chars": 1084,
+          "sha256": "9d22018bc5f6b347"
         },
         {
           "anchor": "3.2",
@@ -1068,15 +1082,15 @@
           "anchor": "3.2.1",
           "title": "Acceptable",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#acceptable",
-          "chars": 2299,
-          "sha256": "ef37ce248657e730"
+          "chars": 2305,
+          "sha256": "bdbb2e9514f705e5"
         },
         {
           "anchor": "3.2.2",
           "title": "Unacceptable",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#unacceptable",
-          "chars": 1890,
-          "sha256": "b8fc22241f767ba3"
+          "chars": 1901,
+          "sha256": "4c09eace30148dba"
         },
         {
           "anchor": "4.1",
@@ -1159,8 +1173,8 @@
           "anchor": "4.4.1",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#4.4.1",
-          "chars": 620,
-          "sha256": "719248cfe8bdcd93"
+          "chars": 626,
+          "sha256": "0d4b09b665352215"
         },
         {
           "anchor": "4.4.2",
@@ -1187,15 +1201,15 @@
           "anchor": "4.5.1",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#4.5.1",
-          "chars": 266,
-          "sha256": "75c202d4d94736fb"
+          "chars": 269,
+          "sha256": "499401d622f2c6b5"
         },
         {
           "anchor": "4.5.2",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#4.5.2",
-          "chars": 2023,
-          "sha256": "3e0bb4a1e3b46d74"
+          "chars": 2029,
+          "sha256": "f3fd3533b06d70c2"
         },
         {
           "anchor": "4.5.3",
@@ -1306,22 +1320,22 @@
           "anchor": "5.1.1",
           "title": "Data Collection and Storage",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#data-collection-and-storage",
-          "chars": 3955,
-          "sha256": "0c2f4db97aa32b73"
+          "chars": 4065,
+          "sha256": "5bca8f1d4b8109ba"
         },
         {
           "anchor": "5.1.1v",
           "title": "(v) Account Sign-In",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#5.1.1v",
-          "chars": 1127,
-          "sha256": "9b260a2f651ff4f0"
+          "chars": 1130,
+          "sha256": "3b8f95831adc34e3"
         },
         {
           "anchor": "5.1.2",
           "title": "Data Use and Sharing",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#data-use-and-sharing",
-          "chars": 3153,
-          "sha256": "aa90c6926df9beda"
+          "chars": 3167,
+          "sha256": "16005bee9a466764"
         },
         {
           "anchor": "5.1.3",
@@ -1334,8 +1348,8 @@
           "anchor": "5.1.4",
           "title": "Kids",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#kids",
-          "chars": 1805,
-          "sha256": "e53545e5cbe3efd5"
+          "chars": 1808,
+          "sha256": "33bf61234e11d62d"
         },
         {
           "anchor": "5.1.5",
@@ -1369,22 +1383,22 @@
           "anchor": "5.2.3",
           "title": "Audio/Video Downloading",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#5.2.3",
-          "chars": 440,
-          "sha256": "503f6738e01098a2"
+          "chars": 443,
+          "sha256": "41dadaf515392d83"
         },
         {
           "anchor": "5.2.4",
           "title": "Apple Endorsements",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#5.2.4",
-          "chars": 299,
-          "sha256": "2c3e13de96d3415d"
+          "chars": 300,
+          "sha256": "a1b6d2e8251805ef"
         },
         {
           "anchor": "5.2.5",
           "title": "Apple Products",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#5.2.5",
-          "chars": 1126,
-          "sha256": "edeba4cf05352c75"
+          "chars": 1132,
+          "sha256": "b1b1adeec5cdc3e5"
         },
         {
           "anchor": "5.3",
@@ -1418,8 +1432,8 @@
           "anchor": "5.3.4",
           "title": "",
           "deep_link": "https://developer.apple.com/app-store/review/guidelines/#5.3.4",
-          "chars": 420,
-          "sha256": "31787136b8cc44d5"
+          "chars": 423,
+          "sha256": "2b8ac71cc15e773e"
         },
         {
           "anchor": "5.4",
@@ -1484,7 +1498,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/describing-data-use-in-privacy-manifests",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-10-12T15:33:27+00:00",
+      "fetched_at": "2026-10-19T13:24:20+00:00",
       "sha256": "0d100d5ed30f2c3343f01d47445e477dc2b9258a1795d2328e816ffb5f53ef4b",
       "chars": 4423,
       "path": "apple/describing-data-use.md",
@@ -1533,7 +1547,7 @@
       "requested_url": "https://docs.expo.dev/guides/apple-privacy/",
       "substituted_from": null,
       "strategy": "generic",
-      "fetched_at": "2026-10-12T15:33:41+00:00",
+      "fetched_at": "2026-10-19T13:24:34+00:00",
       "sha256": "db5c6a3746817e2ecacb34d4247a3ef28832913cf9de69f08144d22da75377aa",
       "chars": 4309,
       "path": "apple/expo-apple-privacy.md",
@@ -1582,7 +1596,7 @@
       "requested_url": "https://docs.expo.dev/submit/ios/",
       "substituted_from": null,
       "strategy": "generic",
-      "fetched_at": "2026-10-12T15:33:41+00:00",
+      "fetched_at": "2026-10-19T13:24:34+00:00",
       "sha256": "ebcfda89e9b6f4de354f282a09d94593b3a94accbbf5a26a2ba84fa1c25d8d1a",
       "chars": 6286,
       "path": "apple/expo-submit-ios.md",
@@ -1659,7 +1673,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:40+00:00",
+      "fetched_at": "2026-10-19T13:24:33+00:00",
       "sha256": "73fae2f638150e31f0d3d70b892355914155e30a6c9409f7333b5f6fba7b65ef",
       "chars": 3257,
       "path": "apple/export-compliance.md",
@@ -1687,7 +1701,7 @@
       "requested_url": "https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-10-12T15:33:38+00:00",
+      "fetched_at": "2026-10-19T13:24:31+00:00",
       "sha256": "ad0ade9cc5dc33202f5c7b4e6ac61f1b3e44ba185f5872bfc4a6796f88addbde",
       "chars": 21020,
       "path": "apple/hig-sign-in-with-apple.md",
@@ -1764,7 +1778,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/privacy-manifest-files",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-10-12T15:33:26+00:00",
+      "fetched_at": "2026-10-19T13:24:20+00:00",
       "sha256": "3f2f6900668f9465623b9838614d8db3d43d453514951642cfb36c512d0905fa",
       "chars": 5735,
       "path": "apple/privacy-manifest-files.md",
@@ -1813,7 +1827,7 @@
       "requested_url": "https://developer.apple.com/app-store/product-page/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:38+00:00",
+      "fetched_at": "2026-10-19T13:24:31+00:00",
       "sha256": "d3c7b246624fd2d216b17ee9611eabfc055a8fc05ec25d406baff6f62deccf37",
       "chars": 12193,
       "path": "apple/product-page.md",
@@ -1946,7 +1960,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api",
       "substituted_from": "https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api",
       "strategy": "apple_docc",
-      "fetched_at": "2026-10-12T15:33:26+00:00",
+      "fetched_at": "2026-10-19T13:24:20+00:00",
       "sha256": "cde18246923f3ea0fd62f73f4cd3451d7be75e12c2e11cb27e69c1bb0e37e2bb",
       "chars": 4786,
       "path": "apple/required-reason-api.md",
@@ -1981,7 +1995,7 @@
       "requested_url": "https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-10-12T15:33:27+00:00",
+      "fetched_at": "2026-10-19T13:24:20+00:00",
       "sha256": "42fb691d1c118f98ad593779a52ff01ea918bc80ab5fb9361998f2d1deb6bfd5",
       "chars": 8122,
       "path": "apple/required-reason-codes.md",
@@ -2023,9 +2037,9 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications",
       "substituted_from": "https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications",
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:38+00:00",
-      "sha256": "19da243781af97d82dc1010dd7be45fe11bdebda35a60c4b80eb3e9064e18f1d",
-      "chars": 9237,
+      "fetched_at": "2026-10-19T13:24:31+00:00",
+      "sha256": "7c211bbe3b6ce7552539341ab22fe7956ce9093cd9e45547e58e3e5c94c8fba4",
+      "chars": 9454,
       "path": "apple/screenshot-specifications.md",
       "sections_dir": "apple/screenshot-specifications.sections",
       "section_count": 8,
@@ -2048,8 +2062,8 @@
           "anchor": "iphone",
           "title": "iPhone",
           "deep_link": null,
-          "chars": 3933,
-          "sha256": "b2a583c017887084"
+          "chars": 4150,
+          "sha256": "765003529e515841"
         },
         {
           "anchor": "ipad",
@@ -2100,19 +2114,26 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:39+00:00",
-      "sha256": "9b2daf59d953b20e51c590722ea6538d20d2017de8eb9449d97ac41296cbd739",
-      "chars": 10204,
+      "fetched_at": "2026-10-19T13:24:33+00:00",
+      "sha256": "ad2656cb2ed5e3cafeb15ac0d0c4da77141b32a8c51b92b7ab2b27bd1ffd5fd5",
+      "chars": 8280,
       "path": "apple/set-age-rating.md",
       "sections_dir": "apple/set-age-rating.sections",
-      "section_count": 2,
+      "section_count": 3,
       "sections": [
         {
           "anchor": "set-an-app-age-rating",
           "title": "Set an app age rating",
           "deep_link": null,
-          "chars": 5337,
-          "sha256": "bdd2e329889612e8"
+          "chars": 1257,
+          "sha256": "6311c9e038f3f250"
+        },
+        {
+          "anchor": "override-to-higher-age-rating",
+          "title": "Override to higher age rating",
+          "deep_link": null,
+          "chars": 2154,
+          "sha256": "b5fe7fdcb32ff982"
         },
         {
           "anchor": "override-age-rating-for-the-republic-of-korea",
@@ -2135,7 +2156,7 @@
       "requested_url": "https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/overview-of-submitting-for-review",
       "substituted_from": "https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/submit-for-review",
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:40+00:00",
+      "fetched_at": "2026-10-19T13:24:33+00:00",
       "sha256": "dedb0f60d360ee80c2ece8120b094d8da62c96101acdd5efc3b58f4af3934599",
       "chars": 5097,
       "path": "apple/submit-for-review.md",
@@ -2170,7 +2191,7 @@
       "requested_url": "https://developer.apple.com/app-store/subscriptions/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:28+00:00",
+      "fetched_at": "2026-10-19T13:24:22+00:00",
       "sha256": "feb8d840ea8fdc038046863e02908cf3849e451a24802b4021b05ff8e086a9f7",
       "chars": 45445,
       "path": "apple/subscriptions.md",
@@ -2373,7 +2394,7 @@
       "requested_url": "https://developer.apple.com/support/third-party-SDK-requirements/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:27+00:00",
+      "fetched_at": "2026-10-19T13:24:21+00:00",
       "sha256": "4a1bf5a97f798b146f07773088bd0c342b103177592b0e1ae8a04fb3095dd313",
       "chars": 3460,
       "path": "apple/third-party-sdk-requirements.md",
@@ -2393,7 +2414,7 @@
       "requested_url": "https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest",
       "substituted_from": null,
       "strategy": "apple_docc",
-      "fetched_at": "2026-10-12T15:33:27+00:00",
+      "fetched_at": "2026-10-19T13:24:20+00:00",
       "sha256": "de26ae6705fef5b4642eeb2762a5a6ef8aeac7304941f262cbdc39cef65f3560",
       "chars": 9639,
       "path": "apple/tn3183.md",
@@ -2470,7 +2491,7 @@
       "requested_url": "https://developer.apple.com/app-store/user-privacy-and-data-use/",
       "substituted_from": null,
       "strategy": "apple_html",
-      "fetched_at": "2026-10-12T15:33:28+00:00",
+      "fetched_at": "2026-10-19T13:24:21+00:00",
       "sha256": "5de775be29e3ed1d3633963728c073d50ad793e0edf414cf4ac6a39c12b38473",
       "chars": 20435,
       "path": "apple/user-privacy-and-data-use.md",
@@ -2610,7 +2631,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/13327111",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:45+00:00",
+      "fetched_at": "2026-10-19T13:24:38+00:00",
       "sha256": "6b2c2c7bca8eaaebd394db6c2bbbe9e251c0c029a039ee6b4dbc9122f15b1666",
       "chars": 11946,
       "path": "google/account-deletion-play.md",
@@ -2659,7 +2680,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/10787469",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:43+00:00",
+      "fetched_at": "2026-10-19T13:24:36+00:00",
       "sha256": "1e4ef95efda8f30ef756201cbf50ab8d6f15b1037559a518db8a2f25f6d4f695",
       "chars": 68487,
       "path": "google/data-safety.md",
@@ -2834,7 +2855,7 @@
       "requested_url": "https://docs.expo.dev/submit/android/",
       "substituted_from": null,
       "strategy": "generic",
-      "fetched_at": "2026-10-12T15:33:49+00:00",
+      "fetched_at": "2026-10-19T13:24:43+00:00",
       "sha256": "81272c10ecfd55aa05fab36025b2537f8aefdab8e8e3816b8c6464add1594961",
       "chars": 7303,
       "path": "google/expo-submit-android.md",
@@ -2904,7 +2925,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/9858738",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:44+00:00",
+      "fetched_at": "2026-10-19T13:24:38+00:00",
       "sha256": "e1b40e8ddf996849ca26a2719bf8ce67253d5b9993090533cbae95bd1a3db786",
       "chars": 4338,
       "path": "google/payments-policy.md",
@@ -2932,7 +2953,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/16558241",
       "substituted_from": "https://support.google.com/googleplay/android-developer/answer/9888170",
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:46+00:00",
+      "fetched_at": "2026-10-19T13:24:39+00:00",
       "sha256": "23980b11e53e0034a44dc579d6beb396350fff79b7f634b4927bd94dcd5753f2",
       "chars": 57635,
       "path": "google/permissions-policy.md",
@@ -3058,9 +3079,9 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/topic/9858052",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:42+00:00",
-      "sha256": "cf980c78b16521d1fc54e23877c203e3c320273071066c4567944224e5372734",
-      "chars": 6851,
+      "fetched_at": "2026-10-19T13:24:35+00:00",
+      "sha256": "7bffead4429d02ef4323e3d4173028cf0fbaedef023d958912f7add555a961ee",
+      "chars": 6937,
       "path": "google/policy-center-hub.md",
       "sections_dir": "google/policy-center-hub.sections",
       "section_count": 17,
@@ -3153,8 +3174,8 @@
           "anchor": "other-programs",
           "title": "Other Programs",
           "deep_link": null,
-          "chars": 477,
-          "sha256": "cd4df7cad7b7e6f6"
+          "chars": 563,
+          "sha256": "b91734a69a4d32ce"
         },
         {
           "anchor": "families",
@@ -3198,7 +3219,7 @@
       "requested_url": "https://play.google/developer-content-policy/",
       "substituted_from": null,
       "strategy": "index_only",
-      "fetched_at": "2026-10-12T15:33:41+00:00",
+      "fetched_at": "2026-10-19T13:24:35+00:00",
       "sha256": "364837ab809cb900ba4d45a1f442666433cb45e687cd819705fdedf34c53c398",
       "chars": 15584,
       "path": "google/policy-center-index.md",
@@ -3235,7 +3256,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/9859348",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:42+00:00",
+      "fetched_at": "2026-10-19T13:24:36+00:00",
       "sha256": "3e0303cf06a9d2731f1e1775e0de18b3d80614fad58bc386aac1c674ff48908f",
       "chars": 13808,
       "path": "google/prepare-and-roll-out-a-release.md",
@@ -3319,7 +3340,7 @@
       "requested_url": "https://developer.android.com/studio/publish/preparing",
       "substituted_from": "https://developer.android.com/distribute/best-practices/launch/launch-checklist",
       "strategy": "android_dev",
-      "fetched_at": "2026-10-12T15:33:47+00:00",
+      "fetched_at": "2026-10-19T13:24:40+00:00",
       "sha256": "65bc4db71169facae8bd877c697b5c8967837580b7ec83adc37c32319a2791ff",
       "chars": 15070,
       "path": "google/prepare-for-release.md",
@@ -3494,7 +3515,7 @@
       "requested_url": "https://developer.android.com/studio/publish",
       "substituted_from": null,
       "strategy": "android_dev",
-      "fetched_at": "2026-10-12T15:33:48+00:00",
+      "fetched_at": "2026-10-19T13:24:41+00:00",
       "sha256": "9c61acb6fa71afd7d342465f37209acfd43fe96802482f486500bd7ef66395db",
       "chars": 7048,
       "path": "google/publish-your-app.md",
@@ -3514,7 +3535,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/10281818",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:44+00:00",
+      "fetched_at": "2026-10-19T13:24:38+00:00",
       "sha256": "a70dbe0e4e43072578984fd4b8b9e0f862123b4fe2c75bd0af0f491111c43722",
       "chars": 17732,
       "path": "google/subscriptions-policy.md",
@@ -3563,7 +3584,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/11926878",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:43+00:00",
+      "fetched_at": "2026-10-19T13:24:37+00:00",
       "sha256": "75acee404deaba5da032e3887d8aaf33b60f52c9bd9c0950ccedd84f2ea1c4cf",
       "chars": 11778,
       "path": "google/target-api-level.md",
@@ -3717,8 +3738,8 @@
       "requested_url": "https://developer.android.com/google/play/requirements/target-sdk",
       "substituted_from": null,
       "strategy": "android_dev",
-      "fetched_at": "2026-10-12T15:33:49+00:00",
-      "sha256": "884638e3aba6504234b9f271e564eff6dc4af956b5ace1d6a756c730cbb38a98",
+      "fetched_at": "2026-10-19T13:24:43+00:00",
+      "sha256": "f68759141b6a5cdff36ad783fcc835e1fa9c4e13849f10f8c638e85c39da16c9",
       "chars": 18786,
       "path": "google/target-sdk.md",
       "sections_dir": "google/target-sdk.sections",
@@ -3827,7 +3848,7 @@
           "title": "Further information",
           "deep_link": null,
           "chars": 464,
-          "sha256": "9c48d05c425621f0"
+          "sha256": "03689132f29f63be"
         }
       ],
       "warnings": [],
@@ -3843,7 +3864,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/14151465",
       "substituted_from": null,
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:45+00:00",
+      "fetched_at": "2026-10-19T13:24:39+00:00",
       "sha256": "d5681f48d897412b37dc8a4139d5f2736f9b0784389d5382f433d97046747f0b",
       "chars": 15317,
       "path": "google/testing-requirements.md",
@@ -3962,7 +3983,7 @@
       "requested_url": "https://support.google.com/googleplay/android-developer/answer/10144311",
       "substituted_from": "https://support.google.com/googleplay/android-developer/answer/16810878",
       "strategy": "google_help",
-      "fetched_at": "2026-10-12T15:33:43+00:00",
+      "fetched_at": "2026-10-19T13:24:37+00:00",
       "sha256": "0698db17c1e1a5b627fe0fef334d403b13f0b7d95538998cdc577db11985b342",
       "chars": 30789,
       "path": "google/user-data-policy.md",

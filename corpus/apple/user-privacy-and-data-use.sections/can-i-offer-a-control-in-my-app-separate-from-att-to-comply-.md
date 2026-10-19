@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=can-i-offer-a-control-in-my-app-separate-from-att-to-comply- url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-10-12T15:33:28+00:00 -->
+<!-- source=user-privacy-and-data-use clause=can-i-offer-a-control-in-my-app-separate-from-att-to-comply- url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-10-19T13:24:21+00:00 -->
 
 ### Can I offer a control in my app, separate from ATT, to comply with local privacy laws?
 

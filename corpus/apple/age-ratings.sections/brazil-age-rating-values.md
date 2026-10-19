@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=brazil-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-10-12T15:33:39+00:00 -->
+<!-- source=age-ratings clause=brazil-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-10-19T13:24:32+00:00 -->
 
 ### Brazil age rating values
 

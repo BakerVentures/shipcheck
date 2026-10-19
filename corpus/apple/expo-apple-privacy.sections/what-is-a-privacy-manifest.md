@@ -1,4 +1,4 @@
-<!-- source=expo-apple-privacy clause=what-is-a-privacy-manifest url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-10-12T15:33:41+00:00 -->
+<!-- source=expo-apple-privacy clause=what-is-a-privacy-manifest url=https://docs.expo.dev/guides/apple-privacy/ fetched=2026-10-19T13:24:34+00:00 -->
 
 ## What is a privacy manifest?
 

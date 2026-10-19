@@ -3,7 +3,7 @@ shipcheck_source_id: user-privacy-and-data-use
 title: "User privacy and data use (App Tracking Transparency)"
 url: https://developer.apple.com/app-store/user-privacy-and-data-use/
 final_url: https://developer.apple.com/app-store/user-privacy-and-data-use/
-fetched_at: 2026-10-12T15:33:28+00:00
+fetched_at: 2026-10-19T13:24:21+00:00
 sha256: 5de775be29e3ed1d3633963728c073d50ad793e0edf414cf4ac6a39c12b38473
 vendor: apple
 ---

@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=ensure-policy-compliance url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-12T15:33:45+00:00 -->
+<!-- source=testing-requirements clause=ensure-policy-compliance url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-19T13:24:39+00:00 -->
 
 ### Ensure policy compliance
 

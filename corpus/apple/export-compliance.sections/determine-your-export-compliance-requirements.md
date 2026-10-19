@@ -1,4 +1,4 @@
-<!-- source=export-compliance clause=determine-your-export-compliance-requirements url=https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance fetched=2026-10-12T15:33:40+00:00 -->
+<!-- source=export-compliance clause=determine-your-export-compliance-requirements url=https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance fetched=2026-10-19T13:24:33+00:00 -->
 
 ## Determine your export compliance requirements
 

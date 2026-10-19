@@ -1,4 +1,4 @@
-<!-- source=account-deletion clause=can-i-direct-people-to-a-customer-service-flow-to-complete-a url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-12T15:33:40+00:00 -->
+<!-- source=account-deletion clause=can-i-direct-people-to-a-customer-service-flow-to-complete-a url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-19T13:24:34+00:00 -->
 
 ### Can I direct people to a customer service flow to complete account deletion?
 

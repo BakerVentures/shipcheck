@@ -3,8 +3,8 @@ shipcheck_source_id: screenshot-specifications
 title: "Screenshot specifications"
 url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
-fetched_at: 2026-10-12T15:33:38+00:00
-sha256: 19da243781af97d82dc1010dd7be45fe11bdebda35a60c4b80eb3e9064e18f1d
+fetched_at: 2026-10-19T13:24:31+00:00
+sha256: 7c211bbe3b6ce7552539341ab22fe7956ce9093cd9e45547e58e3e5c94c8fba4
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications
 note: "Moved under /reference/app-information/."
@@ -57,9 +57,10 @@ iPhone Duo
 
 (inner display)
 
-**Note**
+**Notes**
 
-Starting in April 2027, screenshots will be required for any app using the iOS 27.1 SDK or later. [Learn more](/iphone-duo/)
+- Starting in April 2027, screenshots will be required for any app using the iOS 27.1 SDK or later. [Learn how to prepare your apps for launch on iPhone Duo](/iphone-duo/)
+- When you submit iPhone Duo screenshots in App Store Connect, your App Store product page will display a badge to let people know your app is optimized for iPhone Duo.
 
 iPhone with Dynamic Island (large display)
 

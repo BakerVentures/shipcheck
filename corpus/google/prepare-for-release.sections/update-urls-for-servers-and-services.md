@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=update-urls-for-servers-and-services url=https://developer.android.com/studio/publish/preparing fetched=2026-10-12T15:33:47+00:00 -->
+<!-- source=prepare-for-release clause=update-urls-for-servers-and-services url=https://developer.android.com/studio/publish/preparing fetched=2026-10-19T13:24:40+00:00 -->
 
 ### Update URLs for servers and services
 

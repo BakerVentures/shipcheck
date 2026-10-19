@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=what-developers-need-to-declare-across-data-types url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-10-12T15:33:43+00:00 -->
+<!-- source=data-safety clause=what-developers-need-to-declare-across-data-types url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-10-19T13:24:36+00:00 -->
 
 ### What developers need to declare across data types
 

@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=full-screen-intent-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-10-12T15:33:46+00:00 -->
+<!-- source=permissions-policy clause=full-screen-intent-permission url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-10-19T13:24:39+00:00 -->
 
 ## Full-Screen Intent Permission
 
