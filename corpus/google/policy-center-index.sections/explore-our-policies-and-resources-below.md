@@ -1,4 +1,4 @@
-<!-- source=policy-center-index clause=explore-our-policies-and-resources-below url=https://play.google/developer-content-policy/ fetched=2026-10-19T13:24:35+00:00 -->
+<!-- source=policy-center-index clause=explore-our-policies-and-resources-below url=https://play.google/developer-content-policy/ fetched=2026-10-26T13:10:15+00:00 -->
 
 ## Explore our policies and resources below
 
@@ -157,6 +157,8 @@ In addition to compliance with the content policies set out elsewhere in this Po
 [Android Instant Apps](https://support.google.com/googleplay/android-developer/answer/9900182)
 
 [Android TV](https://transparency.google/our-policies/product-terms/android-tv/)
+
+[Android XR](https://developer.android.com/docs/quality-guidelines/android-xr)
 
 [Wear OS](https://transparency.google/our-policies/product-terms/wear-os/)
 

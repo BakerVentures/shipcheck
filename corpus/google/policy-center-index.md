@@ -3,8 +3,8 @@ shipcheck_source_id: policy-center-index
 title: "Google Play Developer Policy Center (section index)"
 url: https://play.google/developer-content-policy/
 final_url: https://play.google/developer-content-policy/
-fetched_at: 2026-10-19T13:24:35+00:00
-sha256: 364837ab809cb900ba4d45a1f442666433cb45e687cd819705fdedf34c53c398
+fetched_at: 2026-10-26T13:10:15+00:00
+sha256: 72914040011db9a3862c0095460d001d233c5ff5cae812ef6774390b893d18ae
 vendor: google
 note: "JS SPA. Section routes are not server-rendered, so only the table of contents is recoverable. Policy text comes from the support.google.com pages below."
 warnings: ["JS-rendered page: only the section index is recoverable. Policy text for these sections comes from support.google.com."]
@@ -174,6 +174,8 @@ In addition to compliance with the content policies set out elsewhere in this Po
 [Android Instant Apps](https://support.google.com/googleplay/android-developer/answer/9900182)
 
 [Android TV](https://transparency.google/our-policies/product-terms/android-tv/)
+
+[Android XR](https://developer.android.com/docs/quality-guidelines/android-xr)
 
 [Wear OS](https://transparency.google/our-policies/product-terms/wear-os/)
 

@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=clean-up-your-project-directories url=https://developer.android.com/studio/publish/preparing fetched=2026-10-19T13:24:40+00:00 -->
+<!-- source=prepare-for-release clause=clean-up-your-project-directories url=https://developer.android.com/studio/publish/preparing fetched=2026-10-26T13:10:23+00:00 -->
 
 ### Clean up your project directories
 

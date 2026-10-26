@@ -3,8 +3,8 @@ shipcheck_source_id: age-ratings
 title: "Age ratings values and definitions"
 url: https://developer.apple.com/help/app-store-connect/reference/age-ratings
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions
-fetched_at: 2026-10-19T13:24:32+00:00
-sha256: 20d6e65811ae8ee3b1294ccfb41f89ea5b2fdcaa62ad6576a7c49953501773c9
+fetched_at: 2026-10-26T13:10:14+00:00
+sha256: fa53308c534a70bb371f8d1baa492c6ec7d5192dd2115f53e480717d76c67caf
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/age-ratings-definitions
 note: "Original 404s. Apple restructured age ratings (13+/16+/18+ tiers)."
@@ -101,7 +101,7 @@ For all apps made available in Korea, the following region-specific rating value
 
 | Rating | Definition |
 | --- | --- |
-| All | Apps that contain: **In-App Controls:** **Capabilities:** **Mature Themes:** **Medical or Wellness:** **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |
+| All | Apps that contain: **In-App Controls:** **Capabilities:** **Mature Themes:** **Medical or Wellness:** **Violence:** **Chance-Based Activities:** |
 | 12+ | Apps that contain: **Mature Themes:** **Medical or Wellness:** **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |
 | 15+ | Apps that contain: **Capabilities:** **Medical or Wellness:** |
 | 19+ | Apps that contain: **Mature Themes:** **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |

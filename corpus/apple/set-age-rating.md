@@ -3,7 +3,7 @@ shipcheck_source_id: set-age-rating
 title: "Set an app age rating"
 url: https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating
 final_url: https://developer.apple.com/help/app-store-connect/manage-app-information/set-an-app-age-rating
-fetched_at: 2026-10-19T13:24:33+00:00
+fetched_at: 2026-10-26T13:10:14+00:00
 sha256: ad2656cb2ed5e3cafeb15ac0d0c4da77141b32a8c51b92b7ab2b27bd1ffd5fd5
 vendor: apple
 note: "Added alongside age-ratings: covers the questionnaire that drives mismatches."

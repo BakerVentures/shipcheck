@@ -1,4 +1,4 @@
-<!-- source=policy-center-hub clause=monetization-and-ads url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-10-19T13:24:35+00:00 -->
+<!-- source=policy-center-hub clause=monetization-and-ads url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-10-26T13:10:15+00:00 -->
 
 ## Monetization and Ads
 

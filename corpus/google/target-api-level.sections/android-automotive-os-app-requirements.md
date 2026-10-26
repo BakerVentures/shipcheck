@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=android-automotive-os-app-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-10-19T13:24:37+00:00 -->
+<!-- source=target-api-level clause=android-automotive-os-app-requirements url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-10-26T13:10:18+00:00 -->
 
 ### Android Automotive OS app requirements
 

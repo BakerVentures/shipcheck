@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=was-this-helpful url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-19T13:24:39+00:00 -->
+<!-- source=testing-requirements clause=was-this-helpful url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-10-26T13:10:22+00:00 -->
 
 ## Was this helpful?
 

@@ -1,4 +1,4 @@
-<!-- source=required-reason-codes clause=discussion url=https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons fetched=2026-10-19T13:24:20+00:00 -->
+<!-- source=required-reason-codes clause=discussion url=https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitypereasons fetched=2026-10-26T13:10:02+00:00 -->
 
 ## Discussion
 

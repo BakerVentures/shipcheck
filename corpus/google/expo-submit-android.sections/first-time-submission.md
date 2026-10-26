@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=first-time-submission url=https://docs.expo.dev/submit/android/ fetched=2026-10-19T13:24:43+00:00 -->
+<!-- source=expo-submit-android clause=first-time-submission url=https://docs.expo.dev/submit/android/ fetched=2026-10-26T13:10:26+00:00 -->
 
 ## First-time submission
 

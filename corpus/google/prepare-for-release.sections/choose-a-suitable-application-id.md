@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=choose-a-suitable-application-id url=https://developer.android.com/studio/publish/preparing fetched=2026-10-19T13:24:40+00:00 -->
+<!-- source=prepare-for-release clause=choose-a-suitable-application-id url=https://developer.android.com/studio/publish/preparing fetched=2026-10-26T13:10:23+00:00 -->
 
 ### Choose a suitable application ID
 

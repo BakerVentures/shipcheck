@@ -1,4 +1,4 @@
-<!-- source=prepare-and-roll-out-a-release clause=step-1-create-a-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-10-19T13:24:36+00:00 -->
+<!-- source=prepare-and-roll-out-a-release clause=step-1-create-a-release url=https://support.google.com/googleplay/android-developer/answer/9859348 fetched=2026-10-26T13:10:16+00:00 -->
 
 ## Step 1: Create a release
 

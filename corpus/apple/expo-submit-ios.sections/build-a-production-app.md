@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=build-a-production-app url=https://docs.expo.dev/submit/ios/ fetched=2026-10-19T13:24:34+00:00 -->
+<!-- source=expo-submit-ios clause=build-a-production-app url=https://docs.expo.dev/submit/ios/ fetched=2026-10-26T13:10:15+00:00 -->
 
 ## Build a production app
 

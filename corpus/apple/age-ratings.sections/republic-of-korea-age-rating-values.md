@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=republic-of-korea-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-10-19T13:24:32+00:00 -->
+<!-- source=age-ratings clause=republic-of-korea-age-rating-values url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-10-26T13:10:14+00:00 -->
 
 ### Republic of Korea age rating values
 
@@ -8,7 +8,7 @@ For all apps made available in Korea, the following region-specific rating value
 
 | Rating | Definition |
 | --- | --- |
-| All | Apps that contain: **In-App Controls:** **Capabilities:** **Mature Themes:** **Medical or Wellness:** **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |
+| All | Apps that contain: **In-App Controls:** **Capabilities:** **Mature Themes:** **Medical or Wellness:** **Violence:** **Chance-Based Activities:** |
 | 12+ | Apps that contain: **Mature Themes:** **Medical or Wellness:** **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |
 | 15+ | Apps that contain: **Capabilities:** **Medical or Wellness:** |
 | 19+ | Apps that contain: **Mature Themes:** **Sexuality or Nudity:** **Violence:** **Chance-Based Activities:** |

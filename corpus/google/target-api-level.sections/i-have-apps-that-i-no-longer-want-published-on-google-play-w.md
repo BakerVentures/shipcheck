@@ -1,4 +1,4 @@
-<!-- source=target-api-level clause=i-have-apps-that-i-no-longer-want-published-on-google-play-w url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-10-19T13:24:37+00:00 -->
+<!-- source=target-api-level clause=i-have-apps-that-i-no-longer-want-published-on-google-play-w url=https://support.google.com/googleplay/android-developer/answer/11926878 fetched=2026-10-26T13:10:18+00:00 -->
 
 ## I have apps that I no longer want published on Google Play. What can I do?
 

@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=report-a-concern url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-19T13:24:19+00:00 -->
+<!-- source=app-review-overview clause=report-a-concern url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-26T13:10:02+00:00 -->
 
 ### Report a concern
 

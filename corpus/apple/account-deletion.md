@@ -3,7 +3,7 @@ shipcheck_source_id: account-deletion
 title: "Offering account deletion in your app"
 url: https://developer.apple.com/support/offering-account-deletion-in-your-app/
 final_url: https://developer.apple.com/help/app-review/guideline-reference/5-1-1-account-deletion
-fetched_at: 2026-10-19T13:24:34+00:00
+fetched_at: 2026-10-26T13:10:14+00:00
 sha256: 64f2a6b8af93cd2bf04e6fc43cdefa0655635a4f42694a9876d7b0cec96df5cf
 vendor: apple
 ---

@@ -1,4 +1,4 @@
-<!-- source=screenshot-specifications clause=mac url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-19T13:24:31+00:00 -->
+<!-- source=screenshot-specifications clause=mac url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-26T13:10:13+00:00 -->
 
 ### Mac
 

@@ -3,7 +3,7 @@ shipcheck_source_id: screenshot-specifications
 title: "Screenshot specifications"
 url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
-fetched_at: 2026-10-19T13:24:31+00:00
+fetched_at: 2026-10-26T13:10:13+00:00
 sha256: 7c211bbe3b6ce7552539341ab22fe7956ce9093cd9e45547e58e3e5c94c8fba4
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications

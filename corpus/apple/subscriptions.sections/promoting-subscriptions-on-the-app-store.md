@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=promoting-subscriptions-on-the-app-store url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-10-19T13:24:22+00:00 -->
+<!-- source=subscriptions clause=promoting-subscriptions-on-the-app-store url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-10-26T13:10:03+00:00 -->
 
 ### Promoting subscriptions on the App Store
 

@@ -1,4 +1,4 @@
-<!-- source=account-deletion clause=if-my-app-links-out-to-the-default-web-browser-for-account-c url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-19T13:24:34+00:00 -->
+<!-- source=account-deletion clause=if-my-app-links-out-to-the-default-web-browser-for-account-c url=https://developer.apple.com/support/offering-account-deletion-in-your-app/ fetched=2026-10-26T13:10:14+00:00 -->
 
 ### If my app links out to the default web browser for account creation, does it still need to offer account deletion within the app?
 
