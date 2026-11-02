@@ -3,8 +3,8 @@ shipcheck_source_id: policy-center-index
 title: "Google Play Developer Policy Center (section index)"
 url: https://play.google/developer-content-policy/
 final_url: https://play.google/developer-content-policy/
-fetched_at: 2026-10-19T13:24:35+00:00
-sha256: 364837ab809cb900ba4d45a1f442666433cb45e687cd819705fdedf34c53c398
+fetched_at: 2026-11-02T16:02:43+00:00
+sha256: 86a2757a14bcccbb1388c5c151c915f068e49b0e0ef60d6335b934c49c84bb5f
 vendor: google
 note: "JS SPA. Section routes are not server-rendered, so only the table of contents is recoverable. Policy text comes from the support.google.com pages below."
 warnings: ["JS-rendered page: only the section index is recoverable. Policy text for these sections comes from support.google.com."]
@@ -15,7 +15,7 @@ warnings: ["JS-rendered page: only the section index is recoverable. Policy text
 Our policies are designed to deliver your apps and games safely to billions of people worldwide. Explore this page for information on our policies, read the [Developer Distribution Agreement](https://play.google/developer-distribution-agreement.html), and find educational resources to get started.
 
 [![Recent updates button](https://kstatic.googleusercontent.com/files/29cb63dcb702cf782ebc3a04d2b996801bde1368f4cb4b171e137b07710ee060e6133771a904b08c2e6cea88142f81f2c01bf6c796667ecde261a5200aa56636)
-Recent updates](https://support.google.com/googleplay/android-developer/answer/17134731)
+Recent updates](https://support.google.com/googleplay/android-developer/answer/18100766)
 
 ## Explore our policies and resources below
 
@@ -175,6 +175,8 @@ In addition to compliance with the content policies set out elsewhere in this Po
 
 [Android TV](https://transparency.google/our-policies/product-terms/android-tv/)
 
+[Android XR](https://developer.android.com/docs/quality-guidelines/android-xr)
+
 [Wear OS](https://transparency.google/our-policies/product-terms/wear-os/)
 
 [![Enforcement policy](https://kstatic.googleusercontent.com/files/ae2f8c3f89c9eb2ae6f774a9a1f60178b60c9c2b2256c1d7d272859484aa09a1f4aa304694ddc03beddfbbd389fa73dad3ad913f58878f6063545067731a113b)](https://support.google.com/googleplay/android-developer/topic/9877468)
@@ -207,9 +209,9 @@ Learn more about how Google Play works to help developers succeed.
 
 ### Latest Information
 
-Learn more about the policy updates and key reminders we announced in July.
+Learn more about the policy updates and key reminders we announced in October.
 
-- [Watch video](https://goo.gle/policybytes326)
+- [Watch video](https://goo.gle/policybytes426)
 
 In case you missed it, all developers must provide data deletion options for their Data safety section in Play Console by Dec 7, 2023.
 

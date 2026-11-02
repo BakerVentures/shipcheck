@@ -1,4 +1,4 @@
-<!-- source=privacy-manifest-files clause=overview url=https://developer.apple.com/documentation/bundleresources/privacy-manifest-files fetched=2026-10-19T13:24:20+00:00 -->
+<!-- source=privacy-manifest-files clause=overview url=https://developer.apple.com/documentation/bundleresources/privacy-manifest-files fetched=2026-11-02T16:02:29+00:00 -->
 
 ## Overview
 

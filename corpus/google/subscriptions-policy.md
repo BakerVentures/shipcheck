@@ -3,8 +3,8 @@ shipcheck_source_id: subscriptions-policy
 title: "Play subscriptions policy"
 url: https://support.google.com/googleplay/android-developer/answer/10281818
 final_url: https://support.google.com/googleplay/android-developer/answer/10281818?hl=en
-fetched_at: 2026-10-19T13:24:38+00:00
-sha256: a70dbe0e4e43072578984fd4b8b9e0f862123b4fe2c75bd0af0f491111c43722
+fetched_at: 2026-11-02T16:02:45+00:00
+sha256: b88497673bcfa3209ef6ad5b0dfe0783254bb8de9028f3690666446a7fdf1413
 vendor: google
 ---
 
@@ -34,6 +34,8 @@ Purchases that are not supported by Google Play's billing system include:
 Google Play's billing system must not be used for peer-to-peer payments content that facilitates online gambling, or any product category deemed unacceptable under [Google’s Payments Center Content Policies](https://pay.google.com/intl/en_in/about/policy/).
 
 ## Frequently asked questions
+
+[Collapse All](https://support.google.com/googleplay/android-developer/answer/10281818) Expand All
 
 Can I distribute my app on other Android app stores or my website?
 
@@ -180,6 +182,10 @@ My app offers in-app purchases of tokenized digital assets, like NFTs. How do I 
 Tokenized digital assets like NFTs can be used to represent digital or physical content. If the tokenized digital assets are used for [in-app purchases](https://support.google.com/googleplay/android-developer/answer/9858738) of digital content then [Google Play’s Payments policy](https://support.google.com/googleplay/android-developer/answer/10281818) applies and you must use Google Play’s billing system for such transactions.
 
 Refer to our [Blockchain-based content](https://support.google.com/googleplay/android-developer/answer/13607354) policy for more details on tokenized digital assets.
+
+My app offers an AI or agentic experience that can facilitate digital purchases on a user's behalf. Does Google Play’s Payments policy apply?
+
+Yes, if a Play-managed app facilitates the purchase of digital goods, services, content, features, or functionality, it must comply with [Google Play’s Payments policy](https://support.google.com/googleplay/android-developer/answer/9858738?visit_id=637805848490294685-818212466&rd=1). This applies across all implementations, including but not limited to, when the transaction is initiated within a chat agent or inside a third-party embedded app experience or plugin.
 
 ## Related content
 

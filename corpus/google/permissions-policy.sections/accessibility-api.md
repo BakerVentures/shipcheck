@@ -1,10 +1,10 @@
-<!-- source=permissions-policy clause=accessibility-api url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-10-19T13:24:39+00:00 -->
+<!-- source=permissions-policy clause=accessibility-api url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-11-02T16:02:46+00:00 -->
 
 ## Accessibility API
 
 **Policy Summary**
 
-Google Play permits the use of the AccessibilityService API across a wide range of applications. However, only services designed to help people with disabilities access their devices or overcome challenges due to their disabilities are eligible to declare themselves as accessibility tools by setting isAccessibilityTool=true in their metadata. These apps are exempt from the prominent disclosure and consent requirements. For all other uses, or if not declaring your app as an accessibility tool, you will be required to complete an accessibility declaration in Play Console and must implement a clear in-app disclosure explaining data access and use, and obtain affirmative user consent. Please review the full policy to ensure compliance.
+Google Play restricts the use of the AccessibilityAPI and `isAccessibilityTool` flag, enforces feature bans, and sets clear disclosure rules based on app designation. The Accessibility API is prohibited from being used to bypass Android security and privacy controls, record remote call audio, or power autonomous decision-making agents. Apps with a core functionality intended to directly support people with disabilities are eligible to set `isAccessibilityTool=true`, publicly designating themselves as accessibility tools. All other apps using the API must explicitly document usage on their Google Play listing, provide prominent in-app disclosures, and secure affirmative user consent. Developers must use more narrowly scoped APIs whenever possible.
 
 **Full Policy**
 

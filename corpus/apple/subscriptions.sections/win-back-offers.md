@@ -1,4 +1,4 @@
-<!-- source=subscriptions clause=win-back-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-10-19T13:24:22+00:00 -->
+<!-- source=subscriptions clause=win-back-offers url=https://developer.apple.com/app-store/subscriptions/ fetched=2026-11-02T16:02:30+00:00 -->
 
 ### Win-back offers
 

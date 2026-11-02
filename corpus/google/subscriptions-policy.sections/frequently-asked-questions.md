@@ -1,6 +1,8 @@
-<!-- source=subscriptions-policy clause=frequently-asked-questions url=https://support.google.com/googleplay/android-developer/answer/10281818 fetched=2026-10-19T13:24:38+00:00 -->
+<!-- source=subscriptions-policy clause=frequently-asked-questions url=https://support.google.com/googleplay/android-developer/answer/10281818 fetched=2026-11-02T16:02:45+00:00 -->
 
 ## Frequently asked questions
+
+[Collapse All](https://support.google.com/googleplay/android-developer/answer/10281818) Expand All
 
 Can I distribute my app on other Android app stores or my website?
 
@@ -147,3 +149,7 @@ My app offers in-app purchases of tokenized digital assets, like NFTs. How do I 
 Tokenized digital assets like NFTs can be used to represent digital or physical content. If the tokenized digital assets are used for [in-app purchases](https://support.google.com/googleplay/android-developer/answer/9858738) of digital content then [Google Play’s Payments policy](https://support.google.com/googleplay/android-developer/answer/10281818) applies and you must use Google Play’s billing system for such transactions.
 
 Refer to our [Blockchain-based content](https://support.google.com/googleplay/android-developer/answer/13607354) policy for more details on tokenized digital assets.
+
+My app offers an AI or agentic experience that can facilitate digital purchases on a user's behalf. Does Google Play’s Payments policy apply?
+
+Yes, if a Play-managed app facilitates the purchase of digital goods, services, content, features, or functionality, it must comply with [Google Play’s Payments policy](https://support.google.com/googleplay/android-developer/answer/9858738?visit_id=637805848490294685-818212466&rd=1). This applies across all implementations, including but not limited to, when the transaction is initiated within a chat agent or inside a third-party embedded app experience or plugin.

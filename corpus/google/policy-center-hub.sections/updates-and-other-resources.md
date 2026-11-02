@@ -1,4 +1,4 @@
-<!-- source=policy-center-hub clause=updates-and-other-resources url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-10-19T13:24:35+00:00 -->
+<!-- source=policy-center-hub clause=updates-and-other-resources url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-11-02T16:02:43+00:00 -->
 
 ## Updates and Other Resources
 
@@ -7,4 +7,4 @@
 - [Get Developer Support](/googleplay/android-developer/answer/10357403?hl=en&ref_topic=9877065)
 - [Policy Archive](/googleplay/android-developer/answer/13386702?hl=en&ref_topic=9877065)
 - [PolicyBytes Hub](/googleplay/android-developer/answer/16373081?hl=en&ref_topic=9877065)
-- [Developer Program Policy](/googleplay/android-developer/answer/18258653?hl=en&ref_topic=9877065)
+- [Developer Program Policy](/googleplay/android-developer/answer/18265346?hl=en&ref_topic=9877065)

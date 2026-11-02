@@ -1,10 +1,10 @@
-<!-- source=policy-center-index clause=latest-information url=https://play.google/developer-content-policy/ fetched=2026-10-19T13:24:35+00:00 -->
+<!-- source=policy-center-index clause=latest-information url=https://play.google/developer-content-policy/ fetched=2026-11-02T16:02:43+00:00 -->
 
 ### Latest Information
 
-Learn more about the policy updates and key reminders we announced in July.
+Learn more about the policy updates and key reminders we announced in October.
 
-- [Watch video](https://goo.gle/policybytes326)
+- [Watch video](https://goo.gle/policybytes426)
 
 In case you missed it, all developers must provide data deletion options for their Data safety section in Play Console by Dec 7, 2023.
 
