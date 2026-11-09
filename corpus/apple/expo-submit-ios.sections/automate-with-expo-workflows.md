@@ -1,8 +1,8 @@
-<!-- source=expo-submit-ios clause=automate-with-eas-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-10-19T13:24:34+00:00 -->
+<!-- source=expo-submit-ios clause=automate-with-expo-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-11-09T16:28:29+00:00 -->
 
-## Automate with EAS Workflows
+## Automate with Expo Workflows
 
-[EAS Workflows](/eas/workflows/introduction/) runs the same submit step on EAS infrastructure, triggered by a git push or run manually from the CLI. First, configure an App Store Connect API Key so workflows can authenticate with Apple non-interactively:
+[Expo Workflows](/eas/workflows/introduction/) runs the same submit step on Expo infrastructure, triggered by a git push or run manually from the CLI. First, configure an App Store Connect API Key so workflows can authenticate with Apple non-interactively:
 
 Terminal
 
@@ -11,7 +11,7 @@ Terminal
 1. Select the `production` build profile.
 2. Log in with your Apple Developer account and follow the prompts.
 3. Select App Store Connect: Manage your API Key.
-4. Select Set up your project to use an API Key for EAS Submit.
+4. Select Set up your project to use an API Key for Expo Submit.
 
 Prefer to bring your own credentials?
 

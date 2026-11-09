@@ -3,8 +3,8 @@ shipcheck_source_id: screenshot-specifications
 title: "Screenshot specifications"
 url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 final_url: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
-fetched_at: 2026-10-19T13:24:31+00:00
-sha256: 7c211bbe3b6ce7552539341ab22fe7956ce9093cd9e45547e58e3e5c94c8fba4
+fetched_at: 2026-11-09T16:28:27+00:00
+sha256: b3d430a1f9219bf70aa770f3ccbfbacf1736c9beaa82239eec1e7039804690a2
 vendor: apple
 substituted_from: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications
 note: "Moved under /reference/app-information/."
@@ -60,7 +60,7 @@ iPhone Duo
 **Notes**
 
 - Starting in April 2027, screenshots will be required for any app using the iOS 27.1 SDK or later. [Learn how to prepare your apps for launch on iPhone Duo](/iphone-duo/)
-- When you submit iPhone Duo screenshots in App Store Connect, your App Store product page will display a badge to let people know your app is optimized for iPhone Duo.
+- When you submit iPhone Duo screenshots in App Store Connect, your App Store product page will display a badge to let people know your app is made for iPhone Duo.
 
 iPhone with Dynamic Island (large display)
 
@@ -422,7 +422,7 @@ iPad (A16)
 
 iPad (10th generation)
 
-iPad mini (A17 Pro)
+iPad mini (A20 Pro, A17 Pro)
 
 iPad mini (6th generation)
 
@@ -433,6 +433,14 @@ iPad mini (6th generation)
 (portrait)
 
 2266 x 1488 pixels
+
+(landscape)
+
+1512 x 2316 pixels
+
+(portrait)
+
+2316 x 1512 pixels
 
 (landscape)
 

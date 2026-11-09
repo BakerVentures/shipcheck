@@ -1,4 +1,4 @@
-<!-- source=app-review-overview clause=apple-developer-program-license-agreement url=https://developer.apple.com/distribute/app-review/ fetched=2026-10-19T13:24:19+00:00 -->
+<!-- source=app-review-overview clause=apple-developer-program-license-agreement url=https://developer.apple.com/distribute/app-review/ fetched=2026-11-09T16:28:16+00:00 -->
 
 ### Apple Developer Program License Agreement
 

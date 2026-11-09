@@ -1,4 +1,4 @@
-<!-- source=screenshot-specifications clause=iphone url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-19T13:24:31+00:00 -->
+<!-- source=screenshot-specifications clause=iphone url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-11-09T16:28:27+00:00 -->
 
 ### iPhone
 
@@ -21,7 +21,7 @@ iPhone Duo
 **Notes**
 
 - Starting in April 2027, screenshots will be required for any app using the iOS 27.1 SDK or later. [Learn how to prepare your apps for launch on iPhone Duo](/iphone-duo/)
-- When you submit iPhone Duo screenshots in App Store Connect, your App Store product page will display a badge to let people know your app is optimized for iPhone Duo.
+- When you submit iPhone Duo screenshots in App Store Connect, your App Store product page will display a badge to let people know your app is made for iPhone Duo.
 
 iPhone with Dynamic Island (large display)
 

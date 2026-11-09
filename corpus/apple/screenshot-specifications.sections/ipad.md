@@ -1,4 +1,4 @@
-<!-- source=screenshot-specifications clause=ipad url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-19T13:24:31+00:00 -->
+<!-- source=screenshot-specifications clause=ipad url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-11-09T16:28:27+00:00 -->
 
 ### iPad
 
@@ -64,7 +64,7 @@ iPad (A16)
 
 iPad (10th generation)
 
-iPad mini (A17 Pro)
+iPad mini (A20 Pro, A17 Pro)
 
 iPad mini (6th generation)
 
@@ -75,6 +75,14 @@ iPad mini (6th generation)
 (portrait)
 
 2266 x 1488 pixels
+
+(landscape)
+
+1512 x 2316 pixels
+
+(portrait)
+
+2316 x 1512 pixels
 
 (landscape)
 

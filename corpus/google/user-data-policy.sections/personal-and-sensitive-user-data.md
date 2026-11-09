@@ -1,4 +1,4 @@
-<!-- source=user-data-policy clause=personal-and-sensitive-user-data url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-10-19T13:24:37+00:00 -->
+<!-- source=user-data-policy clause=personal-and-sensitive-user-data url=https://support.google.com/googleplay/android-developer/answer/10144311 fetched=2026-11-09T16:28:35+00:00 -->
 
 ## Personal and Sensitive User Data
 

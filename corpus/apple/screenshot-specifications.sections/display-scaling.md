@@ -1,4 +1,4 @@
-<!-- source=screenshot-specifications clause=display-scaling url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-10-19T13:24:31+00:00 -->
+<!-- source=screenshot-specifications clause=display-scaling url=https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications fetched=2026-11-09T16:28:27+00:00 -->
 
 ## Display scaling
 
