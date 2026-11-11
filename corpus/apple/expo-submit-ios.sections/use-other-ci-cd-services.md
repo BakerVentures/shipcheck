@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/ios/ fetched=2026-10-19T13:24:34+00:00 -->
+<!-- source=expo-submit-ios clause=use-other-ci-cd-services url=https://docs.expo.dev/submit/ios/ fetched=2026-11-09T16:28:29+00:00 -->
 
 ## Use other CI/CD services
 
@@ -16,4 +16,4 @@ With `--non-interactive`, `eas submit` and `eas build --auto-submit` cannot prom
 App Store Connect API Keys cannot be set up in --non-interactive mode.
 ```
 
-To fix this, assign a key to your app or bring your own credentials, as described in [Automate with EAS Workflows](/submit/ios/#automate-with-eas-workflows). In non-interactive mode, your submission profile also needs [`ascAppId`](/submit/ios/#configure-a-submission-profile).
+To fix this, assign a key to your app or bring your own credentials, as described in [Automate with Expo Workflows](/submit/ios/#automate-with-expo-workflows). In non-interactive mode, your submission profile also needs [`ascAppId`](/submit/ios/#configure-a-submission-profile).

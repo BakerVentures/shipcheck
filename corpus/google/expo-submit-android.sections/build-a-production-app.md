@@ -1,8 +1,8 @@
-<!-- source=expo-submit-android clause=build-a-production-app url=https://docs.expo.dev/submit/android/ fetched=2026-10-19T13:24:43+00:00 -->
+<!-- source=expo-submit-android clause=build-a-production-app url=https://docs.expo.dev/submit/android/ fetched=2026-11-09T16:28:50+00:00 -->
 
 ## Build a production app
 
-You need a production .aab (Android App Bundle) to submit. Google Play requires new apps to be published as app bundles instead of .apk files, and generates optimized APKs for each device from the bundle. Create one with [EAS Build](/build/introduction/):
+You need a production .aab (Android App Bundle) to submit. Google Play requires new apps to be published as app bundles instead of .apk files, and generates optimized APKs for each device from the bundle. Create one with [Expo Build](/build/introduction/):
 
 Terminal
 

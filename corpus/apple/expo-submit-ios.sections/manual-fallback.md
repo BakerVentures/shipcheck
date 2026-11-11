@@ -1,7 +1,7 @@
-<!-- source=expo-submit-ios clause=manual-fallback url=https://docs.expo.dev/submit/ios/ fetched=2026-10-19T13:24:34+00:00 -->
+<!-- source=expo-submit-ios clause=manual-fallback url=https://docs.expo.dev/submit/ios/ fetched=2026-11-09T16:28:29+00:00 -->
 
 ## Manual fallback
 
-If EAS Submit is temporarily unavailable, you can upload to the Apple App Store manually from a Mac with Xcode.
+If Expo Submit is temporarily unavailable, you can upload to the Apple App Store manually from a Mac with Xcode.
 
 [Manually submit an iOS app with XcodeArchive and upload an iOS app to App Store Connect using Xcode on macOS.](/submit/ios-manual/)
