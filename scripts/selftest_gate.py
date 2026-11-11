@@ -274,7 +274,7 @@ def thin_of(fat_bytes, arch):
 
 
 def make_app(tmp, name="Fix", plist=None, exe_bytes=None, plugins=None,
-             sdk="26.0", salt=None, frameworks=(), jsbundle=None,
+             sdk="26.0", salt=None, frameworks=(), jsbundle=None,  # secret-scan:allow
              exe_name=None):
     """A .app directory with a real Info.plist and a real Mach-O.
 
@@ -1034,7 +1034,7 @@ def _plist_only(art):
     payload = {}
     for k in shipgate.FINGERPRINT_KEYS:
         payload[k] = shipgate._stable(art.plist.get(k))
-    blob = json.dumps(payload, sort_keys=True, ensure_ascii=True)
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=True)  # secret-scan:allow
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
 
 
@@ -1081,14 +1081,14 @@ def test_receipt_bundle_binding(r):
 
         def app(label, js, salt):
             return shipgate.Artifact(make_app(
-                tmp, name=label, plist=shared, salt=salt, jsbundle=js,
+                tmp, name=label, plist=shared, salt=salt, jsbundle=js,  # secret-scan:allow
                 exe_name="App"))
 
         fixed = app("JsFixed", js_fixed, "jsfixedslice")
         broken = app("JsBroken", js_broken, "jsbrokenslice")
         device = app("JsDevice", js_fixed, "jsdeviceslice")
         native = shipgate.Artifact(make_app(
-            tmp, name="JsNative", plist=shared, salt="nativeslice",
+            tmp, name="JsNative", plist=shared, salt="nativeslice",  # secret-scan:allow
             exe_name="App"))
 
         with open(fixed.plist_path, "rb") as f1, \
@@ -1200,7 +1200,7 @@ def test_receipt_bundle_binding(r):
 
         # --- and the digest reads the CONTENT, not the name or the size.
         same_len = shipgate.Artifact(make_app(
-            tmp, name="JsSameLen", plist=shared, salt="samelenslice",
+            tmp, name="JsSameLen", plist=shared, salt="samelenslice",  # secret-scan:allow
             jsbundle=js_broken, exe_name="App"))
         r.check("two artifacts shipping the SAME bundle bytes have the same "
                 "digest (the digest is of content, so a rebuild that does not "

@@ -1088,7 +1088,7 @@ class Artifact:
         if js is None:
             return pf
         blob = json.dumps({"plist": pf, "jsbundle": js},
-                          sort_keys=True, ensure_ascii=True)
+                          sort_keys=True, ensure_ascii=True)  # secret-scan:allow
         return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
 
     def facts(self):
