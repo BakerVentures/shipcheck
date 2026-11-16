@@ -1,4 +1,4 @@
-<!-- source=testing-requirements clause=advanced-testing-resources url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-11-09T16:28:47+00:00 -->
+<!-- source=testing-requirements clause=advanced-testing-resources url=https://support.google.com/googleplay/android-developer/answer/14151465 fetched=2026-11-16T15:53:20+00:00 -->
 
 ### Advanced testing resources
 

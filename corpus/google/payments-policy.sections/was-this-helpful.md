@@ -1,4 +1,4 @@
-<!-- source=payments-policy clause=was-this-helpful url=https://support.google.com/googleplay/android-developer/answer/9858738 fetched=2026-11-09T16:28:36+00:00 -->
+<!-- source=payments-policy clause=was-this-helpful url=https://support.google.com/googleplay/android-developer/answer/9858738 fetched=2026-11-16T15:53:20+00:00 -->
 
 ## Was this helpful?
 

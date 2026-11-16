@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=other-changes url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-11-09T16:28:35+00:00 -->
+<!-- source=data-safety clause=other-changes url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-11-16T15:53:18+00:00 -->
 
 ### **Other changes**
 

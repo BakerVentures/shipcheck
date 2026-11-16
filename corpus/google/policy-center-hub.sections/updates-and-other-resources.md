@@ -1,4 +1,4 @@
-<!-- source=policy-center-hub clause=updates-and-other-resources url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-11-09T16:28:34+00:00 -->
+<!-- source=policy-center-hub clause=updates-and-other-resources url=https://support.google.com/googleplay/android-developer/topic/9858052 fetched=2026-11-16T15:53:13+00:00 -->
 
 ## Updates and Other Resources
 

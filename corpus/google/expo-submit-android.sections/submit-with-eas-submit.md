@@ -1,4 +1,4 @@
-<!-- source=expo-submit-android clause=submit-with-eas-submit url=https://docs.expo.dev/submit/android/ fetched=2026-11-09T16:28:50+00:00 -->
+<!-- source=expo-submit-android clause=submit-with-eas-submit url=https://docs.expo.dev/submit/android/ fetched=2026-11-16T15:53:24+00:00 -->
 
 ## Submit with `eas submit`
 

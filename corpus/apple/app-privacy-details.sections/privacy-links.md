@@ -1,4 +1,4 @@
-<!-- source=app-privacy-details clause=privacy-links url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-11-09T16:28:17+00:00 -->
+<!-- source=app-privacy-details clause=privacy-links url=https://developer.apple.com/app-store/app-privacy-details/ fetched=2026-11-16T15:53:00+00:00 -->
 
 ## Privacy links
 

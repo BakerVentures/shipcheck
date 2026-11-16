@@ -3,7 +3,7 @@ shipcheck_source_id: expo-submit-android
 title: "Expo: Submit to Google Play"
 url: https://docs.expo.dev/submit/android/
 final_url: https://docs.expo.dev/submit/android/
-fetched_at: 2026-11-09T16:28:50+00:00
+fetched_at: 2026-11-16T15:53:24+00:00
 sha256: 8ec0661d391fcbeca2be91f626b6f5d040551dceec917b13031f52ea59f1b60b
 vendor: google
 ---

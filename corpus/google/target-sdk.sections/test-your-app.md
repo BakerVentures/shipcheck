@@ -1,4 +1,4 @@
-<!-- source=target-sdk clause=test-your-app url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-11-09T16:28:50+00:00 -->
+<!-- source=target-sdk clause=test-your-app url=https://developer.android.com/google/play/requirements/target-sdk fetched=2026-11-16T15:53:23+00:00 -->
 
 ## Test your app
 

@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=test-your-app-for-release url=https://developer.android.com/studio/publish/preparing fetched=2026-11-09T16:28:48+00:00 -->
+<!-- source=prepare-for-release clause=test-your-app-for-release url=https://developer.android.com/studio/publish/preparing fetched=2026-11-16T15:53:22+00:00 -->
 
 ## Test your app for release
 
@@ -17,4 +17,4 @@ your app to users](/tools/publishing/publishing_overview#publishing-release).
 
 Content and code samples on this page are subject to the licenses described in the [Content License](/license). Java and OpenJDK are trademarks or registered trademarks of Oracle and/or its affiliates.
 
-Last updated 2026-09-02 UTC.
+Last updated 2026-11-13 UTC.

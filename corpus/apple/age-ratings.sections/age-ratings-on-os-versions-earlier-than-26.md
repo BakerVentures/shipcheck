@@ -1,4 +1,4 @@
-<!-- source=age-ratings clause=age-ratings-on-os-versions-earlier-than-26 url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-11-09T16:28:27+00:00 -->
+<!-- source=age-ratings clause=age-ratings-on-os-versions-earlier-than-26 url=https://developer.apple.com/help/app-store-connect/reference/age-ratings fetched=2026-11-16T15:53:11+00:00 -->
 
 ## Age ratings on OS versions earlier than 26
 

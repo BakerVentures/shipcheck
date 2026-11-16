@@ -3,8 +3,8 @@ shipcheck_source_id: prepare-for-release
 title: "Prepare your app for release"
 url: https://developer.android.com/studio/publish/preparing
 final_url: https://developer.android.com/studio/publish/preparing?hl=en
-fetched_at: 2026-11-09T16:28:48+00:00
-sha256: 65bc4db71169facae8bd877c697b5c8967837580b7ec83adc37c32319a2791ff
+fetched_at: 2026-11-16T15:53:22+00:00
+sha256: 960f1a57f830f8a199ba3422b74ec6df810c1660399e64f37e6a00c453fe1bf3
 vendor: google
 substituted_from: https://developer.android.com/distribute/best-practices/launch/launch-checklist
 note: "The launch-checklist page is retired; it 302s to a Play Console stub."
@@ -316,4 +316,4 @@ your app to users](/tools/publishing/publishing_overview#publishing-release).
 
 Content and code samples on this page are subject to the licenses described in the [Content License](/license). Java and OpenJDK are trademarks or registered trademarks of Oracle and/or its affiliates.
 
-Last updated 2026-09-02 UTC.
+Last updated 2026-11-13 UTC.

@@ -1,4 +1,4 @@
-<!-- source=data-safety clause=import-or-export-your-form-responses url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-11-09T16:28:35+00:00 -->
+<!-- source=data-safety clause=import-or-export-your-form-responses url=https://support.google.com/googleplay/android-developer/answer/10787469 fetched=2026-11-16T15:53:18+00:00 -->
 
 ### Import or export your form responses
 

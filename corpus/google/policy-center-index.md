@@ -3,7 +3,7 @@ shipcheck_source_id: policy-center-index
 title: "Google Play Developer Policy Center (section index)"
 url: https://play.google/developer-content-policy/
 final_url: https://play.google/developer-content-policy/
-fetched_at: 2026-11-09T16:28:29+00:00
+fetched_at: 2026-11-16T15:53:13+00:00
 sha256: 86a2757a14bcccbb1388c5c151c915f068e49b0e0ef60d6335b934c49c84bb5f
 vendor: google
 note: "JS SPA. Section routes are not server-rendered, so only the table of contents is recoverable. Policy text comes from the support.google.com pages below."

@@ -1,4 +1,4 @@
-<!-- source=account-deletion-play clause=overview url=https://support.google.com/googleplay/android-developer/answer/13327111 fetched=2026-11-09T16:28:46+00:00 -->
+<!-- source=account-deletion-play clause=overview url=https://support.google.com/googleplay/android-developer/answer/13327111 fetched=2026-11-16T15:53:20+00:00 -->
 
 ## Overview
 

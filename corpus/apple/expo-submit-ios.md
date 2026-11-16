@@ -3,7 +3,7 @@ shipcheck_source_id: expo-submit-ios
 title: "Expo: Submit to the App Store"
 url: https://docs.expo.dev/submit/ios/
 final_url: https://docs.expo.dev/submit/ios/
-fetched_at: 2026-11-09T16:28:29+00:00
+fetched_at: 2026-11-16T15:53:13+00:00
 sha256: 8c4dbecd9ce0a8ec87616a0512a5fb0c8854b4edf5105975ed57c97d3ff8dfec
 vendor: apple
 ---

@@ -1,4 +1,4 @@
-<!-- source=prepare-for-release clause=implement-licensing-for-google-play url=https://developer.android.com/studio/publish/preparing fetched=2026-11-09T16:28:48+00:00 -->
+<!-- source=prepare-for-release clause=implement-licensing-for-google-play url=https://developer.android.com/studio/publish/preparing fetched=2026-11-16T15:53:22+00:00 -->
 
 ### Implement licensing for Google Play
 

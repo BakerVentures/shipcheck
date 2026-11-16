@@ -1,4 +1,4 @@
-<!-- source=expo-submit-ios clause=automate-with-expo-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-11-09T16:28:29+00:00 -->
+<!-- source=expo-submit-ios clause=automate-with-expo-workflows url=https://docs.expo.dev/submit/ios/ fetched=2026-11-16T15:53:13+00:00 -->
 
 ## Automate with Expo Workflows
 

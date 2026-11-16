@@ -1,4 +1,4 @@
-<!-- source=user-privacy-and-data-use clause=can-i-fingerprint-or-use-signals-from-the-device-to-try-to-i url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-11-09T16:28:17+00:00 -->
+<!-- source=user-privacy-and-data-use clause=can-i-fingerprint-or-use-signals-from-the-device-to-try-to-i url=https://developer.apple.com/app-store/user-privacy-and-data-use/ fetched=2026-11-16T15:53:00+00:00 -->
 
 ### Can I fingerprint or use signals from the device to try to identify the device or a user?
 

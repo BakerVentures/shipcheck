@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=body-sensor-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-11-09T16:28:47+00:00 -->
+<!-- source=permissions-policy clause=body-sensor-permissions url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-11-16T15:53:21+00:00 -->
 
 ## Body Sensor Permissions
 

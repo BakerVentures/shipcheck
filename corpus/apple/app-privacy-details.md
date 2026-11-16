@@ -3,7 +3,7 @@ shipcheck_source_id: app-privacy-details
 title: "App privacy details on the App Store (nutrition labels)"
 url: https://developer.apple.com/app-store/app-privacy-details/
 final_url: https://developer.apple.com/app-store/app-privacy-details/
-fetched_at: 2026-11-09T16:28:17+00:00
+fetched_at: 2026-11-16T15:53:00+00:00
 sha256: 439133326f78d19c8472f5c24ec97d8cde8321192f986766568707862d3c23ae
 vendor: apple
 ---

@@ -1,4 +1,4 @@
-<!-- source=hig-sign-in-with-apple clause=change-log url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-11-09T16:28:26+00:00 -->
+<!-- source=hig-sign-in-with-apple clause=change-log url=https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple fetched=2026-11-16T15:53:10+00:00 -->
 
 ## Change log
 

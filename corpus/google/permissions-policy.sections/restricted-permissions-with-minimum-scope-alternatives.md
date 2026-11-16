@@ -1,4 +1,4 @@
-<!-- source=permissions-policy clause=restricted-permissions-with-minimum-scope-alternatives url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-11-09T16:28:47+00:00 -->
+<!-- source=permissions-policy clause=restricted-permissions-with-minimum-scope-alternatives url=https://support.google.com/googleplay/android-developer/answer/16558241 fetched=2026-11-16T15:53:21+00:00 -->
 
 ## Restricted Permissions with minimum scope alternatives
 
